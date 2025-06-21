@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  body {
+    @apply bg-white text-gray-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors duration-200 border border-gray-300;
+  }
+  
+  /* Position demonstration classes */
+  .btn-static {
+    /* Default positioning (no special CSS needed) */
+    @apply bg-blue-600 text-white py-3 px-6 rounded-lg w-full mb-2;
+  }
+  
+  .btn-relative {
+    /* Positioned relative to normal position */
+    @apply bg-green-600 text-white py-3 px-6 rounded-lg w-full mb-2;
+    position: relative;
+    top: 5px;
+  }
+  
+  .btn-absolute {
+    /* Positioned relative to nearest positioned ancestor */
+    @apply bg-orange-600 text-white py-3 px-6 rounded-lg w-full;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  
+  .btn-fixed {
+    @apply fixed bottom-0 left-0 right-0 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-sticky {
+    /* Positioned based on scroll position */
+    @apply bg-purple-600 text-white py-3 px-6 rounded-lg w-full;
+    position: sticky;
+    bottom: 0;
+  }
+  
+  .section-padding {
+    @apply py-16 lg:py-24;
+  }
+  
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+} 
