@@ -1,6 +1,20 @@
-# Good Motor - Industrial Vacuum Pumps Website
+# Good Motor - Industrial Vacuum Pumps Website (VPS Production Version)
 
-A modern, responsive website for Good Motor, showcasing industrial vacuum pumps and company profile. Built with Next.js 14, TypeScript, Tailwind CSS, and MongoDB.
+A modern, responsive website for Good Motor, showcasing industrial vacuum pumps, project portfolio, and comprehensive admin dashboard. Built with Next.js 14, TypeScript, Tailwind CSS, MongoDB, and deployed on VPS.
+
+**🌐 Live Website**: [goodmotor.vn](http://goodmotor.vn)  
+**📁 GitHub Repository**: [github.com/binhphuong-ab/Nextjs-Goodmotor-vn](https://github.com/binhphuong-ab/Nextjs-Goodmotor-vn)  
+**🖥️ VPS**: CS-Linux-20250614162332977 (103.72.96.189:24700)
+
+## 🚀 Enhanced Features (VPS Version)
+
+- **Rich Text Editor**: React Quill WYSIWYG editor for product descriptions
+- **Admin Dashboard**: Complete product and project management system
+- **Project Portfolio**: Comprehensive project showcase with industry filtering
+- **Enhanced Homepage**: Professional industrial theme with statistics and features
+- **MongoDB Integration**: Full CRUD operations with sample data
+- **VPS Deployment**: Production-ready deployment with PM2 and Nginx
+- **Sample Content**: 10 products and 10 projects with rich HTML descriptions
 
 ## 🚀 Features
 
