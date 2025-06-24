@@ -1,6 +1,7 @@
 export interface Product {
   _id?: string
   name: string
+  slug: string // URL-friendly identifier (e.g., "rotary-vane-pump-rv-2000")
   description: string
   category: 'rotary-vane' | 'scroll' | 'diaphragm' | 'turbomolecular' | 'other'
   specifications: {
@@ -21,6 +22,7 @@ export interface Product {
 
 export interface ProductInput {
   name: string
+  slug: string
   description: string
   category: Product['category']
   specifications: Product['specifications']

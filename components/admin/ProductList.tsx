@@ -1,23 +1,5 @@
 import Image from 'next/image'
-
-interface Product {
-  _id: string
-  name: string
-  description: string
-  category: string
-  specifications: {
-    flowRate: string
-    vacuumLevel: string
-    power: string
-    inletSize: string
-    weight: string
-  }
-  features: string[]
-  applications: string[]
-  image: string
-  price: number
-  inStock: boolean
-}
+import { Product } from '@/models/Product'
 
 interface ProductListProps {
   products: Product[]
@@ -87,7 +69,7 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                 </span>
               </td>
               <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                {formatPrice(product.price)}
+                {product.price ? formatPrice(product.price) : 'N/A'}
               </td>
               <td className="px-4 py-4 whitespace-nowrap">
                 <span
@@ -109,7 +91,7 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                     Edit
                   </button>
                   <button
-                    onClick={() => onDelete(product._id)}
+                    onClick={() => onDelete(product._id || '')}
                     className="text-red-600 hover:text-red-900 font-medium"
                   >
                     Delete

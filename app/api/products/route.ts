@@ -8,10 +8,9 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category')
     
     const db = await getDatabase()
-    const collection = db.collection<Product>('products')
     
     const filter: any = category ? { category } : {}
-    const products = await collection.find(filter).toArray()
+    const products = await db.collection('products').find(filter).toArray()
     
     return NextResponse.json({ products })
   } catch (error) {
@@ -28,7 +27,6 @@ export async function POST(request: NextRequest) {
     const productInput: ProductInput = await request.json()
     
     const db = await getDatabase()
-    const collection = db.collection<Product>('products')
     
     const product: Omit<Product, '_id'> = {
       ...productInput,
@@ -36,7 +34,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date(),
     }
     
-    const result = await collection.insertOne(product)
+    const result = await db.collection('products').insertOne(product)
     
     return NextResponse.json(
       { message: 'Product created successfully', id: result.insertedId },

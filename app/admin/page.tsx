@@ -5,25 +5,7 @@ import ProductForm from '@/components/admin/ProductForm'
 import ProductList from '@/components/admin/ProductList'
 import ProjectForm from '@/components/admin/ProjectForm'
 import ProjectList from '@/components/admin/ProjectList'
-
-interface Product {
-  _id: string
-  name: string
-  description: string
-  category: string
-  specifications: {
-    flowRate: string
-    vacuumLevel: string
-    power: string
-    inletSize: string
-    weight: string
-  }
-  features: string[]
-  applications: string[]
-  image: string
-  price: number
-  inStock: boolean
-}
+import { Product, ProductInput } from '@/models/Product'
 
 interface Project {
   _id: string
@@ -174,7 +156,7 @@ export default function AdminPage() {
     }
   }
 
-  const handleSaveProduct = async (productData: Omit<Product, '_id'>) => {
+  const handleSaveProduct = async (productData: ProductInput) => {
     try {
       if (selectedProduct) {
         // Update existing product

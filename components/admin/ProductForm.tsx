@@ -3,37 +3,19 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import 'react-quill/dist/quill.snow.css'
+import { Product, ProductInput } from '@/models/Product'
 
 // Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
-interface Product {
-  _id?: string
-  name: string
-  description: string
-  category: string
-  specifications: {
-    flowRate: string
-    vacuumLevel: string
-    power: string
-    inletSize: string
-    weight: string
-  }
-  features: string[]
-  applications: string[]
-  image: string
-  price: number
-  inStock: boolean
-}
-
 interface ProductFormProps {
   product?: Product | null
-  onSave: (productData: Omit<Product, '_id'>) => void
+  onSave: (productData: ProductInput) => void
   onCancel: () => void
 }
 
 export default function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
-  const [formData, setFormData] = useState<Omit<Product, '_id'>>({
+  const [formData, setFormData] = useState<ProductInput>({
     name: '',
     description: '',
     category: 'rotary-vane',
