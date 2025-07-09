@@ -7,9 +7,9 @@ export async function GET() {
   try {
     const db = await getDatabase()
     
-    const businessTypes = await BusinessType.find({ isActive: true })
-      .sort({ displayOrder: 1, name: 1 })
-      .select('name slug description category displayOrder stats')
+    const businessTypes = await BusinessType.find({})
+      .sort({ name: 1 })
+      .select('name customerIds')
     
     return NextResponse.json(businessTypes, { status: 200 })
   } catch (error) {
@@ -28,18 +28,20 @@ export async function POST(request: NextRequest) {
     const data: IBusinessTypeInput = await request.json()
     
     // Validate required fields
-    if (!data.name || !data.slug) {
+    if (!data.name) {
       return NextResponse.json(
-        { error: 'Name and slug are required' },
+        { error: 'Name is required' },
         { status: 400 }
       )
     }
     
-    // Check if slug already exists
-    const existingBusinessType = await BusinessType.findOne({ slug: data.slug })
+    // Check if name already exists
+    const existingBusinessType = await BusinessType.findOne({ 
+      name: { $regex: new RegExp(`^${data.name.trim()}$`, 'i') }
+    })
     if (existingBusinessType) {
       return NextResponse.json(
-        { error: 'Business type with this slug already exists' },
+        { error: 'Business type with this name already exists' },
         { status: 409 }
       )
     }
