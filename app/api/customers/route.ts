@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Customer from '@/models/Customer'
+import BusinessType from '@/models/BusinessType' // Ensure BusinessType model is registered
 
 // Connect to MongoDB using Mongoose
 async function connectToDatabase() {
