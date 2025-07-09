@@ -11,6 +11,7 @@ const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 interface Project {
   _id?: string
   title: string
+  slug: string
   description: string
   client: string
   industry: string
@@ -43,6 +44,7 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
   
   const [formData, setFormData] = useState<Omit<Project, '_id' | 'createdAt' | 'updatedAt'>>({
     title: '',
+    slug: '',
     description: '',
     client: '',
     industry: 'pharmaceutical',
@@ -64,10 +66,22 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
     status: 'completed'
   })
 
+  // Function to generate slug from title
+  const generateSlug = (title: string): string => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+  }
+
   useEffect(() => {
     if (project) {
       setFormData({
         title: project.title,
+        slug: project.slug,
         description: project.description,
         client: project.client,
         industry: project.industry,
@@ -103,6 +117,14 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
       setFormData(prev => ({
         ...prev,
         [name]: checked,
+      }))
+    } else if (name === 'title') {
+      // Auto-generate slug when title changes (only if slug is empty or was auto-generated)
+      const newSlug = generateSlug(value)
+      setFormData(prev => ({
+        ...prev,
+        title: value,
+        slug: prev.slug === '' || prev.slug === generateSlug(prev.title) ? newSlug : prev.slug,
       }))
     } else {
       setFormData(prev => ({
@@ -324,6 +346,34 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                  </div>
+
+                  <div>
+                    <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+                      Project Slug *
+                      <span className="text-xs text-gray-500 ml-2">(URL-friendly identifier)</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="slug"
+                      name="slug"
+                      value={formData.slug}
+                      onChange={handleInputChange}
+                      required
+                      pattern="^[a-z0-9-]+$"
+                      placeholder="auto-generated-from-title"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      This will be used in the URL: /projects/{formData.slug}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, slug: generateSlug(prev.title) }))}
+                      className="mt-1 text-xs text-blue-600 hover:text-blue-800"
+                    >
+                      Auto-generate from title
+                    </button>
                   </div>
 
                   <div>

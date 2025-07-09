@@ -6,10 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed:business-types": "npx tsx scripts/seed-business-types.ts",
+    "seed:simple-business-types": "npx tsx scripts/seed-simple-business-types.ts",
+    "migrate:customer-business-types": "npx tsx scripts/migrate-customer-business-types.ts",
+    "update:business-type-relations": "npx tsx scripts/update-business-type-relations.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "dotenv": "^17.0.1",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.519.0",
     "mongodb": "^6.0.0",

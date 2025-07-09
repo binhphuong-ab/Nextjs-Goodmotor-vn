@@ -5,111 +5,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Product } from '@/models/Product'
 
-// Mock data as fallback
-const mockProducts: Product[] = [
-  {
-    _id: '1',
-    name: 'Rotary Vane Pump RV-2000',
-    slug: 'rotary-vane-pump-rv-2000',
-    description: 'High-efficiency rotary vane pump designed for continuous operation in demanding industrial applications. Features oil-sealed design for superior vacuum performance.',
-    category: 'rotary-vane',
-    specifications: {
-      flowRate: '2000 CFM',
-      vacuumLevel: '0.1 torr',
-      power: '15 HP',
-      inletSize: '8 inches',
-      weight: '450 lbs',
-    },
-    features: [
-      'Oil-sealed design for superior vacuum',
-      'Heavy-duty construction for continuous operation',
-      'Low noise operation',
-      'Easy maintenance and service',
-      'Corrosion-resistant materials',
-    ],
-    applications: [
-      'Industrial manufacturing',
-      'Chemical processing',
-      'Packaging machinery',
-      'Material handling',
-    ],
-    image: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
-    price: 15000,
-    inStock: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: '2',
-    name: 'Scroll Pump SC-1500',
-    slug: 'scroll-pump-sc-1500',
-    description: 'Oil-free scroll pump providing clean vacuum for sensitive applications. Ideal for laboratories, clean rooms, and pharmaceutical manufacturing.',
-    category: 'scroll',
-    specifications: {
-      flowRate: '1500 CFM',
-      vacuumLevel: '0.05 torr',
-      power: '12 HP',
-      inletSize: '6 inches',
-      weight: '380 lbs',
-    },
-    features: [
-      'Oil-free operation for contamination-free vacuum',
-      'Quiet operation suitable for laboratory environments',
-      'Compact design saves floor space',
-      'Minimal maintenance requirements',
-      'Digital control panel with diagnostics',
-    ],
-    applications: [
-      'Pharmaceutical manufacturing',
-      'Laboratory applications',
-      'Clean room environments',
-      'Food processing',
-    ],
-    image: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
-    price: 18000,
-    inStock: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: '3',
-    name: 'Diaphragm Pump DP-800',
-    slug: 'diaphragm-pump-dp-800',
-    description: 'Chemical-resistant diaphragm pump designed for corrosive environments. Perfect for aggressive chemical processing and vapor recovery applications.',
-    category: 'diaphragm',
-    specifications: {
-      flowRate: '800 CFM',
-      vacuumLevel: '0.2 torr',
-      power: '8 HP',
-      inletSize: '4 inches',
-      weight: '250 lbs',
-    },
-    features: [
-      'PTFE-lined chamber for chemical resistance',
-      'Dry operation without oil contamination',
-      'Handles condensable vapors',
-      'Automatic restart after power failure',
-      'Self-draining design',
-    ],
-    applications: [
-      'Chemical processing',
-      'Solvent recovery',
-      'Vapor handling',
-      'Corrosive gas applications',
-    ],
-    image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837',
-    price: 12000,
-    inStock: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-]
+
 
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [usingMockData, setUsingMockData] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchProducts()
@@ -117,21 +19,21 @@ export default function ProductsPage() {
 
   const fetchProducts = async () => {
     try {
+      setLoading(true)
+      setError(null)
       const response = await fetch('/api/products')
       
       if (response.ok) {
         const data = await response.json()
         setProducts(data.products || data)
-        setUsingMockData(false)
       } else {
-        console.warn('API failed, using mock data')
-        setProducts(mockProducts)
-        setUsingMockData(true)
+        setError('Failed to load products from server')
+        setProducts([])
       }
     } catch (error) {
-      console.warn('API error, using mock data:', error)
-      setProducts(mockProducts)
-      setUsingMockData(true)
+      console.error('API error:', error)
+      setError('Unable to connect to server')
+      setProducts([])
     } finally {
       setLoading(false)
     }
@@ -225,7 +127,7 @@ export default function ProductsPage() {
                 {/* Price */}
                 <div className="mb-4">
                   <span className="text-2xl font-bold text-blue-600">
-                    ${product.price?.toLocaleString()}
+                    {product.price ? `${product.price.toLocaleString('vi-VN')} VNĐ` : 'Liên hệ'}
                   </span>
                 </div>
 
@@ -259,11 +161,31 @@ export default function ProductsPage() {
           ))}
         </div>
 
+        {/* Error state */}
+        {error && (
+          <div className="text-center py-12">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-8 max-w-md mx-auto">
+              <h3 className="text-xl font-semibold text-red-800 mb-4">Unable to Load Products</h3>
+              <p className="text-red-600 mb-4">{error}</p>
+              <button
+                onClick={fetchProducts}
+                className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* No products found */}
-        {filteredProducts.length === 0 && (
+        {!error && filteredProducts.length === 0 && !loading && (
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">No products found</h3>
-            <p className="text-gray-600">No products match the selected category.</p>
+            <p className="text-gray-600">
+              {selectedCategory === 'all' 
+                ? 'No products are available. Please check back later or contact us for assistance.'
+                : 'No products match the selected category.'}
+            </p>
           </div>
         )}
       </div>

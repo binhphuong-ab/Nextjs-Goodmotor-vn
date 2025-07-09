@@ -5,11 +5,21 @@ import ProductForm from '@/components/admin/ProductForm'
 import ProductList from '@/components/admin/ProductList'
 import ProjectForm from '@/components/admin/ProjectForm'
 import ProjectList from '@/components/admin/ProjectList'
+import CustomerForm from '@/components/admin/CustomerForm'
+import CustomerList from '@/components/admin/CustomerList'
+import IndustryForm from '@/components/admin/IndustryForm'
+import IndustryList from '@/components/admin/IndustryList'
+import BusinessTypeForm from '@/components/admin/BusinessTypeForm'
+import BusinessTypeList from '@/components/admin/BusinessTypeList'
 import { Product, ProductInput } from '@/models/Product'
+import { ICustomer, ICustomerInput } from '@/models/Customer'
+import { IIndustry, IIndustryInput } from '@/models/Industry'
+import { IBusinessType, IBusinessTypeInput } from '@/models/BusinessType'
 
 interface Project {
   _id: string
   title: string
+  slug: string
   description: string
   client: string
   industry: string
@@ -45,7 +55,14 @@ export default function AdminPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'products' | 'projects'>('products')
+  const [customers, setCustomers] = useState<ICustomer[]>([])
+  const [selectedCustomer, setSelectedCustomer] = useState<ICustomer | null>(null)
+  const [isCustomerFormOpen, setIsCustomerFormOpen] = useState(false)
+  const [customerSubTab, setCustomerSubTab] = useState<'customers' | 'business-types'>('customers')
+  const [businessTypes, setBusinessTypes] = useState<any[]>([])
+  const [selectedBusinessType, setSelectedBusinessType] = useState<IBusinessType | null>(null)
+  const [isBusinessTypeFormOpen, setIsBusinessTypeFormOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'products' | 'projects' | 'customers' | 'industries'>('products')
   const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loginData, setLoginData] = useState<LoginCredentials>({
@@ -61,6 +78,9 @@ export default function AdminPage() {
       setIsAuthenticated(true)
       fetchProducts()
       fetchProjects()
+      fetchCustomers()
+      fetchIndustries()
+      fetchBusinessTypes()
     } else {
       setLoading(false)
     }
@@ -76,6 +96,9 @@ export default function AdminPage() {
       localStorage.setItem('adminAuthenticated', 'true')
       fetchProducts()
       fetchProjects()
+      fetchCustomers()
+      fetchIndustries()
+      fetchBusinessTypes()
     } else {
       setLoginError('Invalid email or password')
     }
@@ -122,6 +145,34 @@ export default function AdminPage() {
       }
     } catch (error) {
       console.error('Error fetching projects:', error)
+    }
+  }
+
+  const fetchCustomers = async () => {
+    try {
+      const response = await fetch('/api/admin/customers')
+      if (response.ok) {
+        const customersData = await response.json()
+        setCustomers(customersData)
+      } else {
+        console.error('Failed to fetch customers')
+      }
+    } catch (error) {
+      console.error('Error fetching customers:', error)
+    }
+  }
+
+  const fetchBusinessTypes = async () => {
+    try {
+      const response = await fetch('/api/admin/business-types')
+      if (response.ok) {
+        const businessTypesData = await response.json()
+        setBusinessTypes(businessTypesData)
+      } else {
+        console.error('Failed to fetch business types')
+      }
+    } catch (error) {
+      console.error('Error fetching business types:', error)
     }
   }
 
@@ -288,6 +339,280 @@ export default function AdminPage() {
     }
   }
 
+  // Customer management functions
+  const handleAddCustomer = () => {
+    setSelectedCustomer(null)
+    setIsCustomerFormOpen(true)
+  }
+
+  const handleEditCustomer = (customer: ICustomer) => {
+    setSelectedCustomer(customer)
+    setIsCustomerFormOpen(true)
+  }
+
+  const handleDeleteCustomer = async (customerId: string) => {
+    if (window.confirm('Are you sure you want to delete this customer?')) {
+      try {
+        const response = await fetch(`/api/admin/customers/${customerId}`, {
+          method: 'DELETE',
+        })
+        
+        if (response.ok) {
+          setCustomers(customers.filter(customer => customer._id !== customerId))
+          // Refresh business types to update customer counts
+          fetchBusinessTypes()
+          alert('Customer deleted successfully!')
+        } else {
+          const error = await response.json()
+          alert(`Error deleting customer: ${error.error}`)
+        }
+      } catch (error) {
+        console.error('Error deleting customer:', error)
+        alert('Error deleting customer')
+      }
+    }
+  }
+
+  const handleSaveCustomer = async (customerData: ICustomerInput) => {
+    try {
+      console.log('Saving customer data:', customerData)
+      if (selectedCustomer) {
+        // Update existing customer
+        const response = await fetch(`/api/admin/customers/${selectedCustomer._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(customerData),
+        })
+        
+        if (response.ok) {
+          const updatedCustomer = await response.json()
+          const updatedCustomers = customers.map(customer =>
+            customer._id === selectedCustomer._id ? updatedCustomer : customer
+          )
+          setCustomers(updatedCustomers)
+          // Refresh business types to update customer counts
+          fetchBusinessTypes()
+          alert('Customer updated successfully!')
+        } else {
+          const error = await response.json()
+          console.error('Customer update error:', error)
+          alert(`Error updating customer: ${error.error || error.message || 'Unknown error'}`)
+        }
+      } else {
+        // Add new customer
+        const response = await fetch('/api/admin/customers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(customerData),
+        })
+        
+        if (response.ok) {
+          const newCustomer = await response.json()
+          setCustomers([...customers, newCustomer])
+          // Refresh business types to update customer counts
+          fetchBusinessTypes()
+          alert('Customer added successfully!')
+        } else {
+          const error = await response.json()
+          console.error('Customer creation error:', error)
+          alert(`Error adding customer: ${error.error || error.message || 'Unknown error'}`)
+        }
+      }
+      setIsCustomerFormOpen(false)
+      setSelectedCustomer(null)
+    } catch (error) {
+      console.error('Error saving customer:', error)
+      alert('Error saving customer')
+    }
+  }
+
+  // BusinessType management functions
+  const handleAddBusinessType = () => {
+    setSelectedBusinessType(null)
+    setIsBusinessTypeFormOpen(true)
+  }
+
+  const handleEditBusinessType = (businessType: IBusinessType) => {
+    setSelectedBusinessType(businessType)
+    setIsBusinessTypeFormOpen(true)
+  }
+
+  const handleDeleteBusinessType = async (businessTypeId: string) => {
+    try {
+      const response = await fetch(`/api/admin/business-types?id=${businessTypeId}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        setBusinessTypes(businessTypes.filter(bt => bt._id !== businessTypeId))
+        alert(`Business type "${result.deletedBusinessType}" deleted successfully!`)
+      } else {
+        const error = await response.json()
+        if (response.status === 409) {
+          // Customer reference conflict
+          alert(`${error.error}`)
+        } else {
+          alert(`Error deleting business type: ${error.error}`)
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting business type:', error)
+      alert('Error deleting business type. Please try again.')
+    }
+  }
+
+  const handleSaveBusinessType = async (businessTypeData: IBusinessTypeInput) => {
+    try {
+      if (selectedBusinessType) {
+        // Update existing business type
+        const response = await fetch('/api/admin/business-types', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ _id: selectedBusinessType._id, ...businessTypeData }),
+        })
+        
+        if (response.ok) {
+          const updatedBusinessType = await response.json()
+          setBusinessTypes(businessTypes.map(bt => 
+            bt._id === selectedBusinessType._id ? updatedBusinessType : bt
+          ))
+          alert('Business type updated successfully!')
+        } else {
+          const error = await response.json()
+          alert(`Error updating business type: ${error.error}`)
+        }
+      } else {
+        // Create new business type
+        const response = await fetch('/api/admin/business-types', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(businessTypeData),
+        })
+        
+        if (response.ok) {
+          const newBusinessType = await response.json()
+          setBusinessTypes([...businessTypes, newBusinessType])
+          alert('Business type created successfully!')
+        } else {
+          const error = await response.json()
+          alert(`Error creating business type: ${error.error}`)
+        }
+      }
+      
+      setIsBusinessTypeFormOpen(false)
+      setSelectedBusinessType(null)
+    } catch (error) {
+      console.error('Error saving business type:', error)
+      alert('Error saving business type')
+    }
+  }
+
+  // Industry management state
+  const [industries, setIndustries] = useState<IIndustry[]>([])
+  const [selectedIndustry, setSelectedIndustry] = useState<IIndustry | null>(null)
+  const [isIndustryFormOpen, setIsIndustryFormOpen] = useState(false)
+
+  // Fetch industries function
+  const fetchIndustries = async () => {
+    try {
+      const response = await fetch('/api/industries?updateStats=true&includeCustomers=true')
+      if (response.ok) {
+        const industriesData = await response.json()
+        setIndustries(industriesData)
+      } else {
+        console.error('Failed to fetch industries')
+      }
+    } catch (error) {
+      console.error('Error fetching industries:', error)
+    }
+  }
+
+  // Industry management functions
+  const handleAddIndustry = () => {
+    setSelectedIndustry(null)
+    setIsIndustryFormOpen(true)
+  }
+
+  const handleEditIndustry = (industry: IIndustry) => {
+    setSelectedIndustry(industry)
+    setIsIndustryFormOpen(true)
+  }
+
+  const handleDeleteIndustry = async (industryId: string) => {
+    if (window.confirm('Are you sure you want to delete this industry?')) {
+      try {
+        const response = await fetch(`/api/industries/${industryId}`, {
+          method: 'DELETE',
+        })
+        
+        if (response.ok) {
+          await fetchIndustries() // Refetch to get updated data
+          alert('Industry deleted successfully!')
+        } else {
+          const error = await response.json()
+          alert(`Error deleting industry: ${error.error}`)
+        }
+      } catch (error) {
+        console.error('Error deleting industry:', error)
+        alert('Error deleting industry')
+      }
+    }
+  }
+
+  const handleSaveIndustry = async (industryData: IIndustryInput) => {
+    try {
+      if (selectedIndustry) {
+        // Update existing industry
+        const response = await fetch(`/api/industries/${selectedIndustry._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(industryData),
+        })
+        
+        if (response.ok) {
+          await fetchIndustries() // Refetch to get updated customer data
+          alert('Industry updated successfully!')
+        } else {
+          const error = await response.json()
+          alert(`Error updating industry: ${error.error}`)
+        }
+      } else {
+        // Add new industry
+        const response = await fetch('/api/industries', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(industryData),
+        })
+        
+        if (response.ok) {
+          await fetchIndustries() // Refetch to get updated customer data
+          alert('Industry added successfully!')
+        } else {
+          const error = await response.json()
+          alert(`Error adding industry: ${error.error}`)
+        }
+      }
+      setIsIndustryFormOpen(false)
+      setSelectedIndustry(null)
+    } catch (error) {
+      console.error('Error saving industry:', error)
+      alert('Error saving industry')
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -361,19 +686,44 @@ export default function AdminPage() {
               <p className="text-gray-600 mt-1">Manage your vacuum pump products and projects</p>
             </div>
             <div className="flex items-center space-x-4">
-              {activeTab === 'products' ? (
+              {activeTab === 'products' && (
                 <button
                   onClick={handleAddProduct}
                   className="btn-primary"
                 >
                   Add New Product
                 </button>
-              ) : (
+              )}
+              {activeTab === 'projects' && (
                 <button
                   onClick={handleAddProject}
                   className="btn-primary"
                 >
                   Add New Project
+                </button>
+              )}
+              {activeTab === 'customers' && customerSubTab === 'customers' && (
+                <button
+                  onClick={handleAddCustomer}
+                  className="btn-primary"
+                >
+                  Add New Customer
+                </button>
+              )}
+              {activeTab === 'customers' && customerSubTab === 'business-types' && (
+                <button
+                  onClick={handleAddBusinessType}
+                  className="btn-primary"
+                >
+                  Add New Business Type
+                </button>
+              )}
+              {activeTab === 'industries' && (
+                <button
+                  onClick={handleAddIndustry}
+                  className="btn-primary"
+                >
+                  Add New Industry
                 </button>
               )}
               <button
@@ -408,6 +758,26 @@ export default function AdminPage() {
               >
                 Projects ({projects.length})
               </button>
+              <button
+                onClick={() => setActiveTab('customers')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'customers'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Customers ({customers.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('industries')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'industries'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Industries ({industries.length})
+              </button>
             </nav>
           </div>
         </div>
@@ -416,7 +786,7 @@ export default function AdminPage() {
       <div className="container-custom py-8">
         <div className="bg-white rounded-lg shadow">
           <div className="p-6">
-            {activeTab === 'products' ? (
+            {activeTab === 'products' && (
               <>
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">Products ({products.length})</h2>
                 <ProductList
@@ -425,7 +795,8 @@ export default function AdminPage() {
                   onDelete={handleDeleteProduct}
                 />
               </>
-            ) : (
+            )}
+            {activeTab === 'projects' && (
               <>
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">Projects ({projects.length})</h2>
                 <ProjectList
@@ -434,6 +805,63 @@ export default function AdminPage() {
                   onDelete={handleDeleteProject}
                 />
               </>
+            )}
+            {activeTab === 'customers' && (
+              <>
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Customer Management</h2>
+                  
+                  {/* Customer Sub-tabs */}
+                  <div className="border-b border-gray-200 mb-6">
+                    <nav className="-mb-px flex space-x-8">
+                      <button
+                        onClick={() => setCustomerSubTab('customers')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                          customerSubTab === 'customers'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Customers ({customers.length})
+                      </button>
+                      <button
+                        onClick={() => setCustomerSubTab('business-types')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                          customerSubTab === 'business-types'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Business Types ({businessTypes.length})
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+
+                {customerSubTab === 'customers' && (
+                  <CustomerList
+                    customers={customers}
+                    onEdit={handleEditCustomer}
+                    onDelete={handleDeleteCustomer}
+                  />
+                )}
+
+                {customerSubTab === 'business-types' && (
+                  <BusinessTypeList
+                    businessTypes={businessTypes}
+                    onEdit={handleEditBusinessType}
+                    onDelete={handleDeleteBusinessType}
+                  />
+                )}
+              </>
+            )}
+            {activeTab === 'industries' && (
+              <IndustryList
+                industries={industries as any[]}
+                onEdit={handleEditIndustry as any}
+                onDelete={handleDeleteIndustry}
+                onCreate={handleAddIndustry}
+              />
             )}
           </div>
         </div>
@@ -460,6 +888,39 @@ export default function AdminPage() {
           }}
         />
       )}
+
+      {isCustomerFormOpen && (
+        <CustomerForm
+          customer={selectedCustomer}
+          onSave={handleSaveCustomer}
+          onCancel={() => {
+            setIsCustomerFormOpen(false)
+            setSelectedCustomer(null)
+          }}
+        />
+      )}
+
+      {isIndustryFormOpen && (
+        <IndustryForm
+          industry={selectedIndustry as any}
+          onSubmit={handleSaveIndustry as any}
+          onCancel={() => {
+            setIsIndustryFormOpen(false)
+            setSelectedIndustry(null)
+          }}
+        />
+      )}
+
+      {isBusinessTypeFormOpen && (
+        <BusinessTypeForm
+          businessType={selectedBusinessType}
+          onSave={handleSaveBusinessType}
+          onCancel={() => {
+            setIsBusinessTypeFormOpen(false)
+            setSelectedBusinessType(null)
+          }}
+        />
+      )}
     </div>
   )
-} 
+}

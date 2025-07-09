@@ -1,12 +1,37 @@
+/**
+ * Projects Portfolio Page
+ * 
+ * This is the PUBLIC-FACING projects showcase page that displays completed project case studies.
+ * 
+ * DATA FLOW:
+ * 1. This page makes an API call to → /api/projects/route.ts
+ * 2. The API returns completed projects from MongoDB
+ * 3. This page renders the projects in a beautiful portfolio layout
+ * 
+ * RELATIONSHIP WITH API:
+ * - Frontend Consumer: This page (page.tsx)
+ * - Backend Provider: /api/projects/route.ts
+ * - Data Source: MongoDB Project collection
+ * 
+ * FEATURES:
+ * - Industry filtering
+ * - Dynamic statistics calculation
+ * - Featured project highlighting
+ * - Responsive grid layout
+ */
+
 'use client'
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Calendar, MapPin, Building, Wrench, CheckCircle, Star } from 'lucide-react'
+import Link from 'next/link'
+import { Calendar, MapPin, Building, Wrench, CheckCircle, Star, ArrowRight } from 'lucide-react'
 
+// TypeScript interface matching the Project model from /models/Project.ts
 interface Project {
   _id: string
   title: string
+  slug: string
   description: string
   client: string
   industry: string
@@ -29,19 +54,40 @@ interface Project {
 }
 
 export default function ProjectsPage() {
+  // State management for projects data and UI
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedIndustry, setSelectedIndustry] = useState<string>('all')
 
+  // Fetch projects data when component mounts
   useEffect(() => {
     fetchProjects()
   }, [])
 
+  /**
+   * MAIN DATA FETCHING FUNCTION
+   * 
+   * This function connects the FRONTEND (this page) with the BACKEND API.
+   * 
+   * API CALL FLOW:
+   * 1. Makes HTTP GET request to '/api/projects'
+   * 2. The request is handled by /app/api/projects/route.ts
+   * 3. route.ts queries MongoDB for completed projects
+   * 4. route.ts returns JSON array of projects
+   * 5. This page updates state and re-renders UI
+   * 
+   * ERROR HANDLING:
+   * - Graceful failure: Shows error in console but doesn't crash page
+   * - Loading state: Provides user feedback during data fetch
+   */
   const fetchProjects = async () => {
     try {
+      // API call to our backend route → /app/api/projects/route.ts
       const response = await fetch('/api/projects')
       if (response.ok) {
+        // Parse JSON response from the API
         const projectsData = await response.json()
+        // Update component state with fetched data
         setProjects(projectsData)
       } else {
         console.error('Failed to fetch projects')
@@ -49,10 +95,12 @@ export default function ProjectsPage() {
     } catch (error) {
       console.error('Error fetching projects:', error)
     } finally {
+      // Always stop loading state regardless of success/failure
       setLoading(false)
     }
   }
 
+  // Industry filter options - must match enum values in Project model
   const industries = [
     { value: 'all', label: 'All Industries' },
     { value: 'pharmaceutical', label: 'Pharmaceutical' },
@@ -223,8 +271,8 @@ export default function ProjectsPage() {
 
                     {/* Description */}
                     <div 
-                      className="text-gray-600 mb-4"
-                      dangerouslySetInnerHTML={{ __html: project.description }}
+                      className="text-gray-600 mb-4 line-clamp-2"
+                      dangerouslySetInnerHTML={{ __html: project.description.length > 150 ? project.description.substring(0, 150) + '...' : project.description }}
                     />
 
                     {/* Specifications */}
@@ -261,10 +309,21 @@ export default function ProjectsPage() {
                         <div>
                           <h4 className="font-semibold text-gray-800 mb-1">Results Achieved:</h4>
                           <div 
-                            className="text-sm text-gray-600"
+                            className="text-sm text-gray-600 line-clamp-3"
                             dangerouslySetInnerHTML={{ __html: project.results }}
                           />
                         </div>
+                      </div>
+                      
+                      {/* View Details Button */}
+                      <div className="mt-4 pt-4 border-t">
+                        <Link 
+                          href={`/projects/${project.slug}`}
+                          className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group"
+                        >
+                          View Project Details
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Link>
                       </div>
                     </div>
                   </div>

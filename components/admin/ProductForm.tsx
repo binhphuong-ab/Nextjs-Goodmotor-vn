@@ -17,6 +17,7 @@ interface ProductFormProps {
 export default function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
   const [formData, setFormData] = useState<ProductInput>({
     name: '',
+    slug: '',
     description: '',
     category: 'rotary-vane',
     specifications: {
@@ -37,6 +38,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
     if (product) {
       setFormData({
         name: product.name,
+        slug: product.slug,
         description: product.description,
         category: product.category,
         specifications: { ...product.specifications },
@@ -205,6 +207,25 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+            </div>
+
+            <div>
+              <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
+                Product Slug *
+              </label>
+              <input
+                type="text"
+                id="slug"
+                name="slug"
+                value={formData.slug}
+                onChange={handleInputChange}
+                required
+                placeholder="e.g., rotary-vane-pump-rv-2000"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                URL-friendly identifier (used in product URLs)
+              </p>
             </div>
 
             <div>
@@ -499,19 +520,28 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
-                Price (USD) *
+                Price (VNĐ) *
               </label>
-              <input
-                type="number"
-                id="price"
-                name="price"
-                value={formData.price}
-                onChange={handleInputChange}
-                required
-                min="0"
-                step="0.01"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="relative">
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  required
+                  min="0"
+                  step="1000"
+                  placeholder="e.g., 360000"
+                  className="w-full px-3 py-2 pr-12 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <span className="text-gray-500 text-sm">VNĐ</span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Enter price in VNĐ (Vietnamese Dong). Example: 360000 for 360.000 VNĐ
+              </p>
             </div>
 
             <div>

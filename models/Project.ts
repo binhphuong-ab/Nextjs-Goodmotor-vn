@@ -1,11 +1,12 @@
-import { Schema, model, models } from 'mongoose'
+import { Schema, model, models, Types } from 'mongoose'
 
 export interface IProject {
   _id: string
   title: string
+  slug: string
   description: string
   client: string
-  industry: string
+  industry: any // Reference to Industry _id (ObjectId or populated object)
   location: string
   completionDate: Date
   projectType: string
@@ -33,6 +34,15 @@ const ProjectSchema = new Schema<IProject>({
     trim: true,
     maxlength: [200, 'Title cannot exceed 200 characters']
   },
+  slug: {
+    type: String,
+    required: [true, 'Project slug is required'],
+    unique: true,
+    trim: true,
+    lowercase: true,
+    maxlength: [100, 'Slug cannot exceed 100 characters'],
+    match: [/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens']
+  },
   description: {
     type: String,
     required: [true, 'Project description is required'],
@@ -45,21 +55,9 @@ const ProjectSchema = new Schema<IProject>({
     maxlength: [100, 'Client name cannot exceed 100 characters']
   },
   industry: {
-    type: String,
-    required: [true, 'Industry is required'],
-    enum: [
-      'pharmaceutical',
-      'semiconductor',
-      'food-processing',
-      'chemical',
-      'automotive',
-      'aerospace',
-      'oil-gas',
-      'power-generation',
-      'manufacturing',
-      'research',
-      'other'
-    ]
+    type: Schema.Types.ObjectId,
+    ref: 'Industry',
+    required: [true, 'Industry is required']
   },
   location: {
     type: String,
@@ -156,5 +154,6 @@ const ProjectSchema = new Schema<IProject>({
 ProjectSchema.index({ featured: -1, completionDate: -1 })
 ProjectSchema.index({ industry: 1 })
 ProjectSchema.index({ status: 1 })
+ProjectSchema.index({ slug: 1 })
 
 export default models.Project || model<IProject>('Project', ProjectSchema) 

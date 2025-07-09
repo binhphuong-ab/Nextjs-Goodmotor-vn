@@ -4,6 +4,7 @@ import { Calendar, MapPin, Building, Star } from 'lucide-react'
 interface Project {
   _id: string
   title: string
+  slug: string
   description: string
   client: string
   industry: string

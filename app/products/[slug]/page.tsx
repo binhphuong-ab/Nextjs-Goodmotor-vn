@@ -7,39 +7,7 @@ import Link from 'next/link'
 import { ArrowLeft, ShoppingCart, Phone, Mail, Check, Star } from 'lucide-react'
 import { Product } from '@/models/Product'
 
-// Mock product data for demo
-const mockProduct: Product = {
-  _id: '1',
-  name: 'Rotary Vane Pump RV-2000',
-  slug: 'rotary-vane-pump-rv-2000',
-  description: 'High-efficiency rotary vane pump designed for continuous operation in demanding industrial applications. Features oil-sealed design for superior vacuum performance.',
-  category: 'rotary-vane',
-  specifications: {
-    flowRate: '2000 CFM',
-    vacuumLevel: '0.1 torr',
-    power: '15 HP',
-    inletSize: '8 inches',
-    weight: '450 lbs',
-  },
-  features: [
-    'Oil-sealed design for superior vacuum',
-    'Heavy-duty construction for continuous operation',
-    'Low noise operation',
-    'Easy maintenance and service',
-    'Corrosion-resistant materials',
-  ],
-  applications: [
-    'Industrial manufacturing',
-    'Chemical processing',
-    'Packaging machinery',
-    'Material handling',
-  ],
-  image: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
-  price: 15000,
-  inStock: true,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-}
+
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -48,7 +16,6 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedImage, setSelectedImage] = useState(0)
-  const [usingMockData, setUsingMockData] = useState(false)
 
   useEffect(() => {
     if (params.slug) {
@@ -59,37 +26,31 @@ export default function ProductDetailPage() {
   const fetchProduct = async (slug: string) => {
     try {
       setLoading(true)
+      setError(null)
       const response = await fetch(`/api/products/${slug}`)
       
       if (response.ok) {
         const productData = await response.json()
         setProduct(productData)
-        setUsingMockData(false)
       } else if (response.status === 404) {
-        // Use mock data if product not found in database
-        setProduct(mockProduct)
-        setUsingMockData(true)
+        setError('Product not found')
+        setProduct(null)
       } else {
-        // Use mock data for other API errors
-        setProduct(mockProduct)
-        setUsingMockData(true)
+        setError('Failed to load product')
+        setProduct(null)
       }
     } catch (error) {
-      console.warn('API error, using mock data:', error)
-      setProduct(mockProduct)
-      setUsingMockData(true)
+      console.error('API error:', error)
+      setError('Unable to connect to server')
+      setProduct(null)
     } finally {
       setLoading(false)
     }
   }
 
   const formatPrice = (price?: number) => {
-    if (!price) return 'Contact for pricing'
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(price)
+    if (!price) return 'Liên hệ để biết giá'
+    return `${price.toLocaleString('vi-VN')} VNĐ`
   }
 
   const handleRequestQuote = () => {
@@ -111,17 +72,34 @@ export default function ProductDetailPage() {
   if (error || !product) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            {error || 'Product not found'}
-          </h1>
-          <Link 
-            href="/products" 
-            className="inline-flex items-center text-blue-600 hover:text-blue-800"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Products
-          </Link>
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              {error || 'Product not found'}
+            </h1>
+            <p className="text-gray-600 mb-6">
+              {error === 'Product not found' 
+                ? 'The product you are looking for does not exist or may have been removed.'
+                : 'We are unable to load the product details at this time.'}
+            </p>
+            <div className="space-y-3">
+              <Link 
+                href="/products" 
+                className="inline-flex items-center justify-center w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Browse All Products
+              </Link>
+              {error && error !== 'Product not found' && (
+                <button
+                  onClick={() => fetchProduct(params.slug as string)}
+                  className="w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Try Again
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     )
