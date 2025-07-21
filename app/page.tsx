@@ -195,7 +195,7 @@ export default function HomePage() {
                 {/* NEXT.JS IMAGE COMPONENT */}
                 {/* Automatically optimizes images for performance */}
                 <Image
-                  src="/images/hero/busch vacuum pump 1.jpg" 
+                  src="/images/hero/busch-vacuum-pump-1.jpg" 
                   alt="Industrial Vacuum System" // Alt text for accessibility
                   width={600}  // Explicit dimensions for optimization
                   height={400}

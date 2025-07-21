@@ -150,7 +150,7 @@ export default function AboutPage() {
             </div>
             <div>
               <Image
-                src="/images/hero/Busch Vacuum Pump 2.png"
+                src="/images/hero/busch-vacuum-pump-2.png"
                 alt="Vacuum Pump Technology"
                 width={500}
                 height={400}
