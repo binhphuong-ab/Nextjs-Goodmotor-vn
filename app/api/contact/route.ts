@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDatabase } from '@/lib/mongodb'
-import { Contact, ContactInput } from '@/models/Contact'
+import mongoose from 'mongoose'
+import Contact, { IContactInput } from '@/models/Contact'
+
+// Connect to MongoDB using Mongoose
+async function connectToDatabase() {
+  if (mongoose.connections[0].readyState) {
+    return
+  }
+  
+  await mongoose.connect(process.env.MONGODB_URI as string)
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const contactInput: ContactInput = await request.json()
+    const contactInput: IContactInput = await request.json()
     
     // Basic validation
     if (!contactInput.name || !contactInput.email || !contactInput.message) {
@@ -14,24 +23,27 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const db = await getDatabase()
-    const collection = db.collection<Contact>('contacts')
+    await connectToDatabase()
     
-    const contact: Omit<Contact, '_id'> = {
-      ...contactInput,
-      status: 'new',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
-    
-    const result = await collection.insertOne(contact)
+    const contact = new Contact(contactInput)
+    await contact.save()
     
     return NextResponse.json(
-      { message: 'Contact form submitted successfully', id: result.insertedId },
+      { message: 'Contact form submitted successfully', contact },
       { status: 201 }
     )
   } catch (error) {
     console.error('Error submitting contact form:', error)
+    
+    // Handle validation errors
+    if (error instanceof Error && error.name === 'ValidationError') {
+      const validationErrors = Object.values((error as any).errors).map((err: any) => err.message)
+      return NextResponse.json(
+        { error: 'Validation failed', details: validationErrors },
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Failed to submit contact form' },
       { status: 500 }
@@ -41,10 +53,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const db = await getDatabase()
-    const collection = db.collection<Contact>('contacts')
+    await connectToDatabase()
     
-    const contacts = await collection.find({}).sort({ createdAt: -1 }).toArray()
+    const contacts = await Contact.find({}).sort({ createdAt: -1 })
     
     return NextResponse.json({ contacts })
   } catch (error) {

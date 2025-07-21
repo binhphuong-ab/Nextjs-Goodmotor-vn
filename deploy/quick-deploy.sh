@@ -10,7 +10,16 @@ echo "========================================"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# VPS Configuration
+VPS_HOST="103.72.96.189"
+VPS_PORT="24700"
+VPS_USER="root"
+VPS_PASSWORD="(*W4dd#qao8k%iwlb)%R"
+VPS_PATH="/var/www/good-motor"
+APP_NAME="good-motor"
 
 # Function to print colored output
 print_status() {
@@ -24,6 +33,19 @@ print_warning() {
 print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
+
+print_vps_info() {
+    echo -e "${BLUE}[VPS INFO]${NC} $1"
+}
+
+# Display VPS information
+echo ""
+print_vps_info "VPS Configuration:"
+echo "  • Host: $VPS_HOST"
+echo "  • Port: $VPS_PORT" 
+echo "  • User: $VPS_USER"
+echo "  • Path: $VPS_PATH"
+echo ""
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then
@@ -128,9 +150,11 @@ print_status "🎉 Deployment completed!"
 echo ""
 echo "========================================"
 echo "🌐 Your website is now accessible at:"
-echo "   http://103.72.96.189"
+echo "   http://goodmotor.vn"
 echo ""
 echo "🔧 Useful commands:"
+echo "   ssh -p $VPS_PORT $VPS_USER@$VPS_HOST  # Connect to VPS"
+echo "   VPS Password: $VPS_PASSWORD"
 echo "   pm2 logs good-motor-website  # View application logs"
 echo "   pm2 restart good-motor-website  # Restart application"
 echo "   systemctl status nginx  # Check Nginx status"

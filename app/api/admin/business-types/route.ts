@@ -1,120 +1,134 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { getDatabase } from '@/lib/mongodb'
-import BusinessType from '@/models/BusinessType'
+import { NextRequest, NextResponse } from 'next/server'
+import BusinessType, { IBusinessTypeInput } from '@/models/BusinessType'
 
+// GET all business types with customer information
 export async function GET() {
   try {
-    await getDatabase()
+    const db = await getDatabase()
     
     const businessTypes = await BusinessType.find({})
       .populate({
-        path: 'customerIds',
-        select: 'name slug',
-        strictPopulate: false
+        path: 'customers',
+        select: 'name slug customerStatus'
       })
       .sort({ name: 1 })
-      .lean()
     
-    // Add customer count to each business type and handle missing customerIds
-    const businessTypesWithCounts = businessTypes.map(bt => ({
-      ...bt,
-      customerIds: bt.customerIds || [],
-      customerCount: bt.customerIds ? bt.customerIds.length : 0
+    // Add customer count to each business type using virtual field
+    const businessTypesWithCount = businessTypes.map(bt => ({
+      _id: bt._id,
+      name: bt.name,
+      customers: bt.customers || [],
+      customerCount: bt.customers ? bt.customers.length : 0,
+      createdAt: bt.createdAt,
+      updatedAt: bt.updatedAt
     }))
     
-    console.log('Found business types:', businessTypesWithCounts.length)
-    return NextResponse.json(businessTypesWithCounts)
+    return NextResponse.json(businessTypesWithCount)
   } catch (error) {
     console.error('Error fetching business types:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch business types', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to fetch business types' },
       { status: 500 }
     )
   }
 }
 
+// POST new business type
 export async function POST(request: NextRequest) {
   try {
-    const data = await request.json()
+    const db = await getDatabase()
+    const data: IBusinessTypeInput = await request.json()
     
-    await getDatabase()
-    
-    // Check if business type with same name already exists
-    const existingBusinessType = await BusinessType.findOne({ 
-      name: { $regex: new RegExp(`^${data.name.trim()}$`, 'i') }
-    })
-    
-    if (existingBusinessType) {
+    // Validate required fields
+    if (!data.name) {
       return NextResponse.json(
-        { error: 'Business type with this name already exists' },
+        { error: 'Name is required' },
         { status: 400 }
       )
     }
     
+    // Check if name already exists
+    const existingBusinessType = await BusinessType.findOne({ 
+      name: { $regex: new RegExp(`^${data.name.trim()}$`, 'i') }
+    })
+    if (existingBusinessType) {
+      return NextResponse.json(
+        { error: 'Business type with this name already exists' },
+        { status: 409 }
+      )
+    }
+    
     const businessType = new BusinessType({
-      name: data.name.trim(),
-      customerIds: []
+      name: data.name.trim()
     })
     
     await businessType.save()
     
-    // Populate and return with customer count
-    const populatedBusinessType = await BusinessType.findById(businessType._id)
-      .populate({
-        path: 'customerIds',
-        select: 'name slug',
-        strictPopulate: false
-      })
-      .lean()
+    // Populate virtual field for response
+    await businessType.populate({
+      path: 'customers',
+      select: 'name slug'
+    })
     
     return NextResponse.json({
-      ...populatedBusinessType,
-      customerCount: 0
-    })
+      _id: businessType._id,
+      name: businessType.name,
+      customers: businessType.customers || [],
+      customerCount: businessType.customers ? businessType.customers.length : 0,
+      createdAt: businessType.createdAt,
+      updatedAt: businessType.updatedAt
+    }, { status: 201 })
   } catch (error) {
     console.error('Error creating business type:', error)
     return NextResponse.json(
-      { error: 'Failed to create business type', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to create business type' },
       { status: 500 }
     )
   }
 }
 
+// PUT update business type
 export async function PUT(request: NextRequest) {
   try {
-    const data = await request.json()
-    const { _id, ...updateData } = data
+    const db = await getDatabase()
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    const data: IBusinessTypeInput = await request.json()
     
-    if (!_id) {
+    if (!id) {
       return NextResponse.json(
         { error: 'Business type ID is required' },
         { status: 400 }
       )
     }
     
-    await getDatabase()
-    
-    // Check if business type with same name already exists (excluding current one)
-    const existingBusinessType = await BusinessType.findOne({ 
-      name: { $regex: new RegExp(`^${updateData.name.trim()}$`, 'i') },
-      _id: { $ne: _id }
-    })
-    
-    if (existingBusinessType) {
+    if (!data.name) {
       return NextResponse.json(
-        { error: 'Business type with this name already exists' },
+        { error: 'Name is required' },
         { status: 400 }
       )
     }
     
+    // Check if name already exists (excluding current business type)
+    const existingBusinessType = await BusinessType.findOne({ 
+      name: { $regex: new RegExp(`^${data.name.trim()}$`, 'i') },
+      _id: { $ne: id }
+    })
+    if (existingBusinessType) {
+      return NextResponse.json(
+        { error: 'Business type with this name already exists' },
+        { status: 409 }
+      )
+    }
+    
     const businessType = await BusinessType.findByIdAndUpdate(
-      _id,
-      { name: updateData.name.trim() },
+      id,
+      { name: data.name.trim() },
       { new: true, runValidators: true }
     ).populate({
-      path: 'customerIds',
-      select: 'name slug',
-      strictPopulate: false
+      path: 'customers',
+      select: 'name slug'
     })
     
     if (!businessType) {
@@ -125,20 +139,26 @@ export async function PUT(request: NextRequest) {
     }
     
     return NextResponse.json({
-      ...businessType.toObject(),
-      customerCount: businessType.customerIds ? businessType.customerIds.length : 0
+      _id: businessType._id,
+      name: businessType.name,
+      customers: businessType.customers || [],
+      customerCount: businessType.customers ? businessType.customers.length : 0,
+      createdAt: businessType.createdAt,
+      updatedAt: businessType.updatedAt
     })
   } catch (error) {
     console.error('Error updating business type:', error)
     return NextResponse.json(
-      { error: 'Failed to update business type', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to update business type' },
       { status: 500 }
     )
   }
 }
 
+// DELETE business type
 export async function DELETE(request: NextRequest) {
   try {
+    const db = await getDatabase()
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
     
@@ -149,13 +169,10 @@ export async function DELETE(request: NextRequest) {
       )
     }
     
-    await getDatabase()
-    
-    // Get the business type with customer info
+    // Check if business type has associated customers using virtual field
     const businessType = await BusinessType.findById(id).populate({
-      path: 'customerIds',
-      select: 'name',
-      strictPopulate: false
+      path: 'customers',
+      select: 'name'
     })
     
     if (!businessType) {
@@ -165,31 +182,24 @@ export async function DELETE(request: NextRequest) {
       )
     }
     
-    // Check if any customers are using this business type
-    if (businessType.customerIds && businessType.customerIds.length > 0) {
-      const customerCount = businessType.customerIds.length
-      const customerNames = (businessType.customerIds as any[]).map(c => c.name).join(', ')
-      
+    if (businessType.customers && businessType.customers.length > 0) {
+      const customerCount = businessType.customers.length
+      const customerNames = (businessType.customers as any[]).map(c => c.name).join(', ')
       return NextResponse.json(
         { 
-          error: `Cannot delete business type "${businessType.name}". It is currently used by ${customerCount} customer${customerCount > 1 ? 's' : ''}: ${customerNames}. Please reassign all customers to a different business type before deletion.`,
-          customerCount,
-          customerNames: customerNames
+          error: `Cannot delete business type. It is currently assigned to ${customerCount} customer(s): ${customerNames}` 
         },
-        { status: 409 }
+        { status: 400 }
       )
     }
     
     await BusinessType.findByIdAndDelete(id)
     
-    return NextResponse.json({ 
-      message: 'Business type deleted successfully',
-      deletedBusinessType: businessType.name
-    })
+    return NextResponse.json({ message: 'Business type deleted successfully' })
   } catch (error) {
     console.error('Error deleting business type:', error)
     return NextResponse.json(
-      { error: 'Failed to delete business type', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to delete business type' },
       { status: 500 }
     )
   }

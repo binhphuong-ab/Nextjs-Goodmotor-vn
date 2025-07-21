@@ -46,15 +46,12 @@ export async function POST(request: Request) {
     const customer = new Customer(body)
     await customer.save()
     
-    // Add customer ID to the BusinessType's customerIds array
-    if (body.businessType) {
-      await BusinessType.findByIdAndUpdate(
-        body.businessType,
-        { $addToSet: { customerIds: customer._id } },
-        { runValidators: false }
-      )
-    }
-    
+    // Populate references for response
+    await customer.populate([
+      { path: 'businessType', select: 'name' },
+      { path: 'industry', select: 'name slug' }
+    ])
+
     return NextResponse.json(customer, { status: 201 })
   } catch (error) {
     console.error('Error creating customer:', error)

@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDatabase } from '@/lib/mongodb'
-import { ObjectId } from 'mongodb'
+import mongoose from 'mongoose'
+import Product, { IProductInput } from '@/models/Product'
+
+// Connect to MongoDB using Mongoose
+async function connectToDatabase() {
+  if (mongoose.connections[0].readyState) {
+    return
+  }
+  
+  await mongoose.connect(process.env.MONGODB_URI as string)
+}
 
 interface Params {
   id: string
@@ -13,15 +22,8 @@ export async function GET(
   try {
     const { id } = params
     
-    if (!ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { error: 'Invalid product ID' },
-        { status: 400 }
-      )
-    }
-
-    const db = await getDatabase()
-    const product = await db.collection('products').findOne({ _id: new ObjectId(id) })
+    await connectToDatabase()
+    const product = await Product.findById(id)
     
     if (!product) {
       return NextResponse.json(
@@ -46,40 +48,50 @@ export async function PUT(
 ) {
   try {
     const { id } = params
-    const updateData = await request.json()
+    const updateData: IProductInput = await request.json()
     
-    if (!ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { error: 'Invalid product ID' },
-        { status: 400 }
-      )
+    await connectToDatabase()
+    
+    // Check if slug already exists for a different product
+    if (updateData.slug) {
+      const existingProduct = await Product.findOne({ 
+        slug: updateData.slug, 
+        _id: { $ne: id } 
+      })
+      if (existingProduct) {
+        return NextResponse.json(
+          { error: 'Product slug already exists' },
+          { status: 400 }
+        )
+      }
     }
-
-    const db = await getDatabase()
     
-    // Add update timestamp
-    const updatedProduct = {
-      ...updateData,
-      updatedAt: new Date()
-    }
-    
-    const result = await db.collection('products').updateOne(
-      { _id: new ObjectId(id) },
-      { $set: updatedProduct }
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { ...updateData, updatedAt: new Date() },
+      { new: true, runValidators: true }
     )
     
-    if (result.matchedCount === 0) {
+    if (!product) {
       return NextResponse.json(
         { error: 'Product not found' },
         { status: 404 }
       )
     }
 
-    // Fetch and return the updated product
-    const product = await db.collection('products').findOne({ _id: new ObjectId(id) })
     return NextResponse.json(product)
   } catch (error) {
     console.error('Error updating product:', error)
+    
+    // Handle validation errors
+    if (error instanceof Error && error.name === 'ValidationError') {
+      const validationErrors = Object.values((error as any).errors).map((err: any) => err.message)
+      return NextResponse.json(
+        { error: 'Validation failed', details: validationErrors },
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Failed to update product' },
       { status: 500 }
@@ -94,17 +106,10 @@ export async function DELETE(
   try {
     const { id } = params
     
-    if (!ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { error: 'Invalid product ID' },
-        { status: 400 }
-      )
-    }
-
-    const db = await getDatabase()
-    const result = await db.collection('products').deleteOne({ _id: new ObjectId(id) })
+    await connectToDatabase()
+    const product = await Product.findByIdAndDelete(id)
     
-    if (result.deletedCount === 0) {
+    if (!product) {
       return NextResponse.json(
         { error: 'Product not found' },
         { status: 404 }

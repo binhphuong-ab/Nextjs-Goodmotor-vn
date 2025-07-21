@@ -1,64 +1,70 @@
-import dotenv from 'dotenv'
-dotenv.config({ path: '.env.local' })
+import mongoose from 'mongoose'
+import BusinessType from '../models/BusinessType'
+import Customer from '../models/Customer'
 
-import { getDatabase } from '@/lib/mongodb'
-import BusinessType from '@/models/BusinessType'
-import Customer from '@/models/Customer'
+// Connect to MongoDB using Mongoose
+async function connectToDatabase() {
+  if (mongoose.connections[0].readyState) {
+    return
+  }
+  
+  await mongoose.connect(process.env.MONGODB_URI as string)
+}
 
 async function updateBusinessTypeRelations() {
   try {
-    await getDatabase()
+    await connectToDatabase()
     
-    console.log('Starting business type relationship update...')
+    console.log('Starting BusinessType relations update...')
     
     // Get all business types
     const businessTypes = await BusinessType.find({})
-    console.log(`Found ${businessTypes.length} business types`)
     
-    // Get all customers
-    const customers = await Customer.find({}, 'businessType name')
-    console.log(`Found ${customers.length} customers`)
-    
-    // Update each business type with its customer IDs
     for (const businessType of businessTypes) {
-      const customerIds = customers
-        .filter(customer => customer.businessType?.toString() === businessType._id.toString())
-        .map(customer => customer._id)
+      // Get customers that reference this business type using virtual field
+      const customers = await Customer.find({ businessType: businessType._id })
       
-      await BusinessType.findByIdAndUpdate(
-        businessType._id,
-        { customerIds },
-        { runValidators: false }
-      )
+      console.log(`Processing "${businessType.name}": Found ${customers.length} customers`)
       
-      console.log(`Updated "${businessType.name}": ${customerIds.length} customers`)
-      
-      if (customerIds.length > 0) {
-        const customerNames = customers
-          .filter(customer => customer.businessType?.toString() === businessType._id.toString())
-          .map(customer => customer.name)
-          .join(', ')
-        console.log(`  - Customers: ${customerNames}`)
+      if (customers.length > 0) {
+        const customerNames = customers.map(c => c.name).join(', ')
+        console.log(`  Customers: ${customerNames}`)
       }
     }
     
-    console.log('\n✅ Business type relationships updated successfully!')
+    // Test virtual field population
+    console.log('\nTesting virtual field population...')
+    const businessTypesWithCustomers = await BusinessType.find({})
+      .populate({
+        path: 'customers',
+        select: 'name slug'
+      })
     
-    // Verify the updates
-    console.log('\n📊 Final verification:')
-    const updatedBusinessTypes = await BusinessType.find({}).populate('customerIds', 'name')
+    businessTypesWithCustomers.forEach(bt => {
+      const customerCount = bt.customers ? bt.customers.length : 0
+      console.log(`"${bt.name}": ${customerCount} customers`)
+      
+      if (customerCount > 0) {
+        const customerNames = (bt.customers as any[]).map(c => c.name).join(', ')
+        console.log(`  Customers: ${customerNames}`)
+      }
+    })
     
-    for (const bt of updatedBusinessTypes) {
-      const customerCount = bt.customerIds ? bt.customerIds.length : 0
-      console.log(`${bt.name}: ${customerCount} customers`)
-    }
+    console.log('\nBusinessType relations update completed successfully!')
     
-    process.exit(0)
   } catch (error) {
-    console.error('❌ Error updating business type relationships:', error)
-    process.exit(1)
+    console.error('Error updating BusinessType relations:', error)
+    throw error
   }
 }
 
 // Run the update
-updateBusinessTypeRelations() 
+updateBusinessTypeRelations()
+  .then(() => {
+    console.log('Script completed successfully')
+    process.exit(0)
+  })
+  .catch((error) => {
+    console.error('Script failed:', error)
+    process.exit(1)
+  }) 

@@ -7,7 +7,7 @@ interface BusinessTypeWithCount {
   _id: string
   name: string
   customerCount: number
-  customerIds?: Array<{ _id: string; name: string; slug: string }>
+  customers?: Array<{ _id: string; name: string; slug: string }>
   createdAt: Date
   updatedAt: Date
 }
@@ -23,8 +23,8 @@ export default function BusinessTypeList({ businessTypes, onEdit, onDelete }: Bu
     const customerCount = businessType.customerCount || 0
     
     if (customerCount > 0) {
-      const customerNames = businessType.customerIds 
-        ? businessType.customerIds.map(c => c.name).join(', ')
+      const customerNames = businessType.customers 
+        ? businessType.customers.map((c: any) => c.name).join(', ')
         : 'customers'
       
       alert(`Cannot delete "${businessType.name}". It is currently used by ${customerCount} customer${customerCount > 1 ? 's' : ''}: ${customerNames}.\n\nTo delete this business type, first reassign all customers to a different business type.`)
@@ -65,8 +65,8 @@ export default function BusinessTypeList({ businessTypes, onEdit, onDelete }: Bu
                     {isUsed && (
                       <span 
                         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 cursor-help"
-                        title={businessType.customerIds ? 
-                          `Used by: ${businessType.customerIds.map(c => c.name).join(', ')}` : 
+                        title={businessType.customers ? 
+                          `Used by: ${businessType.customers.map((c: any) => c.name).join(', ')}` : 
                           `Used by ${customerCount} customers`
                         }
                       >
@@ -81,10 +81,10 @@ export default function BusinessTypeList({ businessTypes, onEdit, onDelete }: Bu
                   </div>
                   <div className="mt-1 text-sm text-gray-500">
                     Created: {new Date(businessType.createdAt).toLocaleDateString()}
-                    {isUsed && businessType.customerIds && (
+                    {isUsed && businessType.customers && (
                       <div className="mt-1">
                         <span className="text-xs text-gray-400">
-                          Customers: {businessType.customerIds.map(c => c.name).join(', ')}
+                          Customers: {businessType.customers.map((c: any) => c.name).join(', ')}
                         </span>
                       </div>
                     )}
@@ -96,7 +96,7 @@ export default function BusinessTypeList({ businessTypes, onEdit, onDelete }: Bu
                     onClick={() => onEdit({
                       _id: businessType._id,
                       name: businessType.name,
-                      customerIds: [],
+                      customers: businessType.customers || [],
                       createdAt: businessType.createdAt,
                       updatedAt: businessType.updatedAt
                     })}

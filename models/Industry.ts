@@ -38,10 +38,16 @@ export interface IIndustry {
   // Virtual field for customers referencing this industry
   customers?: any[] // Will be populated with Customer documents
   
+  // Virtual field for projects referencing this industry
+  projects?: any[] // Will be populated with Project documents
+  
   // Methods
   getCustomers?: () => Promise<any[]>
   getCustomerCount?: () => Promise<number>
   updateCustomerCount?: () => Promise<IIndustry>
+  getProjects?: () => Promise<any[]>
+  getProjectCount?: () => Promise<number>
+  updateProjectCount?: () => Promise<IIndustry>
   
   createdAt: Date
   updatedAt: Date
@@ -180,16 +186,50 @@ IndustrySchema.methods.updateCustomerCount = async function() {
   return await this.save()
 }
 
+// Virtual field to populate projects that reference this industry
+IndustrySchema.virtual('projects', {
+  ref: 'Project',
+  localField: '_id',
+  foreignField: 'industry',
+  justOne: false
+})
+
+// Method to get projects for this industry
+IndustrySchema.methods.getProjects = async function() {
+  const Project = models.Project || model('Project')
+  return await Project.find({ industry: { $in: [this._id] } }).populate('industry', 'name slug')
+}
+
+// Method to get project count for this industry
+IndustrySchema.methods.getProjectCount = async function() {
+  const Project = models.Project || model('Project')
+  return await Project.countDocuments({ industry: { $in: [this._id] } })
+}
+
+// Method to update project count in stats
+IndustrySchema.methods.updateProjectCount = async function() {
+  const count = await this.getProjectCount()
+  this.stats = {
+    ...this.stats,
+    projectCount: count,
+    lastUpdated: new Date()
+  }
+  return await this.save()
+}
+
 // Ensure virtual fields are serialized
 IndustrySchema.set('toJSON', { virtuals: true })
 IndustrySchema.set('toObject', { virtuals: true })
 
 // Indexes for better query performance
-IndustrySchema.index({ slug: 1 })
 IndustrySchema.index({ category: 1 })
 IndustrySchema.index({ isActive: 1 })
 IndustrySchema.index({ displayOrder: 1 })
 IndustrySchema.index({ name: 'text', description: 'text', keywords: 'text' })
+
+// Add compound indexes for common query patterns
+IndustrySchema.index({ isActive: 1, displayOrder: 1 }) // Active industries by display order
+IndustrySchema.index({ category: 1, isActive: 1 }) // Active industries by category
 
 // Input interface for creating/updating industries
 export interface IIndustryInput {

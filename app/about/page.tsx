@@ -150,7 +150,7 @@ export default function AboutPage() {
             </div>
             <div>
               <Image
-                src="https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg"
+                src="/images/hero/Busch Vacuum Pump 2.png"
                 alt="Vacuum Pump Technology"
                 width={500}
                 height={400}

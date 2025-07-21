@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDatabase } from '@/lib/mongodb'
-import { Product } from '@/models/Product'
+import mongoose from 'mongoose'
+import Product from '@/models/Product'
+
+// Connect to MongoDB using Mongoose
+async function connectToDatabase() {
+  if (mongoose.connections[0].readyState) {
+    return
+  }
+  
+  await mongoose.connect(process.env.MONGODB_URI as string)
+}
 
 interface Params {
   slug: string
@@ -13,15 +22,8 @@ export async function GET(
   try {
     const { slug } = params
     
-    if (!slug || typeof slug !== 'string') {
-      return NextResponse.json(
-        { error: 'Invalid product slug' },
-        { status: 400 }
-      )
-    }
-
-    const db = await getDatabase()
-    const product = await db.collection('products').findOne({ slug: slug })
+    await connectToDatabase()
+    const product = await Product.findOne({ slug })
     
     if (!product) {
       return NextResponse.json(

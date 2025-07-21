@@ -388,13 +388,25 @@ const CustomerSchema = new Schema<ICustomer>({
 })
 
 // Indexes for better query performance
-CustomerSchema.index({ slug: 1 })
 CustomerSchema.index({ businessType: 1 })
 CustomerSchema.index({ customerStatus: 1 })
 CustomerSchema.index({ customerTier: 1 })
 CustomerSchema.index({ 'contactInfo.primaryEmail': 1 })
 CustomerSchema.index({ isActive: 1 })
 CustomerSchema.index({ tags: 1 })
+
+// Add compound indexes for common query patterns
+CustomerSchema.index({ isActive: 1, customerStatus: 1 }) // Active customers by status
+CustomerSchema.index({ businessType: 1, customerTier: 1 }) // Business type + tier queries
+CustomerSchema.index({ customerStatus: 1, lastContactDate: -1 }) // Recent contacts by status
+CustomerSchema.index({ industry: 1 }) // Industry references (array field)
+CustomerSchema.index({ assignedSalesRep: 1, isActive: 1 }) // Sales rep active customers
+CustomerSchema.index({ 'addresses.headquarters.country': 1, 'addresses.headquarters.state': 1 }) // Geographic queries
+
+// Sparse indexes for optional fields (only indexes documents that have these fields)
+CustomerSchema.index({ lastContactDate: -1 }, { sparse: true }) // Recent contact dates
+CustomerSchema.index({ acquisitionDate: -1 }, { sparse: true }) // Customer acquisition timeline
+CustomerSchema.index({ assignedSalesRep: 1 }, { sparse: true }) // Sales rep assignments
 
 // Input interface for creating/updating customers
 export interface ICustomerInput {

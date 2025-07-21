@@ -154,6 +154,5 @@ const ProjectSchema = new Schema<IProject>({
 ProjectSchema.index({ featured: -1, completionDate: -1 })
 ProjectSchema.index({ industry: 1 })
 ProjectSchema.index({ status: 1 })
-ProjectSchema.index({ slug: 1 })
 
 export default models.Project || model<IProject>('Project', ProjectSchema) 

@@ -16,7 +16,8 @@ NC='\033[0m' # No Color
 VPS_HOST="103.72.96.189"
 VPS_PORT="24700"
 VPS_USER="root"
-VPS_PATH="/var/www/good-motor-website"
+VPS_PASSWORD="(*W4dd#qao8k%iwlb)%R"
+VPS_PATH="/var/www/good-motor"
 APP_NAME="good-motor"
 
 # Function to print colored output
@@ -97,7 +98,16 @@ check_status "Code pushed to GitHub" "Failed to push to GitHub"
 
 # Step 5: VPS Connection Test
 print_status "Step 5: Testing VPS connection..."
-ssh -p $VPS_PORT $VPS_USER@$VPS_HOST "echo 'VPS connection successful'" > /dev/null 2>&1
+
+# Check if sshpass is installed
+if command -v sshpass &> /dev/null; then
+    print_status "Using sshpass for automatic password handling"
+    sshpass -p "$VPS_PASSWORD" ssh -p $VPS_PORT $VPS_USER@$VPS_HOST "echo 'VPS connection successful'" > /dev/null 2>&1
+else
+    print_status "VPS connection requires password. VPS Password: $VPS_PASSWORD"
+    ssh -p $VPS_PORT $VPS_USER@$VPS_HOST "echo 'VPS connection successful'" > /dev/null 2>&1
+fi
+
 check_status "VPS connection successful" "Cannot connect to VPS. Check your SSH connection."
 
 # Step 6: Deployment confirmation
@@ -152,7 +162,13 @@ curl -f http://localhost:3000/api/projects -s > /dev/null && echo 'API test: ✅
 "
 
 # Execute deployment
-ssh -p $VPS_PORT $VPS_USER@$VPS_HOST "$DEPLOY_COMMANDS"
+if command -v sshpass &> /dev/null; then
+    sshpass -p "$VPS_PASSWORD" ssh -p $VPS_PORT $VPS_USER@$VPS_HOST "$DEPLOY_COMMANDS"
+else
+    print_status "Password for deployment: $VPS_PASSWORD"
+    ssh -p $VPS_PORT $VPS_USER@$VPS_HOST "$DEPLOY_COMMANDS"
+fi
+
 check_status "VPS deployment completed" "VPS deployment failed"
 
 # Step 8: Final verification

@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDatabase } from '@/lib/mongodb'
-import { ObjectId } from 'mongodb'
+import mongoose from 'mongoose'
+import Product, { IProductInput } from '@/models/Product'
+
+// Connect to MongoDB using Mongoose
+async function connectToDatabase() {
+  if (mongoose.connections[0].readyState) {
+    return
+  }
+  
+  await mongoose.connect(process.env.MONGODB_URI as string)
+}
 
 export async function GET() {
   try {
-    const db = await getDatabase()
-    const products = await db.collection('products').find({}).toArray()
+    await connectToDatabase()
+    const products = await Product.find({}).sort({ name: 1 })
     
     return NextResponse.json(products)
   } catch (error) {
@@ -19,35 +28,43 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const productData = await request.json()
+    const productData: IProductInput = await request.json()
     
     // Validate required fields
-    if (!productData.name || !productData.description || !productData.category || !productData.price) {
+    if (!productData.name || !productData.description || !productData.category || !productData.slug) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, description, category, price' },
+        { error: 'Missing required fields: name, description, category, slug' },
         { status: 400 }
       )
     }
 
-    const db = await getDatabase()
+    await connectToDatabase()
     
-    // Add timestamp
-    const newProduct = {
-      ...productData,
-      createdAt: new Date(),
-      updatedAt: new Date()
+    // Check if slug already exists
+    const existingProduct = await Product.findOne({ slug: productData.slug })
+    if (existingProduct) {
+      return NextResponse.json(
+        { error: 'Product slug already exists' },
+        { status: 400 }
+      )
     }
     
-    const result = await db.collection('products').insertOne(newProduct)
+    const product = new Product(productData)
+    await product.save()
     
-    if (result.insertedId) {
-      const insertedProduct = await db.collection('products').findOne({ _id: result.insertedId })
-      return NextResponse.json(insertedProduct, { status: 201 })
-    } else {
-      throw new Error('Failed to insert product')
-    }
+    return NextResponse.json(product, { status: 201 })
   } catch (error) {
     console.error('Error creating product:', error)
+    
+    // Handle validation errors
+    if (error instanceof Error && error.name === 'ValidationError') {
+      const validationErrors = Object.values((error as any).errors).map((err: any) => err.message)
+      return NextResponse.json(
+        { error: 'Validation failed', details: validationErrors },
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Failed to create product' },
       { status: 500 }
