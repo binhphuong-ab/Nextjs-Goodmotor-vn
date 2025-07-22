@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       { path: 'businessType', select: 'name' },
       { path: 'industry', select: 'name slug' }
     ])
-
+    
     return NextResponse.json(customer, { status: 201 })
   } catch (error) {
     console.error('Error creating customer:', error)

@@ -67,14 +67,14 @@ export async function PUT(
       { path: 'businessType', select: 'name' },
       { path: 'industry', select: 'name slug' }
     ])
-
+    
     if (!customer) {
       return NextResponse.json(
         { error: 'Customer not found' },
         { status: 404 }
       )
     }
-
+    
     return NextResponse.json(customer)
   } catch (error) {
     console.error('Detailed error updating customer:', error)

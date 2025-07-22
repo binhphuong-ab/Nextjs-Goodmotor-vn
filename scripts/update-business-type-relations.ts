@@ -59,7 +59,7 @@ async function updateBusinessTypeRelations() {
 }
 
 // Run the update
-updateBusinessTypeRelations()
+updateBusinessTypeRelations() 
   .then(() => {
     console.log('Script completed successfully')
     process.exit(0)

@@ -59,11 +59,11 @@ export async function PUT(
         _id: { $ne: id } 
       })
       if (existingProduct) {
-        return NextResponse.json(
+      return NextResponse.json(
           { error: 'Product slug already exists' },
-          { status: 400 }
-        )
-      }
+        { status: 400 }
+      )
+    }
     }
     
     const product = await Product.findByIdAndUpdate(

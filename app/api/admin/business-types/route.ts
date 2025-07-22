@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     await businessType.populate({
       path: 'customers',
       select: 'name slug'
-    })
+      })
     
     return NextResponse.json({
       _id: businessType._id,
