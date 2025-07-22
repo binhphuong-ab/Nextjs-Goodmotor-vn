@@ -20,12 +20,6 @@ const nextConfig = {
     // Enable SWC minification for better performance
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  
-  // Experimental features for better performance
-  experimental: {
-    // Enable optimized CSS loading
-    optimizeCss: true,
-  },
 }
 
 module.exports = nextConfig 
