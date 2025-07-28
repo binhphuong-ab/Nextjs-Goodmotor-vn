@@ -5,8 +5,8 @@ export interface ICustomer {
   name: string
   slug: string
   legalName?: string
-  businessType: Types.ObjectId // Reference to BusinessType _id
-  industry: string[] // References to Industry _id
+  businessType: Types.ObjectId // Single reference (one-to-one) to BusinessType - each customer has ONE business type (e.g., "Manufacturing", "Healthcare")
+  industry: string[] // Array of Industry IDs (one-to-many) - each customer can belong to MULTIPLE industries (e.g., ["Automotive", "Chemical Processing"])
   website?: string
   logo?: string
   

@@ -41,6 +41,11 @@ export async function GET() {
       select: 'name slug',
       strictPopulate: false
     })
+    .populate({
+      path: 'industry',
+      select: 'name slug',
+      strictPopulate: false
+    })
     .sort({ customerTier: -1, createdAt: -1 }) // Sort by tier (enterprise first) then by newest
     
     return NextResponse.json(customers)

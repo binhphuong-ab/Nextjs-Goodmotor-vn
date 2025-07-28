@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Industry from '@/models/Industry'
 import Customer from '@/models/Customer'
+import Application from '@/models/Application'
 
 // Connect to MongoDB using Mongoose
 async function connectToDatabase() {
@@ -19,13 +20,26 @@ export async function GET(request: Request, { params }: { params: { id: string }
     
     const { searchParams } = new URL(request.url)
     const includeCustomers = searchParams.get('includeCustomers') === 'true'
+    const includeApplications = searchParams.get('includeApplications') === 'true'
     const updateStats = searchParams.get('updateStats') === 'true'
     
     let industryQuery = Industry.findById(params.id)
     
     // Optionally populate customers
     if (includeCustomers) {
-      industryQuery = industryQuery.populate('customers', 'name slug businessType customerStatus contactInfo.primaryEmail')
+      industryQuery = industryQuery.populate({
+        path: 'customers',
+        select: 'name slug businessType customerStatus contactInfo.primaryEmail',
+        populate: {
+          path: 'businessType',
+          select: 'name'
+        }
+      })
+    }
+    
+    // Optionally populate applications
+    if (includeApplications) {
+      industryQuery = industryQuery.populate('applications', 'name slug category')
     }
     
     const industry = await industryQuery
@@ -37,9 +51,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
       )
     }
     
-    // Optionally update customer count in stats
+    // Optionally update customer and application counts in stats
     if (updateStats) {
       await industry.updateCustomerCount()
+      await industry.updateApplicationCount()
     }
     
     return NextResponse.json(industry)

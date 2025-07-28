@@ -13,7 +13,11 @@ interface Customer {
     name: string
     slug: string
   }
-  industry: string[]
+  industry: {
+    _id: string
+    name: string
+    slug: string
+  }[]
   website?: string
   logo?: string
   addresses: {
@@ -314,7 +318,7 @@ export default function CustomersPage() {
                             key={index}
                             className="inline-flex px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded-md"
                           >
-                            {industry}
+                            {industry.name}
                           </span>
                         ))}
                         {customer.industry.length > 3 && (

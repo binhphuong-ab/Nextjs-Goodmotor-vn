@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Product, { IProductInput } from '@/models/Product'
+import Brand from '@/models/Brand'
+import PumpType from '@/models/PumpType'
 
 // Connect to MongoDB using Mongoose
 async function connectToDatabase() {
@@ -14,7 +16,19 @@ async function connectToDatabase() {
 export async function GET() {
   try {
     await connectToDatabase()
-    const products = await Product.find({}).sort({ name: 1 })
+    
+    // First try to get products with brand and pumpType population
+    let products
+    try {
+      products = await Product.find({})
+        .populate('brand', 'name country productLines')
+        .populate('pumpType', 'pumpType')
+        .sort({ name: 1 })
+    } catch (populateError) {
+      console.warn('Population failed, fetching without population:', populateError)
+      // Fallback: get products without population
+      products = await Product.find({}).sort({ name: 1 })
+    }
     
     return NextResponse.json(products)
   } catch (error) {
@@ -31,9 +45,9 @@ export async function POST(request: NextRequest) {
     const productData: IProductInput = await request.json()
     
     // Validate required fields
-    if (!productData.name || !productData.description || !productData.category || !productData.slug) {
+    if (!productData.name || !productData.slug) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, description, category, slug' },
+        { error: 'Missing required fields: name, slug' },
         { status: 400 }
       )
     }

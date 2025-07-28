@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Industry from '@/models/Industry'
 import Customer from '@/models/Customer'
+import Application from '@/models/Application'
 
 // Connect to MongoDB using Mongoose
 async function connectToDatabase() {
@@ -18,16 +19,12 @@ export async function GET(request: Request) {
     await connectToDatabase()
     
     const { searchParams } = new URL(request.url)
-    const activeOnly = searchParams.get('active') === 'true'
     const category = searchParams.get('category')
     const includeCustomers = searchParams.get('includeCustomers') === 'true'
+    const includeApplications = searchParams.get('includeApplications') === 'true'
     const updateStats = searchParams.get('updateStats') === 'true'
     
     let query: any = {}
-    
-    if (activeOnly) {
-      query.isActive = true
-    }
     
     if (category && category !== 'all') {
       query.category = category
@@ -37,18 +34,31 @@ export async function GET(request: Request) {
     
     // Optionally populate customers
     if (includeCustomers) {
-      industriesQuery = industriesQuery.populate('customers', 'name slug businessType customerStatus')
+      industriesQuery = industriesQuery.populate({
+        path: 'customers',
+        select: 'name slug businessType customerStatus',
+        populate: {
+          path: 'businessType',
+          select: 'name'
+        }
+      })
+    }
+    
+    // Optionally populate applications
+    if (includeApplications) {
+      industriesQuery = industriesQuery.populate('applications', 'name slug category')
     }
     
     const industries = await industriesQuery.sort({ displayOrder: 1, name: 1 })
     
-    // Optionally update customer counts in stats
+    // Optionally update customer and application counts in stats
     if (updateStats) {
       try {
         await Promise.all(
           industries.map(async (industry: any) => {
             try {
               await industry.updateCustomerCount()
+              await industry.updateApplicationCount()
             } catch (err) {
               console.error(`Error updating stats for industry ${industry.name}:`, err)
               // Continue with other industries even if one fails
@@ -58,7 +68,17 @@ export async function GET(request: Request) {
         // Refetch with updated stats
         let refetchQuery = Industry.find(query)
         if (includeCustomers) {
-          refetchQuery = refetchQuery.populate('customers', 'name slug businessType customerStatus')
+          refetchQuery = refetchQuery.populate({
+            path: 'customers',
+            select: 'name slug businessType customerStatus',
+            populate: {
+              path: 'businessType',
+              select: 'name'
+            }
+          })
+        }
+        if (includeApplications) {
+          refetchQuery = refetchQuery.populate('applications', 'name slug category')
         }
         return NextResponse.json(
           await refetchQuery.sort({ displayOrder: 1, name: 1 })

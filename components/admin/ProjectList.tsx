@@ -7,11 +7,17 @@ interface Project {
   slug: string
   description: string
   client: string
-  industry: string
   location: string
   completionDate: string
   projectType: string
-  pumpTypes: string[]
+  pumpModels: Array<{
+    name: string
+    url: string
+  }>
+  applications: Array<{
+    name: string
+    url: string
+  }>
   images: string[]
   specifications: {
     flowRate?: string
@@ -79,7 +85,7 @@ export default function ProjectList({ projects, onEdit, onDelete }: ProjectListP
               Project
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Client & Industry
+              Client
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Type & Status
@@ -135,9 +141,6 @@ export default function ProjectList({ projects, onEdit, onDelete }: ProjectListP
               
               <td className="px-4 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">{project.client}</div>
-                <div className="text-sm text-gray-500 capitalize">
-                  {project.industry.replace('-', ' ')}
-                </div>
               </td>
               
               <td className="px-4 py-4 whitespace-nowrap">

@@ -49,7 +49,7 @@ export default function ProductDetailPage() {
   }
 
   const formatPrice = (price?: number) => {
-    if (!price) return 'Liên hệ để biết giá'
+    if (!price || price === 0) return 'Liên hệ để biết giá'
     return `${price.toLocaleString('vi-VN')} VNĐ`
   }
 
@@ -183,44 +183,60 @@ export default function ProductDetailPage() {
                 {product.name}
               </h1>
               <div className="flex items-center space-x-4">
+                {product.pumpType && (
                 <span className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                  {product.category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </span>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  product.inStock 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {product.inStock ? (
-                    <>
-                      <Check className="w-4 h-4 mr-1" />
-                      In Stock
-                    </>
-                  ) : (
-                    'Out of Stock'
-                  )}
-                </span>
+                    {(product.pumpType as any).pumpType || 'Pump Type'}
+                  </span>
+                )}
+                {product.brand && (
+                  <span className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    {(product.brand as any).name || 'Brand'}
+                  </span>
+                )}
+                {/* Product Line Display */}
+                {product.productLineId && product.brand && (product.brand as any).productLines && (
+                  <span className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                    {(() => {
+                      const brand = product.brand as any;
+                      const productLine = brand.productLines?.find((line: any) => line._id === product.productLineId);
+                      return productLine ? productLine.name : 'Product Line';
+                    })()}
+                  </span>
+                )}
               </div>
             </div>
 
             {/* Price */}
-            <div className="bg-gray-100 rounded-lg p-4">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
-                {formatPrice(product.price)}
+            {(product.price && product.price > 0) ? (
+              <div className="bg-gray-100 rounded-lg p-4">
+                <div className="text-3xl font-bold text-blue-600 mb-2">
+                  {formatPrice(product.price)}
+                </div>
+                <p className="text-gray-600 text-sm">
+                  Contact us for volume pricing and financing options
+                </p>
               </div>
-              <p className="text-gray-600 text-sm">
-                Contact us for volume pricing and financing options
-              </p>
-            </div>
+            ) : (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="text-lg font-semibold text-blue-800 mb-2">
+                  Contact for Pricing
+                </div>
+                <p className="text-blue-600 text-sm">
+                  Please contact us for detailed pricing information and quotes
+                </p>
+              </div>
+            )}
 
             {/* Description */}
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Description</h3>
-              <div 
-                className="text-gray-700 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: product.description }}
-              />
-            </div>
+            {product.description && (
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Description</h3>
+                <div 
+                  className="text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                />
+              </div>
+            )}
 
             {/* Key Features */}
             {product.features && product.features.length > 0 && (
@@ -268,40 +284,52 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Technical Specifications */}
-        <div className="mt-12 bg-white rounded-lg shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Technical Specifications</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="space-y-3">
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Flow Rate</dt>
-                <dd className="text-lg font-semibold text-gray-900">{product.specifications.flowRate}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Vacuum Level</dt>
-                <dd className="text-lg font-semibold text-gray-900">{product.specifications.vacuumLevel}</dd>
-              </div>
-            </div>
+        {(product.specifications?.flowRate || product.specifications?.vacuumLevel || product.specifications?.power || product.specifications?.inletSize || product.specifications?.weight) && (
+          <div className="mt-12 bg-white rounded-lg shadow-lg p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Technical Specifications</h2>
             
-            <div className="space-y-3">
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Power</dt>
-                <dd className="text-lg font-semibold text-gray-900">{product.specifications.power}</dd>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="space-y-3">
+                {product.specifications?.flowRate && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Flow Rate</dt>
+                    <dd className="text-lg font-semibold text-gray-900">{product.specifications.flowRate}</dd>
+                  </div>
+                )}
+                {product.specifications?.vacuumLevel && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Vacuum Level</dt>
+                    <dd className="text-lg font-semibold text-gray-900">{product.specifications.vacuumLevel}</dd>
+                  </div>
+                )}
               </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Inlet Size</dt>
-                <dd className="text-lg font-semibold text-gray-900">{product.specifications.inletSize}</dd>
+              
+              <div className="space-y-3">
+                {product.specifications?.power && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Power</dt>
+                    <dd className="text-lg font-semibold text-gray-900">{product.specifications.power}</dd>
+                  </div>
+                )}
+                {product.specifications?.inletSize && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Inlet Size</dt>
+                    <dd className="text-lg font-semibold text-gray-900">{product.specifications.inletSize}</dd>
+                  </div>
+                )}
               </div>
-            </div>
-            
-            <div className="space-y-3">
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Weight</dt>
-                <dd className="text-lg font-semibold text-gray-900">{product.specifications.weight}</dd>
+              
+              <div className="space-y-3">
+                {product.specifications?.weight && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Weight</dt>
+                    <dd className="text-lg font-semibold text-gray-900">{product.specifications.weight}</dd>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Applications */}
         {product.applications && product.applications.length > 0 && (

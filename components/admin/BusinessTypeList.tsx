@@ -1,7 +1,8 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { IBusinessType } from '@/models/BusinessType'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 interface BusinessTypeWithCount {
   _id: string
@@ -19,6 +20,15 @@ interface BusinessTypeListProps {
 }
 
 export default function BusinessTypeList({ businessTypes, onEdit, onDelete }: BusinessTypeListProps) {
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean
+    businessType: BusinessTypeWithCount | null
+    errorMessage?: string
+  }>({
+    isOpen: false,
+    businessType: null
+  })
+
   const handleDelete = (businessType: BusinessTypeWithCount) => {
     const customerCount = businessType.customerCount || 0
     
@@ -27,13 +37,29 @@ export default function BusinessTypeList({ businessTypes, onEdit, onDelete }: Bu
         ? businessType.customers.map((c: any) => c.name).join(', ')
         : 'customers'
       
-      alert(`Cannot delete "${businessType.name}". It is currently used by ${customerCount} customer${customerCount > 1 ? 's' : ''}: ${customerNames}.\n\nTo delete this business type, first reassign all customers to a different business type.`)
+      setConfirmDialog({
+        isOpen: true,
+        businessType,
+        errorMessage: `Cannot delete "${businessType.name}". It is currently used by ${customerCount} customer${customerCount > 1 ? 's' : ''}: ${customerNames}.\n\nTo delete this business type, first reassign all customers to a different business type.`
+      })
       return
     }
 
-    if (window.confirm(`Are you sure you want to delete "${businessType.name}"?\n\nThis action cannot be undone.`)) {
-      onDelete(businessType._id)
+    setConfirmDialog({
+      isOpen: true,
+      businessType
+    })
+  }
+
+  const handleConfirmDelete = () => {
+    if (confirmDialog.businessType && !confirmDialog.errorMessage) {
+      onDelete(confirmDialog.businessType._id)
     }
+    setConfirmDialog({ isOpen: false, businessType: null })
+  }
+
+  const handleCancelDelete = () => {
+    setConfirmDialog({ isOpen: false, businessType: null })
   }
 
   if (businessTypes.length === 0) {
@@ -133,6 +159,18 @@ export default function BusinessTypeList({ businessTypes, onEdit, onDelete }: Bu
           </span>
         </div>
       </div>
+      
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.errorMessage ? "Cannot Delete Business Type" : "Delete Business Type"}
+        message={confirmDialog.errorMessage || `Are you sure you want to delete "${confirmDialog.businessType?.name}"? This action cannot be undone.`}
+        confirmText={confirmDialog.errorMessage ? "OK" : "Delete"}
+        cancelText={confirmDialog.errorMessage ? undefined : "Cancel"}
+        onConfirm={confirmDialog.errorMessage ? handleCancelDelete : handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        danger={!confirmDialog.errorMessage}
+      />
     </div>
   )
 } 

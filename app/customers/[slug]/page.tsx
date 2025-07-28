@@ -21,8 +21,16 @@ interface Customer {
   name: string
   slug: string
   legalName?: string
-  businessType: string
-  industry: string[]
+  businessType: {
+    _id: string
+    name: string
+    slug: string
+  }
+  industry: {
+    _id: string
+    name: string
+    slug: string
+  }[]
   website?: string
   logo?: string
   
@@ -287,7 +295,7 @@ export default function CustomerDetailPage() {
                     {customer.customerStatus.charAt(0).toUpperCase() + customer.customerStatus.slice(1)}
                   </span>
                   <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-800 border border-gray-200">
-                    {businessTypeLabels[customer.businessType as keyof typeof businessTypeLabels]}
+                    {customer.businessType.name}
                   </span>
                 </div>
               </div>
@@ -326,7 +334,7 @@ export default function CustomerDetailPage() {
                         key={index}
                         className="inline-flex px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded-md border border-blue-200"
                       >
-                        {industry}
+                        {industry.name}
                       </span>
                     ))}
                   </div>

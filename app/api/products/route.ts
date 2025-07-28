@@ -19,7 +19,10 @@ export async function GET(request: NextRequest) {
     await connectToDatabase()
     
     const filter: any = category ? { category } : {}
-    const products = await Product.find(filter).sort({ name: 1 })
+    const products = await Product.find(filter)
+      .populate('brand', 'name country productLines')
+      .populate('pumpType', 'pumpType')
+      .sort({ name: 1 })
     
     return NextResponse.json({ products })
   } catch (error) {

@@ -25,11 +25,17 @@ interface Project {
   slug: string
   description: string
   client: string
-  industry: string
   location: string
   completionDate: string
   projectType: string
-  pumpTypes: string[]
+  pumpModels: Array<{
+    name: string
+    url: string
+  }>
+  applications: Array<{
+    name: string
+    url: string
+  }>
   images: string[]
   specifications: {
     flowRate?: string
@@ -94,17 +100,6 @@ export default function ProjectDetailPage() {
     'emergency-repair': 'Emergency Repair',
     'consultation': 'Consultation',
     'custom-solution': 'Custom Solution'
-  }
-
-  const pumpTypeLabels = {
-    'rotary-vane': 'Rotary Vane',
-    'scroll': 'Scroll',
-    'diaphragm': 'Diaphragm',
-    'turbomolecular': 'Turbomolecular',
-    'liquid-ring': 'Liquid Ring',
-    'roots-blower': 'Roots Blower',
-    'claw-pump': 'Claw Pump',
-    'other': 'Other'
   }
 
   if (loading) {
@@ -175,10 +170,6 @@ export default function ProjectDetailPage() {
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   <span>{formatDate(project.completionDate)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Wrench className="w-4 h-4" />
-                  <span className="capitalize">{project.industry.replace('-', ' ')}</span>
                 </div>
               </div>
               
@@ -344,16 +335,43 @@ export default function ProjectDetailPage() {
             )}
 
             {/* Equipment Used */}
-            {project.pumpTypes && project.pumpTypes.length > 0 && (
+            {project.pumpModels && project.pumpModels.length > 0 && (
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Equipment Used</h3>
                 <div className="space-y-2">
-                  {project.pumpTypes.map((type, index) => (
+                  {project.pumpModels.map((model, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span className="text-gray-700">
-                        {pumpTypeLabels[type as keyof typeof pumpTypeLabels]}
-                      </span>
+                      <a
+                        href={model.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+                      >
+                        {model.name}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Applications */}
+            {project.applications && project.applications.length > 0 && (
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Applications</h3>
+                <div className="space-y-2">
+                  {project.applications.map((app, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <a
+                        href={app.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-600 hover:text-purple-800 transition-colors cursor-pointer"
+                      >
+                        {app.name}
+                      </a>
                     </div>
                   ))}
                 </div>
@@ -364,10 +382,6 @@ export default function ProjectDetailPage() {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Project Information</h3>
               <div className="space-y-3">
-                <div>
-                  <span className="text-gray-600 block">Industry:</span>
-                  <span className="font-medium capitalize">{project.industry.replace('-', ' ')}</span>
-                </div>
                 <div>
                   <span className="text-gray-600 block">Project Type:</span>
                   <span className="font-medium">

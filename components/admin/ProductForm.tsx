@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import 'react-quill/dist/quill.snow.css'
 import { Product, ProductInput } from '@/models/Product'
+import { IBrand } from '@/models/Brand'
+import { IPumpType } from '@/models/PumpType'
 
 // Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
@@ -15,11 +17,30 @@ interface ProductFormProps {
 }
 
 export default function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
+  const [brands, setBrands] = useState<IBrand[]>([])
+  const [pumpTypes, setPumpTypes] = useState<IPumpType[]>([])
+  const [selectedBrand, setSelectedBrand] = useState<IBrand | null>(null)
+  const [availableProductLines, setAvailableProductLines] = useState<any[]>([])
+  const isInitializedRef = useRef(false)
+  
+  // Function to generate slug from name
+  const generateSlug = (name: string): string => {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+  }
+  
   const [formData, setFormData] = useState<ProductInput>({
     name: '',
     slug: '',
     description: '',
-    category: 'rotary-vane',
+    brand: '',
+    productLineId: '',
+    pumpType: '',
     specifications: {
       flowRate: '',
       vacuumLevel: '',
@@ -30,26 +51,146 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
     features: [''],
     applications: [''],
     image: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
-    price: 0,
-    inStock: true,
+    price: undefined,
   })
 
   useEffect(() => {
-    if (product) {
-      setFormData({
-        name: product.name,
-        slug: product.slug,
-        description: product.description,
-        category: product.category,
-        specifications: { ...product.specifications },
-        features: [...product.features],
-        applications: [...product.applications],
-        image: product.image,
-        price: product.price,
-        inStock: product.inStock,
-      })
+    // Fetch brands and pump types on component mount
+    fetchBrands()
+    fetchPumpTypes()
+  }, []) // Only run once on mount
+
+  // Separate useEffect to handle product data after brands are loaded
+  useEffect(() => {
+    // Only process product data if brands are loaded (or if there's no product)
+    if (!product || brands.length === 0) {
+      if (!product) {
+        // Reset form for new product
+        setFormData({
+          name: '',
+          slug: '',
+          description: '',
+          brand: '',
+          productLineId: '',
+          pumpType: '',
+          specifications: {
+            flowRate: '',
+            vacuumLevel: '',
+            power: '',
+            inletSize: '',
+            weight: '',
+          },
+          features: [''],
+          applications: [''],
+          image: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
+          price: undefined,
+        })
+      }
+      return
     }
-  }, [product])
+
+    // Reset initialization flag when product changes
+    isInitializedRef.current = false
+    
+    // Handle brand - it might be populated object or just ID string
+    const brandId = typeof product.brand === 'object' && product.brand !== null 
+      ? (product.brand as any)._id 
+      : product.brand ? String(product.brand) : ''
+    
+    // Handle pumpType - it might be populated object or just ID string  
+    const pumpTypeId = typeof product.pumpType === 'object' && product.pumpType !== null
+      ? (product.pumpType as any)._id
+      : product.pumpType ? String(product.pumpType) : ''
+    
+    // Product data processing
+    
+    setFormData({
+      name: product.name,
+      slug: product.slug,
+      description: product.description,
+      brand: brandId,
+      productLineId: product.productLineId || '',
+      pumpType: pumpTypeId,
+      specifications: { ...product.specifications },
+      features: [...product.features],
+      applications: [...product.applications],
+      image: product.image,
+      price: product.price || undefined,
+    })
+  }, [product, brands.length])
+
+  // Handle brand selection and populate product lines
+  useEffect(() => {
+    if (formData.brand && brands.length > 0) {
+      const brand = brands.find(b => b._id === formData.brand)
+      if (brand) {
+        setSelectedBrand(brand)
+        const activeProductLines = brand.productLines?.filter(line => line.isActive) || []
+        const sortedLines = activeProductLines.sort((a, b) => a.displayOrder - b.displayOrder)
+        setAvailableProductLines(sortedLines)
+        
+        // Check if this is the initial load when brands data becomes available
+        // Use product.productLineId directly to avoid React state update race condition
+        const isInitialBrandLoad = !isInitializedRef.current && product && product.productLineId
+        
+        if (isInitialBrandLoad) {
+          // Set productLineId from product data on initial load (fixes React state race condition)
+          setFormData(prev => ({ ...prev, productLineId: product.productLineId || '' }))
+        } else if (isInitializedRef.current && product) {
+          // This is a user-initiated change - check if brand actually changed
+          const originalBrandId = product.brand 
+            ? (typeof product.brand === 'object' && product.brand !== null 
+               ? (product.brand as any)._id 
+               : String(product.brand))
+            : null
+          
+          if (formData.brand !== originalBrandId) {
+            setFormData(prev => ({ ...prev, productLineId: '' }))
+          }
+        }
+        
+        // Mark as initialized after first successful load
+        if (!isInitializedRef.current) {
+          isInitializedRef.current = true
+        }
+      }
+          } else {
+        setSelectedBrand(null)
+        setAvailableProductLines([])
+        // Only reset productLineId if brands are loaded and no brand is selected, or if this is a user change
+        if ((brands.length > 0 && !formData.brand) || isInitializedRef.current) {
+          setFormData(prev => ({ ...prev, productLineId: '' }))
+        }
+      }
+  }, [formData.brand, brands, product])
+
+  const fetchBrands = async () => {
+    try {
+      const response = await fetch('/api/admin/brands')
+      if (response.ok) {
+        const brandsData = await response.json()
+        setBrands(brandsData)
+      } else {
+        console.error('Failed to fetch brands')
+      }
+    } catch (error) {
+      console.error('Error fetching brands:', error)
+    }
+  }
+
+  const fetchPumpTypes = async () => {
+    try {
+      const response = await fetch('/api/admin/pump-types')
+      if (response.ok) {
+        const pumpTypesData = await response.json()
+        setPumpTypes(pumpTypesData)
+      } else {
+        console.error('Failed to fetch pump types')
+      }
+    } catch (error) {
+      console.error('Error fetching pump types:', error)
+    }
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
@@ -63,16 +204,18 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
           [specField]: value,
         },
       }))
-    } else if (type === 'checkbox') {
-      const checked = (e.target as HTMLInputElement).checked
-      setFormData(prev => ({
-        ...prev,
-        [name]: checked,
-      }))
     } else if (type === 'number') {
       setFormData(prev => ({
         ...prev,
-        [name]: parseFloat(value) || 0,
+        [name]: value === '' ? undefined : Number(value),
+      }))
+    } else if (name === 'name') {
+      // Auto-generate slug when name changes (only if slug is empty or was auto-generated)
+      const newSlug = generateSlug(value)
+      setFormData(prev => ({
+        ...prev,
+        name: value,
+        slug: prev.slug === '' || prev.slug === generateSlug(prev.name) ? newSlug : prev.slug,
       }))
     } else {
       setFormData(prev => ({
@@ -150,6 +293,9 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
     
     const cleanedData = {
       ...formData,
+      brand: formData.brand && formData.brand.trim() !== '' ? formData.brand : undefined,
+      productLineId: formData.productLineId && formData.productLineId.trim() !== '' ? formData.productLineId : undefined,
+      pumpType: formData.pumpType && formData.pumpType.trim() !== '' ? formData.pumpType : undefined,
       features: formData.features.filter(feature => feature.trim() !== ''),
       applications: formData.applications.filter(app => app.trim() !== ''),
     }
@@ -157,13 +303,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
     onSave(cleanedData)
   }
 
-  const categories = [
-    { value: 'rotary-vane', label: 'Rotary Vane Pumps' },
-    { value: 'scroll', label: 'Scroll Pumps' },
-    { value: 'diaphragm', label: 'Diaphragm Pumps' },
-    { value: 'turbomolecular', label: 'Turbomolecular Pumps' },
-    { value: 'other', label: 'Other' },
-  ]
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -212,6 +352,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             <div>
               <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-2">
                 Product Slug *
+                <span className="text-xs text-gray-500 ml-2">(URL-friendly identifier)</span>
               </label>
               <input
                 type="text"
@@ -220,38 +361,112 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
                 value={formData.slug}
                 onChange={handleInputChange}
                 required
-                placeholder="e.g., rotary-vane-pump-rv-2000"
+                pattern="^[a-z0-9-]+$"
+                placeholder="auto-generated-from-name"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-xs text-gray-500 mt-1">
-                URL-friendly identifier (used in product URLs)
+                This will be used in the URL: /products/{formData.slug}
+              </p>
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, slug: generateSlug(prev.name) }))}
+                className="mt-1 text-xs text-blue-600 hover:text-blue-800"
+              >
+                Auto-generate from title
+              </button>
+            </div>
+
+            <div>
+              <label htmlFor="pumpType" className="block text-sm font-medium text-gray-700 mb-2">
+                Pump Type (Optional)
+              </label>
+              <select
+                id="pumpType"
+                name="pumpType"
+                value={formData.pumpType || ''}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select a pump type (optional)</option>
+                {pumpTypes.map(pumpType => (
+                  <option key={pumpType._id} value={pumpType._id}>
+                    {pumpType.pumpType}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Choose the type of pump for this product
               </p>
             </div>
 
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                Category *
+              <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-2">
+                Brand (Optional)
               </label>
               <select
-                id="category"
-                name="category"
-                value={formData.category}
+                id="brand"
+                name="brand"
+                value={formData.brand || ''}
                 onChange={handleInputChange}
-                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {categories.map(cat => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
+                <option value="">Select a brand (optional)</option>
+                {brands.map(brand => (
+                  <option key={brand._id} value={brand._id}>
+                    {brand.name}{brand.country ? ` (${brand.country})` : ''}
                   </option>
                 ))}
               </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Choose the manufacturer/brand of this product
+              </p>
             </div>
+
+            {/* Product Line Selection */}
+            {selectedBrand && (
+              <div>
+                <label htmlFor="productLineId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Product Line (Optional)
+                </label>
+                {availableProductLines.length > 0 ? (
+                  <>
+                    <select
+                      id="productLineId"
+                      name="productLineId"
+                      value={formData.productLineId || ''}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select product line (optional)</option>
+                      {availableProductLines.map(line => (
+                        <option key={line._id} value={line._id}>
+                          {line.name}
+                          {line.description && ` - ${line.description}`}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Choose a specific product line within {selectedBrand.name}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500">
+                      No product lines defined for this brand
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      This brand has no active product lines. You can add them in Brand management.
+                    </p>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description * (Rich Text Editor)
+              Description (Rich Text Editor)
             </label>
             <div className="quill-editor-wrapper">
               <ReactQuill
@@ -378,7 +593,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
           </div>
 
           <div>
-            <h4 className="text-md font-medium text-gray-900 mb-4">Specifications</h4>
+            <h4 className="text-md font-medium text-gray-900 mb-4">Specifications (Optional)</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="spec_flowRate" className="block text-sm font-medium text-gray-700 mb-2">
@@ -517,22 +732,21 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
-                Price (VNĐ) *
+                Price (VNĐ) (Optional)
               </label>
               <div className="relative">
                 <input
                   type="number"
                   id="price"
                   name="price"
-                  value={formData.price}
+                  value={formData.price || ''}
                   onChange={handleInputChange}
-                  required
                   min="0"
                   step="1000"
-                  placeholder="e.g., 360000"
+                  placeholder="e.g., 360000 (leave empty for contact pricing)"
                   className="w-full px-3 py-2 pr-12 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -540,13 +754,13 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
                 </div>
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Enter price in VNĐ (Vietnamese Dong). Example: 360000 for 360.000 VNĐ
+                Enter price in VNĐ (Vietnamese Dong). Leave empty to show "Contact for pricing"
               </p>
             </div>
 
             <div>
               <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
-                Image URL
+                Image URL *
               </label>
               <input
                 type="url"
@@ -554,23 +768,16 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
                 name="image"
                 value={formData.image}
                 onChange={handleInputChange}
+                required
+                placeholder="https://example.com/image.jpg"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Enter a valid image URL (jpg, jpeg, png, gif, webp, svg)
+              </p>
             </div>
 
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="inStock"
-                name="inStock"
-                checked={formData.inStock}
-                onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="inStock" className="ml-2 block text-sm text-gray-900">
-                In Stock
-              </label>
-            </div>
+
           </div>
 
 

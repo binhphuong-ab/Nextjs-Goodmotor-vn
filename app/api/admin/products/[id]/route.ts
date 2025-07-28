@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Product, { IProductInput } from '@/models/Product'
+import Brand from '@/models/Brand'
+import PumpType from '@/models/PumpType'
 
 // Connect to MongoDB using Mongoose
 async function connectToDatabase() {
@@ -23,7 +25,16 @@ export async function GET(
     const { id } = params
     
     await connectToDatabase()
-    const product = await Product.findById(id)
+    
+    let product
+    try {
+      product = await Product.findById(id)
+        .populate('brand', 'name country productLines')
+        .populate('pumpType', 'pumpType')
+    } catch (populateError) {
+      console.warn('Population failed for product, fetching without population:', populateError)
+      product = await Product.findById(id)
+    }
     
     if (!product) {
       return NextResponse.json(
@@ -66,11 +77,22 @@ export async function PUT(
     }
     }
     
-    const product = await Product.findByIdAndUpdate(
+    let product = await Product.findByIdAndUpdate(
       id,
       { ...updateData, updatedAt: new Date() },
       { new: true, runValidators: true }
     )
+    
+    // Try to populate brand and pumpType if possible
+    try {
+      product = await product?.populate([
+        { path: 'brand', select: 'name country productLines' },
+        { path: 'pumpType', select: 'pumpType' }
+      ])
+    } catch (populateError) {
+      console.warn('Population failed after update, returning without population:', populateError)
+      // product already has the updated data, just without population
+    }
     
     if (!product) {
       return NextResponse.json(

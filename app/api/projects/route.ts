@@ -69,7 +69,7 @@ async function connectToDatabase() {
  * 
  * RESPONSE FORMAT:
  * - Returns JSON array of project objects
- * - Each project includes: title, client, industry, specs, images, etc.
+ * - Each project includes: title, client, specs, images, etc.
  * - Frontend TypeScript interface matches this structure
  * 
  * @returns {Array} Array of completed project objects for frontend consumption

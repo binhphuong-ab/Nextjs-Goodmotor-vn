@@ -11,10 +11,21 @@ import IndustryForm from '@/components/admin/IndustryForm'
 import IndustryList from '@/components/admin/IndustryList'
 import BusinessTypeForm from '@/components/admin/BusinessTypeForm'
 import BusinessTypeList from '@/components/admin/BusinessTypeList'
+import BrandForm from '@/components/admin/BrandForm'
+import BrandList from '@/components/admin/BrandList'
+import PumpTypeForm from '@/components/admin/PumpTypeForm'
+import PumpTypeList from '@/components/admin/PumpTypeList'
+import ApplicationForm from '@/components/admin/ApplicationForm'
+import ApplicationList from '@/components/admin/ApplicationList'
+import NotificationContainer from '@/components/NotificationContainer'
+import ConfirmDialog from '@/components/ConfirmDialog'
+import { IApplication, IApplicationInput } from '@/models/Application'
 import { Product, ProductInput } from '@/models/Product'
 import { ICustomer, ICustomerInput } from '@/models/Customer'
 import { IIndustry, IIndustryInput } from '@/models/Industry'
 import { IBusinessType, IBusinessTypeInput } from '@/models/BusinessType'
+import { IBrand, IBrandInput } from '@/models/Brand'
+import { IPumpType, IPumpTypeInput } from '@/models/PumpType'
 
 interface Project {
   _id: string
@@ -22,7 +33,6 @@ interface Project {
   slug: string
   description: string
   client: string
-  industry: string
   location: string
   completionDate: string
   projectType: string
@@ -58,11 +68,18 @@ export default function AdminPage() {
   const [customers, setCustomers] = useState<ICustomer[]>([])
   const [selectedCustomer, setSelectedCustomer] = useState<ICustomer | null>(null)
   const [isCustomerFormOpen, setIsCustomerFormOpen] = useState(false)
-  const [customerSubTab, setCustomerSubTab] = useState<'customers' | 'business-types'>('customers')
+  const [customerSubTab, setCustomerSubTab] = useState<'customers' | 'business-types' | 'industries'>('customers')
+  const [productSubTab, setProductSubTab] = useState<'products' | 'brands' | 'pump-types'>('products')
   const [businessTypes, setBusinessTypes] = useState<any[]>([])
   const [selectedBusinessType, setSelectedBusinessType] = useState<IBusinessType | null>(null)
   const [isBusinessTypeFormOpen, setIsBusinessTypeFormOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'products' | 'projects' | 'customers' | 'industries'>('products')
+  const [brands, setBrands] = useState<IBrand[]>([])
+  const [selectedBrand, setSelectedBrand] = useState<IBrand | null>(null)
+  const [isBrandFormOpen, setIsBrandFormOpen] = useState(false)
+  const [pumpTypes, setPumpTypes] = useState<IPumpType[]>([])
+  const [selectedPumpType, setSelectedPumpType] = useState<IPumpType | null>(null)
+  const [isPumpTypeFormOpen, setIsPumpTypeFormOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'products' | 'projects' | 'customers' | 'applications'>('products')
   const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loginData, setLoginData] = useState<LoginCredentials>({
@@ -70,6 +87,25 @@ export default function AdminPage() {
     password: ''
   })
   const [loginError, setLoginError] = useState('')
+  const [applications, setApplications] = useState<IApplication[]>([])
+  const [selectedApplication, setSelectedApplication] = useState<IApplication | null>(null)
+  const [isApplicationFormOpen, setIsApplicationFormOpen] = useState(false)
+  
+  // Notification system
+  const [showNotification, setShowNotification] = useState<((notification: { type: 'success' | 'error' | 'info'; message: string; duration?: number }) => void) | null>(null)
+  
+  // Confirmation dialogs for all entities
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean
+    type: 'product' | 'project' | 'customer' | 'businessType' | 'brand' | 'pumpType' | 'industry' | null
+    entity: any
+    entityName: string
+  }>({
+    isOpen: false,
+    type: null,
+    entity: null,
+    entityName: ''
+  })
 
   useEffect(() => {
     // Check if user is already authenticated (using localStorage)
@@ -81,6 +117,9 @@ export default function AdminPage() {
       fetchCustomers()
       fetchIndustries()
       fetchBusinessTypes()
+      fetchBrands()
+      fetchPumpTypes()
+      fetchApplications()
     } else {
       setLoading(false)
     }
@@ -99,6 +138,9 @@ export default function AdminPage() {
       fetchCustomers()
       fetchIndustries()
       fetchBusinessTypes()
+      fetchBrands()
+      fetchPumpTypes()
+      fetchApplications()
     } else {
       setLoginError('Invalid email or password')
     }
@@ -176,6 +218,92 @@ export default function AdminPage() {
     }
   }
 
+  const fetchBrands = async () => {
+    try {
+      const response = await fetch('/api/admin/brands')
+      if (response.ok) {
+        const brandsData = await response.json()
+        setBrands(brandsData)
+      } else {
+        console.error('Failed to fetch brands')
+      }
+    } catch (error) {
+      console.error('Error fetching brands:', error)
+    }
+  }
+
+  const fetchPumpTypes = async () => {
+    try {
+      const response = await fetch('/api/admin/pump-types')
+      if (response.ok) {
+        const pumpTypesData = await response.json()
+        setPumpTypes(pumpTypesData)
+      } else {
+        console.error('Failed to fetch pump types')
+      }
+    } catch (error) {
+      console.error('Error fetching pump types:', error)
+    }
+  }
+
+  const fetchApplications = async () => {
+    try {
+      const response = await fetch('/api/admin/applications')
+      if (response.ok) {
+        const applicationsData = await response.json()
+        setApplications(applicationsData)
+      } else {
+        console.error('Failed to fetch applications')
+      }
+    } catch (error) {
+      console.error('Error fetching applications:', error)
+    }
+  }
+
+  // Generic confirmation dialog handlers
+  const showConfirmDialog = (type: typeof confirmDialog.type, entity: any, entityName: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      type,
+      entity,
+      entityName
+    })
+  }
+
+  const handleConfirmAction = () => {
+    const { type, entity } = confirmDialog
+    
+    switch (type) {
+      case 'product':
+        executeDeleteProduct(entity._id)
+        break
+      case 'project':
+        executeDeleteProject(entity._id)
+        break
+      case 'customer':
+        executeDeleteCustomer(entity._id)
+        break
+      case 'businessType':
+        executeDeleteBusinessType(entity._id)
+        break
+      case 'brand':
+        executeDeleteBrand(entity._id)
+        break
+      case 'pumpType':
+        executeDeletePumpType(entity._id)
+        break
+      case 'industry':
+        executeDeleteIndustry(entity._id)
+        break
+    }
+    
+    setConfirmDialog({ isOpen: false, type: null, entity: null, entityName: '' })
+  }
+
+  const handleCancelAction = () => {
+    setConfirmDialog({ isOpen: false, type: null, entity: null, entityName: '' })
+  }
+
   const handleAddProduct = () => {
     setSelectedProduct(null)
     setIsFormOpen(true)
@@ -187,23 +315,28 @@ export default function AdminPage() {
   }
 
   const handleDeleteProduct = async (productId: string) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        const response = await fetch(`/api/admin/products/${productId}`, {
-          method: 'DELETE',
-        })
-        
-        if (response.ok) {
-          setProducts(products.filter(product => product._id !== productId))
-          alert('Product deleted successfully!')
-        } else {
-          const error = await response.json()
-          alert(`Error deleting product: ${error.error}`)
-        }
-      } catch (error) {
-        console.error('Error deleting product:', error)
-        alert('Error deleting product')
+    const product = products.find(p => p._id === productId)
+    if (product) {
+      showConfirmDialog('product', product, product.name)
+    }
+  }
+
+  const executeDeleteProduct = async (productId: string) => {
+    try {
+      const response = await fetch(`/api/admin/products/${productId}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        setProducts(products.filter(product => product._id !== productId))
+        showNotification?.({ type: 'success', message: 'Product deleted successfully!' })
+      } else {
+        const error = await response.json()
+        showNotification?.({ type: 'error', message: `Error deleting product: ${error.error}` })
       }
+    } catch (error) {
+      console.error('Error deleting product:', error)
+      showNotification?.({ type: 'error', message: 'Error deleting product' })
     }
   }
 
@@ -225,10 +358,10 @@ export default function AdminPage() {
             product._id === selectedProduct._id ? updatedProduct : product
           )
           setProducts(updatedProducts)
-          alert('Product updated successfully!')
+          showNotification?.({ type: 'success', message: 'Product updated successfully!' })
         } else {
           const error = await response.json()
-          alert(`Error updating product: ${error.error}`)
+          showNotification?.({ type: 'error', message: `Error updating product: ${error.error}` })
         }
       } else {
         // Add new product
@@ -243,18 +376,18 @@ export default function AdminPage() {
         if (response.ok) {
           const newProduct = await response.json()
           setProducts([...products, newProduct])
-          alert('Product added successfully!')
+          showNotification?.({ type: 'success', message: 'Product added successfully!' })
         } else {
           const error = await response.json()
-          alert(`Error adding product: ${error.error}`)
+          showNotification?.({ type: 'error', message: `Error adding product: ${error.error}` })
         }
       }
       setIsFormOpen(false)
       setSelectedProduct(null)
-    } catch (error) {
-      console.error('Error saving product:', error)
-      alert('Error saving product')
-    }
+          } catch (error) {
+        console.error('Error saving product:', error)
+        showNotification?.({ type: 'error', message: 'Error saving product' })
+      }
   }
 
   // Project management functions
@@ -269,23 +402,28 @@ export default function AdminPage() {
   }
 
   const handleDeleteProject = async (projectId: string) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      try {
-        const response = await fetch(`/api/admin/projects/${projectId}`, {
-          method: 'DELETE',
-        })
-        
-        if (response.ok) {
-          setProjects(projects.filter(project => project._id !== projectId))
-          alert('Project deleted successfully!')
-        } else {
-          const error = await response.json()
-          alert(`Error deleting project: ${error.error}`)
-        }
-      } catch (error) {
-        console.error('Error deleting project:', error)
-        alert('Error deleting project')
+    const project = projects.find(p => p._id === projectId)
+    if (project) {
+      showConfirmDialog('project', project, project.title)
+    }
+  }
+
+  const executeDeleteProject = async (projectId: string) => {
+    try {
+      const response = await fetch(`/api/admin/projects/${projectId}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        setProjects(projects.filter(project => project._id !== projectId))
+        showNotification?.({ type: 'success', message: 'Project deleted successfully!' })
+      } else {
+        const error = await response.json()
+        showNotification?.({ type: 'error', message: `Error deleting project: ${error.error}` })
       }
+    } catch (error) {
+      console.error('Error deleting project:', error)
+      showNotification?.({ type: 'error', message: 'Error deleting project' })
     }
   }
 
@@ -351,25 +489,30 @@ export default function AdminPage() {
   }
 
   const handleDeleteCustomer = async (customerId: string) => {
-    if (window.confirm('Are you sure you want to delete this customer?')) {
-      try {
-        const response = await fetch(`/api/admin/customers/${customerId}`, {
-          method: 'DELETE',
-        })
-        
-        if (response.ok) {
-          setCustomers(customers.filter(customer => customer._id !== customerId))
-          // Refresh business types to update customer counts
-          fetchBusinessTypes()
-          alert('Customer deleted successfully!')
-        } else {
-          const error = await response.json()
-          alert(`Error deleting customer: ${error.error}`)
-        }
-      } catch (error) {
-        console.error('Error deleting customer:', error)
-        alert('Error deleting customer')
+    const customer = customers.find(c => c._id === customerId)
+    if (customer) {
+      showConfirmDialog('customer', customer, customer.name)
+    }
+  }
+
+  const executeDeleteCustomer = async (customerId: string) => {
+    try {
+      const response = await fetch(`/api/admin/customers/${customerId}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        setCustomers(customers.filter(customer => customer._id !== customerId))
+        // Refresh business types to update customer counts
+        fetchBusinessTypes()
+        showNotification?.({ type: 'success', message: 'Customer deleted successfully!' })
+      } else {
+        const error = await response.json()
+        showNotification?.({ type: 'error', message: `Error deleting customer: ${error.error}` })
       }
+    } catch (error) {
+      console.error('Error deleting customer:', error)
+      showNotification?.({ type: 'error', message: 'Error deleting customer' })
     }
   }
 
@@ -394,11 +537,11 @@ export default function AdminPage() {
           setCustomers(updatedCustomers)
           // Refresh business types to update customer counts
           fetchBusinessTypes()
-          alert('Customer updated successfully!')
+          showNotification?.({ type: 'success', message: 'Customer updated successfully!' })
         } else {
           const error = await response.json()
           console.error('Customer update error:', error)
-          alert(`Error updating customer: ${error.error || error.message || 'Unknown error'}`)
+                      showNotification?.({ type: 'error', message: `Error updating customer: ${error.error || error.message || 'Unknown error'}` })
         }
       } else {
         // Add new customer
@@ -415,18 +558,18 @@ export default function AdminPage() {
           setCustomers([...customers, newCustomer])
           // Refresh business types to update customer counts
           fetchBusinessTypes()
-          alert('Customer added successfully!')
+          showNotification?.({ type: 'success', message: 'Customer added successfully!' })
         } else {
           const error = await response.json()
           console.error('Customer creation error:', error)
-          alert(`Error adding customer: ${error.error || error.message || 'Unknown error'}`)
+                      showNotification?.({ type: 'error', message: `Error adding customer: ${error.error || error.message || 'Unknown error'}` })
         }
       }
       setIsCustomerFormOpen(false)
       setSelectedCustomer(null)
     } catch (error) {
       console.error('Error saving customer:', error)
-      alert('Error saving customer')
+              showNotification?.({ type: 'error', message: 'Error saving customer' })
     }
   }
 
@@ -442,27 +585,35 @@ export default function AdminPage() {
   }
 
   const handleDeleteBusinessType = async (businessTypeId: string) => {
+    // BusinessTypeList component handles its own confirmation dialog
+    await executeDeleteBusinessType(businessTypeId)
+  }
+
+  const executeDeleteBusinessType = async (businessTypeId: string) => {
     try {
+      // Get the business type name before deletion for the success message
+      const businessType = businessTypes.find(bt => bt._id === businessTypeId)
+      const businessTypeName = businessType?.name || 'Business type'
+      
       const response = await fetch(`/api/admin/business-types?id=${businessTypeId}`, {
         method: 'DELETE',
       })
       
       if (response.ok) {
-        const result = await response.json()
         setBusinessTypes(businessTypes.filter(bt => bt._id !== businessTypeId))
-        alert(`Business type "${result.deletedBusinessType}" deleted successfully!`)
+        showNotification?.({ type: 'success', message: `Business type "${businessTypeName}" deleted successfully!` })
       } else {
         const error = await response.json()
         if (response.status === 409) {
           // Customer reference conflict
-          alert(`${error.error}`)
+          showNotification?.({ type: 'error', message: error.error })
         } else {
-          alert(`Error deleting business type: ${error.error}`)
+          showNotification?.({ type: 'error', message: `Error deleting business type: ${error.error}` })
         }
       }
     } catch (error) {
       console.error('Error deleting business type:', error)
-      alert('Error deleting business type. Please try again.')
+      showNotification?.({ type: 'error', message: 'Error deleting business type. Please try again.' })
     }
   }
 
@@ -483,10 +634,10 @@ export default function AdminPage() {
           setBusinessTypes(businessTypes.map(bt => 
             bt._id === selectedBusinessType._id ? updatedBusinessType : bt
           ))
-          alert('Business type updated successfully!')
+          showNotification?.({ type: 'success', message: 'Business type updated successfully!' })
         } else {
           const error = await response.json()
-          alert(`Error updating business type: ${error.error}`)
+          showNotification?.({ type: 'error', message: `Error updating business type: ${error.error}` })
         }
       } else {
         // Create new business type
@@ -501,10 +652,10 @@ export default function AdminPage() {
         if (response.ok) {
           const newBusinessType = await response.json()
           setBusinessTypes([...businessTypes, newBusinessType])
-          alert('Business type created successfully!')
+          showNotification?.({ type: 'success', message: 'Business type created successfully!' })
         } else {
           const error = await response.json()
-          alert(`Error creating business type: ${error.error}`)
+          showNotification?.({ type: 'error', message: `Error creating business type: ${error.error}` })
         }
       }
       
@@ -512,7 +663,179 @@ export default function AdminPage() {
       setSelectedBusinessType(null)
     } catch (error) {
       console.error('Error saving business type:', error)
-      alert('Error saving business type')
+      showNotification?.({ type: 'error', message: 'Error saving business type. Please try again.' })
+    }
+  }
+
+  // Brand management functions
+  const handleAddBrand = () => {
+    setSelectedBrand(null)
+    setIsBrandFormOpen(true)
+  }
+
+  const handleEditBrand = (brand: IBrand) => {
+    setSelectedBrand(brand)
+    setIsBrandFormOpen(true)
+  }
+
+  const handleDeleteBrand = async (brandId: string) => {
+    // BrandList component handles its own confirmation dialog
+    await executeDeleteBrand(brandId)
+  }
+
+  const executeDeleteBrand = async (brandId: string) => {
+    try {
+      const response = await fetch(`/api/admin/brands?id=${brandId}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        setBrands(brands.filter(b => b._id !== brandId))
+        showNotification?.({ type: 'success', message: `Brand "${result.deletedBrand}" deleted successfully!` })
+      } else {
+        const error = await response.json()
+        showNotification?.({ type: 'error', message: `Error deleting brand: ${error.error}` })
+      }
+    } catch (error) {
+      console.error('Error deleting brand:', error)
+      showNotification?.({ type: 'error', message: 'Error deleting brand' })
+    }
+  }
+
+  const handleSaveBrand = async (brandData: IBrandInput) => {
+    try {
+      if (selectedBrand) {
+        // Update existing brand
+        const response = await fetch(`/api/admin/brands?id=${selectedBrand._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(brandData),
+        })
+        
+        if (response.ok) {
+          const updatedBrand = await response.json()
+          setBrands(brands.map(b => 
+            b._id === selectedBrand._id ? updatedBrand : b
+          ))
+          showNotification?.({ type: 'success', message: 'Brand updated successfully!' })
+        } else {
+          const error = await response.json()
+          showNotification?.({ type: 'error', message: `Error updating brand: ${error.error}` })
+        }
+      } else {
+        // Create new brand
+        const response = await fetch('/api/admin/brands', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(brandData),
+        })
+        
+        if (response.ok) {
+          const newBrand = await response.json()
+          setBrands([...brands, newBrand])
+          showNotification?.({ type: 'success', message: 'Brand created successfully!' })
+        } else {
+          const error = await response.json()
+          showNotification?.({ type: 'error', message: `Error creating brand: ${error.error}` })
+        }
+      }
+      
+      setIsBrandFormOpen(false)
+      setSelectedBrand(null)
+    } catch (error) {
+      console.error('Error saving brand:', error)
+      showNotification?.({ type: 'error', message: 'Error saving brand. Please try again.' })
+    }
+  }
+
+  // PumpType management functions
+  const handleAddPumpType = () => {
+    setSelectedPumpType(null)
+    setIsPumpTypeFormOpen(true)
+  }
+
+  const handleEditPumpType = (pumpType: IPumpType) => {
+    setSelectedPumpType(pumpType)
+    setIsPumpTypeFormOpen(true)
+  }
+
+  const handleDeletePumpType = async (pumpTypeId: string) => {
+    // PumpTypeList component handles its own confirmation dialog
+    await executeDeletePumpType(pumpTypeId)
+  }
+
+  const executeDeletePumpType = async (pumpTypeId: string) => {
+    try {
+      const response = await fetch(`/api/admin/pump-types?id=${pumpTypeId}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        setPumpTypes(pumpTypes.filter(pt => pt._id !== pumpTypeId))
+        showNotification?.({ type: 'success', message: `Pump type "${result.deletedPumpType}" deleted successfully!` })
+      } else {
+        const error = await response.json()
+        showNotification?.({ type: 'error', message: `Error deleting pump type: ${error.error}` })
+      }
+    } catch (error) {
+      console.error('Error deleting pump type:', error)
+      showNotification?.({ type: 'error', message: 'Error deleting pump type' })
+    }
+  }
+
+  const handleSavePumpType = async (pumpTypeData: IPumpTypeInput) => {
+    try {
+      if (selectedPumpType) {
+        // Update existing pump type
+        const response = await fetch(`/api/admin/pump-types?id=${selectedPumpType._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(pumpTypeData),
+        })
+        
+        if (response.ok) {
+          const updatedPumpType = await response.json()
+          setPumpTypes(pumpTypes.map(pt => 
+            pt._id === selectedPumpType._id ? updatedPumpType : pt
+          ))
+          showNotification?.({ type: 'success', message: 'Pump type updated successfully!' })
+        } else {
+          const error = await response.json()
+          showNotification?.({ type: 'error', message: `Error updating pump type: ${error.error}` })
+        }
+      } else {
+        // Create new pump type
+        const response = await fetch('/api/admin/pump-types', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(pumpTypeData),
+        })
+        
+        if (response.ok) {
+          const newPumpType = await response.json()
+          setPumpTypes([...pumpTypes, newPumpType])
+          showNotification?.({ type: 'success', message: 'Pump type created successfully!' })
+        } else {
+          const error = await response.json()
+          showNotification?.({ type: 'error', message: `Error creating pump type: ${error.error}` })
+        }
+      }
+      
+      setIsPumpTypeFormOpen(false)
+      setSelectedPumpType(null)
+    } catch (error) {
+      console.error('Error saving pump type:', error)
+      showNotification?.({ type: 'error', message: 'Error saving pump type. Please try again.' })
     }
   }
 
@@ -524,7 +847,7 @@ export default function AdminPage() {
   // Fetch industries function
   const fetchIndustries = async () => {
     try {
-      const response = await fetch('/api/industries?updateStats=true&includeCustomers=true')
+      const response = await fetch('/api/industries?updateStats=true&includeCustomers=true&includeApplications=true')
       if (response.ok) {
         const industriesData = await response.json()
         setIndustries(industriesData)
@@ -548,23 +871,26 @@ export default function AdminPage() {
   }
 
   const handleDeleteIndustry = async (industryId: string) => {
-    if (window.confirm('Are you sure you want to delete this industry?')) {
-      try {
-        const response = await fetch(`/api/industries/${industryId}`, {
-          method: 'DELETE',
-        })
-        
-        if (response.ok) {
-          await fetchIndustries() // Refetch to get updated data
-          alert('Industry deleted successfully!')
-        } else {
-          const error = await response.json()
-          alert(`Error deleting industry: ${error.error}`)
-        }
-      } catch (error) {
-        console.error('Error deleting industry:', error)
-        alert('Error deleting industry')
+    // IndustryList component handles its own confirmation dialog
+    await executeDeleteIndustry(industryId)
+  }
+
+  const executeDeleteIndustry = async (industryId: string) => {
+    try {
+      const response = await fetch(`/api/industries/${industryId}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        await fetchIndustries() // Refetch to get updated data
+        showNotification?.({ type: 'success', message: 'Industry deleted successfully!' })
+      } else {
+        const error = await response.json()
+        showNotification?.({ type: 'error', message: `Error deleting industry: ${error.error}` })
       }
+    } catch (error) {
+      console.error('Error deleting industry:', error)
+      showNotification?.({ type: 'error', message: 'Error deleting industry' })
     }
   }
 
@@ -610,6 +936,86 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Error saving industry:', error)
       alert('Error saving industry')
+    }
+  }
+
+  // Application management functions
+  const handleAddApplication = () => {
+    setSelectedApplication(null)
+    setIsApplicationFormOpen(true)
+  }
+
+  const handleEditApplication = (application: IApplication) => {
+    setSelectedApplication(application)
+    setIsApplicationFormOpen(true)
+  }
+
+  const handleDeleteApplication = async (applicationId: string) => {
+    try {
+      const response = await fetch(`/api/admin/applications/${applicationId}`, {
+        method: 'DELETE',
+      })
+      
+      if (response.ok) {
+        setApplications(applications.filter(application => application._id !== applicationId))
+        showNotification?.({ type: 'success', message: 'Application deleted successfully!' })
+      } else {
+        const error = await response.json()
+        showNotification?.({ type: 'error', message: `Error deleting application: ${error.error}` })
+      }
+    } catch (error) {
+      console.error('Error deleting application:', error)
+      showNotification?.({ type: 'error', message: 'Error deleting application' })
+    }
+  }
+
+  const handleSaveApplication = async (applicationData: IApplicationInput) => {
+    try {
+      if (selectedApplication) {
+        // Update existing application
+        const response = await fetch(`/api/admin/applications/${selectedApplication._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(applicationData),
+        })
+        
+        if (response.ok) {
+          const updatedApplication = await response.json()
+          const updatedApplications = applications.map(application =>
+            application._id === selectedApplication._id ? updatedApplication : application
+          )
+          setApplications(updatedApplications)
+          showNotification?.({ type: 'success', message: 'Application updated successfully!' })
+        } else {
+          const error = await response.json()
+          showNotification?.({ type: 'error', message: `Error updating application: ${error.error}` })
+        }
+      } else {
+        // Add new application
+        const response = await fetch('/api/admin/applications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(applicationData),
+        })
+        
+        if (response.ok) {
+          const newApplication = await response.json()
+          setApplications([...applications, newApplication])
+          showNotification?.({ type: 'success', message: 'Application added successfully!' })
+        } else {
+          const error = await response.json()
+          showNotification?.({ type: 'error', message: `Error adding application: ${error.error}` })
+        }
+      }
+      setIsApplicationFormOpen(false)
+      setSelectedApplication(null)
+    } catch (error) {
+      console.error('Error saving application:', error)
+      showNotification?.({ type: 'error', message: 'Error saving application' })
     }
   }
 
@@ -686,12 +1092,28 @@ export default function AdminPage() {
               <p className="text-gray-600 mt-1">Manage your vacuum pump products and projects</p>
             </div>
             <div className="flex items-center space-x-4">
-              {activeTab === 'products' && (
+              {activeTab === 'products' && productSubTab === 'products' && (
                 <button
                   onClick={handleAddProduct}
                   className="btn-primary"
                 >
                   Add New Product
+                </button>
+              )}
+              {activeTab === 'products' && productSubTab === 'brands' && (
+                <button
+                  onClick={handleAddBrand}
+                  className="btn-primary"
+                >
+                  Add New Brand
+                </button>
+              )}
+              {activeTab === 'products' && productSubTab === 'pump-types' && (
+                <button
+                  onClick={handleAddPumpType}
+                  className="btn-primary"
+                >
+                  Add New Pump Type
                 </button>
               )}
               {activeTab === 'projects' && (
@@ -718,12 +1140,20 @@ export default function AdminPage() {
                   Add New Business Type
                 </button>
               )}
-              {activeTab === 'industries' && (
+              {activeTab === 'customers' && customerSubTab === 'industries' && (
                 <button
                   onClick={handleAddIndustry}
                   className="btn-primary"
                 >
                   Add New Industry
+                </button>
+              )}
+              {activeTab === 'applications' && (
+                <button
+                  onClick={handleAddApplication}
+                  className="btn-primary"
+                >
+                  Add New Application
                 </button>
               )}
               <button
@@ -769,14 +1199,14 @@ export default function AdminPage() {
                 Customers ({customers.length})
               </button>
               <button
-                onClick={() => setActiveTab('industries')}
+                onClick={() => setActiveTab('applications')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'industries'
+                  activeTab === 'applications'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Industries ({industries.length})
+                Applications ({applications.length})
               </button>
             </nav>
           </div>
@@ -788,12 +1218,69 @@ export default function AdminPage() {
           <div className="p-6">
             {activeTab === 'products' && (
               <>
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">Products ({products.length})</h2>
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Product Management</h2>
+                  
+                  {/* Product Sub-tabs */}
+                  <div className="border-b border-gray-200 mb-6">
+                    <nav className="-mb-px flex space-x-8">
+                      <button
+                        onClick={() => setProductSubTab('products')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                          productSubTab === 'products'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Products ({products.length})
+                      </button>
+                      <button
+                        onClick={() => setProductSubTab('brands')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                          productSubTab === 'brands'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Brands ({brands.length})
+                      </button>
+                      <button
+                        onClick={() => setProductSubTab('pump-types')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                          productSubTab === 'pump-types'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Pump Types ({pumpTypes.length})
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+
+                {productSubTab === 'products' && (
                 <ProductList
                   products={products}
                   onEdit={handleEditProduct}
                   onDelete={handleDeleteProduct}
                 />
+                )}
+
+                {productSubTab === 'brands' && (
+                  <BrandList
+                    brands={brands}
+                    onEdit={handleEditBrand}
+                    onDelete={handleDeleteBrand}
+                  />
+                )}
+
+                {productSubTab === 'pump-types' && (
+                  <PumpTypeList
+                    pumpTypes={pumpTypes}
+                    onEdit={handleEditPumpType}
+                    onDelete={handleDeletePumpType}
+                  />
+                )}
               </>
             )}
             {activeTab === 'projects' && (
@@ -834,6 +1321,16 @@ export default function AdminPage() {
                       >
                         Business Types ({businessTypes.length})
                       </button>
+                      <button
+                        onClick={() => setCustomerSubTab('industries')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                          customerSubTab === 'industries'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Industries ({industries.length})
+                      </button>
                     </nav>
                   </div>
                 </div>
@@ -853,15 +1350,27 @@ export default function AdminPage() {
                     onDelete={handleDeleteBusinessType}
                   />
                 )}
+
+                {customerSubTab === 'industries' && (
+                  <IndustryList
+                    industries={industries as any[]}
+                    onEdit={handleEditIndustry as any}
+                    onDelete={handleDeleteIndustry}
+                    onCreate={handleAddIndustry}
+                  />
+                )}
               </>
             )}
-            {activeTab === 'industries' && (
-              <IndustryList
-                industries={industries as any[]}
-                onEdit={handleEditIndustry as any}
-                onDelete={handleDeleteIndustry}
-                onCreate={handleAddIndustry}
-              />
+            {activeTab === 'applications' && (
+              <>
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">Applications ({applications.length})</h2>
+                <ApplicationList
+                  applications={applications}
+                  onEdit={handleEditApplication}
+                  onDelete={handleDeleteApplication}
+                  onCreate={handleAddApplication}
+                />
+              </>
             )}
           </div>
         </div>
@@ -921,6 +1430,56 @@ export default function AdminPage() {
           }}
         />
       )}
+
+      {isBrandFormOpen && (
+        <BrandForm
+          brand={selectedBrand}
+          onSave={handleSaveBrand}
+          onCancel={() => {
+            setIsBrandFormOpen(false)
+            setSelectedBrand(null)
+          }}
+        />
+      )}
+
+      {isPumpTypeFormOpen && (
+        <PumpTypeForm
+          pumpType={selectedPumpType}
+          onSave={handleSavePumpType}
+          onCancel={() => {
+            setIsPumpTypeFormOpen(false)
+            setSelectedPumpType(null)
+          }}
+        />
+      )}
+
+      {isApplicationFormOpen && (
+        <ApplicationForm
+          application={selectedApplication}
+          onSave={handleSaveApplication}
+          onCancel={() => {
+            setIsApplicationFormOpen(false)
+            setSelectedApplication(null)
+          }}
+        />
+      )}
+      
+      {/* Notification Container */}
+      <NotificationContainer
+        onNotificationAdd={(addNotification) => setShowNotification(() => addNotification)}
+      />
+      
+      {/* Global Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={`Delete ${confirmDialog.type ? confirmDialog.type.charAt(0).toUpperCase() + confirmDialog.type.slice(1) : 'Item'}`}
+        message={`Are you sure you want to delete "${confirmDialog.entityName}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmAction}
+        onCancel={handleCancelAction}
+        danger={true}
+      />
     </div>
   )
 }

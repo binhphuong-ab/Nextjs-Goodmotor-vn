@@ -1,23 +1,24 @@
-import { Schema, model, models } from 'mongoose'
+import { Schema, model, models, Types } from 'mongoose'
 
 export interface IProduct {
   _id: string
   name: string
   slug: string // URL-friendly identifier (e.g., "rotary-vane-pump-rv-2000")
-  description: string
-  category: 'rotary-vane' | 'scroll' | 'diaphragm' | 'turbomolecular' | 'other'
+  description?: string
+  brand?: Types.ObjectId // Optional reference to Brand _id
+  productLineId?: string // Optional reference to specific product line within brand
+  pumpType?: Types.ObjectId // Optional reference to PumpType _id
   specifications: {
-    flowRate: string // CFM
-    vacuumLevel: string // torr or mbar
-    power: string // HP or kW
-    inletSize: string // inches
-    weight: string // lbs or kg
+    flowRate?: string // CFM
+    vacuumLevel?: string // torr or mbar
+    power?: string // HP or kW
+    inletSize?: string // inches
+    weight?: string // lbs or kg
   }
   features: string[]
   applications: string[]
   image: string
   price?: number
-  inStock: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -40,38 +41,47 @@ const ProductSchema = new Schema<IProduct>({
   },
   description: {
     type: String,
-    required: [true, 'Product description is required'],
+    required: false,
     trim: true
   },
-  category: {
+  brand: {
+    type: Schema.Types.ObjectId,
+    ref: 'Brand',
+    required: false
+  },
+  productLineId: {
     type: String,
-    required: [true, 'Product category is required'],
-    enum: ['rotary-vane', 'scroll', 'diaphragm', 'turbomolecular', 'other']
+    required: false
+  },
+  pumpType: {
+    type: Schema.Types.ObjectId,
+    ref: 'PumpType',
+    required: false
   },
   specifications: {
     flowRate: {
       type: String,
-      required: [true, 'Flow rate is required'],
+      required: false,
       trim: true
     },
     vacuumLevel: {
       type: String,
-      required: [true, 'Vacuum level is required'],
+      required: false,
       trim: true
     },
     power: {
       type: String,
-      required: [true, 'Power is required'],
+      required: false,
       trim: true
     },
     inletSize: {
       type: String,
-      required: [true, 'Inlet size is required'],
+      required: false,
       trim: true
     },
     weight: {
       type: String,
-      required: [true, 'Weight is required'],
+      required: false,
       trim: true
     }
   },
@@ -97,41 +107,41 @@ const ProductSchema = new Schema<IProduct>({
   price: {
     type: Number,
     min: [0, 'Price cannot be negative']
-  },
-  inStock: {
-    type: Boolean,
-    required: [true, 'Stock status is required'],
-    default: true
   }
 }, {
   timestamps: true
 })
 
 // Indexes for better query performance
-ProductSchema.index({ category: 1 })
-ProductSchema.index({ inStock: 1 })
+ProductSchema.index({ pumpType: 1 })
+ProductSchema.index({ brand: 1 })
+ProductSchema.index({ productLineId: 1 })
 ProductSchema.index({ name: 'text', description: 'text' })
 
 // Add compound indexes for common e-commerce query patterns
-ProductSchema.index({ category: 1, inStock: 1 }) // Available products by category
-ProductSchema.index({ inStock: 1, price: 1 }) // Available products by price range
-ProductSchema.index({ category: 1, price: 1 }) // Category products by price
+ProductSchema.index({ pumpType: 1, price: 1 }) // Pump type products by price
+ProductSchema.index({ brand: 1, pumpType: 1 }) // Products by brand and pump type
+ProductSchema.index({ brand: 1, productLineId: 1 }) // Products by brand and product line
 
-// Sparse index for optional price field (only indexes documents that have a price)
+// Sparse index for optional fields (only indexes documents that have the field)
 ProductSchema.index({ price: 1 }, { sparse: true })
+ProductSchema.index({ brand: 1 }, { sparse: true })
+ProductSchema.index({ productLineId: 1 }, { sparse: true })
+ProductSchema.index({ pumpType: 1 }, { sparse: true })
 
 // Input interface for creating/updating products
 export interface IProductInput {
   name: string
   slug: string
-  description: string
-  category: IProduct['category']
+  description?: string
+  brand?: string // Brand ID as string
+  productLineId?: string // Product line ID as string
+  pumpType?: string // PumpType ID as string
   specifications: IProduct['specifications']
   features: string[]
   applications: string[]
   image: string
   price?: number
-  inStock?: boolean
 }
 
 // Keep old interfaces for backward compatibility

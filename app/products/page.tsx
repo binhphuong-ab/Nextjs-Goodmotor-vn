@@ -5,11 +5,27 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Product } from '@/models/Product'
 
+// Extended interface for populated product
+interface PopulatedProduct extends Omit<Product, 'brand'> {
+  brand?: {
+    _id: string
+    name: string
+    country?: string
+    productLines?: Array<{
+      _id: string
+      name: string
+      description?: string
+      isActive: boolean
+      displayOrder: number
+    }>
+  }
+}
+
 
 
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<PopulatedProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -47,9 +63,8 @@ export default function ProductsPage() {
     { value: 'turbomolecular', label: 'Turbomolecular Pumps' },
   ]
 
-  const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category === selectedCategory)
+  // Note: Products don't currently have categories in the model
+  const filteredProducts = products
 
   if (loading) {
     return (
@@ -77,7 +92,8 @@ export default function ProductsPage() {
 
         </div>
 
-        {/* Category Filter */}
+        {/* Category Filter - Disabled until categories are added to Product model */}
+        {/* 
         <div className="mb-12">
           <div className="flex flex-wrap justify-center gap-4">
             {categories.map((category) => (
@@ -95,6 +111,7 @@ export default function ProductsPage() {
             ))}
           </div>
         </div>
+        */}
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -109,38 +126,54 @@ export default function ProductsPage() {
               />
               <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{product.name}</h3>
-                <div 
-                  className="text-gray-600 mb-4"
-                  dangerouslySetInnerHTML={{ __html: product.description }}
-                />
+                
+                {/* Brand and Product Line Info */}
+                {(product.brand || product.productLineId) && (
+                  <div className="mb-3">
+                    {product.brand && (
+                      <div className="text-sm text-blue-600 font-medium">
+                        {product.brand.name}
+                        {product.brand.country && ` (${product.brand.country})`}
+                      </div>
+                    )}
+                    {product.productLineId && product.brand?.productLines && (
+                      <div className="text-sm text-gray-500">
+                        {(() => {
+                          const productLine = product.brand.productLines.find(line => line._id === product.productLineId)
+                          return productLine ? productLine.name : 'Product Line'
+                        })()}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {product.description && (
+                  <div 
+                    className="text-gray-600 mb-4"
+                    dangerouslySetInnerHTML={{ __html: product.description }}
+                  />
+                )}
                 
                 {/* Specifications */}
-                <div className="mb-4">
-                  <h4 className="font-semibold text-gray-800 mb-2">Specifications:</h4>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <div>Flow Rate: {product.specifications?.flowRate}</div>
-                    <div>Vacuum Level: {product.specifications?.vacuumLevel}</div>
-                    <div>Power: {product.specifications?.power}</div>
+                {(product.specifications?.flowRate || product.specifications?.vacuumLevel || product.specifications?.power) && (
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-gray-800 mb-2">Specifications:</h4>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      {product.specifications?.flowRate && <div>Flow Rate: {product.specifications.flowRate}</div>}
+                      {product.specifications?.vacuumLevel && <div>Vacuum Level: {product.specifications.vacuumLevel}</div>}
+                      {product.specifications?.power && <div>Power: {product.specifications.power}</div>}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Price */}
-                <div className="mb-4">
-                  <span className="text-2xl font-bold text-blue-600">
-                    {product.price ? `${product.price.toLocaleString('vi-VN')} VNĐ` : 'Liên hệ'}
-                  </span>
-                </div>
-
-                {/* Stock Status */}
-                <div className="mb-4">
-                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                    product.inStock 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {product.inStock ? 'In Stock' : 'Out of Stock'}
-                  </span>
-                </div>
+                {(product.price && product.price > 0) && (
+                  <div className="mb-4">
+                    <span className="text-2xl font-bold text-blue-600">
+                      {product.price.toLocaleString('vi-VN')} VNĐ
+                    </span>
+                  </div>
+                )}
 
                 {/* Button with margin-top: auto */}
                 <div className="space-y-3 mt-auto">
@@ -182,9 +215,7 @@ export default function ProductsPage() {
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">No products found</h3>
             <p className="text-gray-600">
-              {selectedCategory === 'all' 
-                ? 'No products are available. Please check back later or contact us for assistance.'
-                : 'No products match the selected category.'}
+              No products are available. Please check back later or contact us for assistance.
             </p>
           </div>
         )}

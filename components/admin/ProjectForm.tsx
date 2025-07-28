@@ -14,11 +14,17 @@ interface Project {
   slug: string
   description: string
   client: string
-  industry: string
   location: string
   completionDate: string
   projectType: string
-  pumpTypes: string[]
+  pumpModels: Array<{
+    name: string
+    url: string
+  }>
+  applications: Array<{
+    name: string
+    url: string
+  }>
   images: string[]
   specifications: {
     flowRate?: string
@@ -47,11 +53,11 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
     slug: '',
     description: '',
     client: '',
-    industry: 'pharmaceutical',
     location: '',
     completionDate: '',
     projectType: 'new-installation',
-    pumpTypes: ['rotary-vane'],
+    pumpModels: [{ name: '', url: '' }],
+    applications: [{ name: '', url: '' }],
     images: [''],
     specifications: {
       flowRate: '',
@@ -84,11 +90,11 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
         slug: project.slug,
         description: project.description,
         client: project.client,
-        industry: project.industry,
         location: project.location,
         completionDate: project.completionDate,
         projectType: project.projectType,
-        pumpTypes: [...project.pumpTypes],
+        pumpModels: [...project.pumpModels],
+        applications: [...project.applications],
         images: [...project.images],
         specifications: { ...project.specifications },
         challenges: project.challenges,
@@ -141,21 +147,21 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
     }))
   }
 
-  const handleArrayChange = (arrayName: 'pumpTypes' | 'images', index: number, value: string) => {
+  const handleArrayChange = (arrayName: 'pumpModels' | 'applications' | 'images', index: number, value: string | { name: string; url: string }) => {
     setFormData(prev => ({
       ...prev,
       [arrayName]: prev[arrayName].map((item, i) => i === index ? value : item),
     }))
   }
 
-  const addArrayItem = (arrayName: 'pumpTypes' | 'images') => {
+  const addArrayItem = (arrayName: 'pumpModels' | 'applications' | 'images') => {
     setFormData(prev => ({
       ...prev,
-      [arrayName]: [...prev[arrayName], ''],
+      [arrayName]: [...prev[arrayName], arrayName === 'images' ? '' : { name: '', url: '' }],
     }))
   }
 
-  const removeArrayItem = (arrayName: 'pumpTypes' | 'images', index: number) => {
+  const removeArrayItem = (arrayName: 'pumpModels' | 'applications' | 'images', index: number) => {
     if (formData[arrayName].length > 1) {
       setFormData(prev => ({
         ...prev,
@@ -169,7 +175,8 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
     
     const cleanedData = {
       ...formData,
-      pumpTypes: formData.pumpTypes.filter(type => type.trim() !== ''),
+      pumpModels: formData.pumpModels.filter(model => model.name.trim() !== ''),
+      applications: formData.applications.filter(app => app.name.trim() !== ''),
       images: formData.images.filter(img => img.trim() !== ''),
     }
     
@@ -186,20 +193,6 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
   }
 
   // Options
-  const industries = [
-    { value: 'pharmaceutical', label: 'Pharmaceutical' },
-    { value: 'semiconductor', label: 'Semiconductor' },
-    { value: 'food-processing', label: 'Food Processing' },
-    { value: 'chemical', label: 'Chemical' },
-    { value: 'automotive', label: 'Automotive' },
-    { value: 'aerospace', label: 'Aerospace' },
-    { value: 'oil-gas', label: 'Oil & Gas' },
-    { value: 'power-generation', label: 'Power Generation' },
-    { value: 'manufacturing', label: 'Manufacturing' },
-    { value: 'research', label: 'Research' },
-    { value: 'other', label: 'Other' }
-  ]
-
   const projectTypes = [
     { value: 'new-installation', label: 'New Installation' },
     { value: 'system-upgrade', label: 'System Upgrade' },
@@ -209,33 +202,11 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
     { value: 'custom-solution', label: 'Custom Solution' }
   ]
 
-  const pumpTypes = [
-    { value: 'rotary-vane', label: 'Rotary Vane' },
-    { value: 'scroll', label: 'Scroll' },
-    { value: 'diaphragm', label: 'Diaphragm' },
-    { value: 'turbomolecular', label: 'Turbomolecular' },
-    { value: 'liquid-ring', label: 'Liquid Ring' },
-    { value: 'roots-blower', label: 'Roots Blower' },
-    { value: 'claw-pump', label: 'Claw Pump' },
-    { value: 'other', label: 'Other' }
-  ]
-
   const statusOptions = [
     { value: 'completed', label: 'Completed' },
     { value: 'ongoing', label: 'Ongoing' },
     { value: 'planned', label: 'Planned' }
   ]
-
-  const pumpTypeLabels = {
-    'rotary-vane': 'Rotary Vane',
-    'scroll': 'Scroll',
-    'diaphragm': 'Diaphragm',
-    'turbomolecular': 'Turbomolecular',
-    'liquid-ring': 'Liquid Ring',
-    'roots-blower': 'Roots Blower',
-    'claw-pump': 'Claw Pump',
-    'other': 'Other'
-  }
 
   // Quill editor configuration
   const modules = {
@@ -394,26 +365,6 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label htmlFor="industry" className="block text-sm font-medium text-gray-700 mb-2">
-                      Industry *
-                    </label>
-                    <select
-                      id="industry"
-                      name="industry"
-                      value={formData.industry}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {industries.map(industry => (
-                        <option key={industry.value} value={industry.value}>
-                          {industry.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
                     <label htmlFor="projectType" className="block text-sm font-medium text-gray-700 mb-2">
                       Project Type *
                     </label>
@@ -569,30 +520,32 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                   </div>
                 </div>
 
-                {/* Pump Types */}
+                {/* Pump Models */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pump Types Used
+                    Pump Models Used
                   </label>
                   <div className="space-y-2">
-                    {formData.pumpTypes.map((pumpType, index) => (
+                    {formData.pumpModels.map((pumpModel, index) => (
                       <div key={index} className="flex items-center space-x-2">
-                        <select
-                          value={pumpType}
-                          onChange={(e) => handleArrayChange('pumpTypes', index, e.target.value)}
+                        <input
+                          type="text"
+                          value={pumpModel.name}
+                          onChange={(e) => handleArrayChange('pumpModels', index, { ...pumpModel, name: e.target.value })}
+                          placeholder="Pump Model Name"
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="">Select pump type</option>
-                          {pumpTypes.map(type => (
-                            <option key={type.value} value={type.value}>
-                              {type.label}
-                            </option>
-                          ))}
-                        </select>
-                        {formData.pumpTypes.length > 1 && (
+                        />
+                        <input
+                          type="url"
+                          value={pumpModel.url}
+                          onChange={(e) => handleArrayChange('pumpModels', index, { ...pumpModel, url: e.target.value })}
+                          placeholder="Pump Model URL"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        {formData.pumpModels.length > 1 && (
                           <button
                             type="button"
-                            onClick={() => removeArrayItem('pumpTypes', index)}
+                            onClick={() => removeArrayItem('pumpModels', index)}
                             className="px-3 py-2 text-red-600 border border-red-300 rounded-md hover:bg-red-50"
                           >
                             Remove
@@ -602,10 +555,53 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                     ))}
                     <button
                       type="button"
-                      onClick={() => addArrayItem('pumpTypes')}
+                      onClick={() => addArrayItem('pumpModels')}
                       className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
                     >
-                      Add Pump Type
+                      Add Pump Model
+                    </button>
+                  </div>
+                </div>
+
+                {/* Applications */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Applications Used
+                  </label>
+                  <div className="space-y-2">
+                    {formData.applications.map((application, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          value={application.name}
+                          onChange={(e) => handleArrayChange('applications', index, { ...application, name: e.target.value })}
+                          placeholder="Application Name"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <input
+                          type="url"
+                          value={application.url}
+                          onChange={(e) => handleArrayChange('applications', index, { ...application, url: e.target.value })}
+                          placeholder="Application URL"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        {formData.applications.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeArrayItem('applications', index)}
+                            className="px-3 py-2 text-red-600 border border-red-300 rounded-md hover:bg-red-50"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => addArrayItem('applications')}
+                      className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                    >
+                      Add Application
                     </button>
                   </div>
                 </div>
@@ -757,7 +753,6 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       </div>
                       <div className="space-y-2">
                         <div><span className="font-semibold">Completion:</span> {formatDate(formData.completionDate) || 'Date'}</div>
-                        <div><span className="font-semibold">Industry:</span> {industries.find(ind => ind.value === formData.industry)?.label || 'Industry'}</div>
                       </div>
                     </div>
 
@@ -783,15 +778,41 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       </div>
                     )}
 
-                    {/* Pump Types */}
-                    {formData.pumpTypes.some(type => type.trim()) && (
+                    {/* Pump Models */}
+                    {formData.pumpModels.some(model => model.name.trim()) && (
                       <div className="mb-6">
                         <h4 className="font-semibold text-gray-800 mb-3">Equipment Used:</h4>
                         <div className="flex flex-wrap gap-2">
-                          {formData.pumpTypes.filter(type => type.trim()).map((type, index) => (
-                            <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                              {pumpTypeLabels[type as keyof typeof pumpTypeLabels]}
-                            </span>
+                          {formData.pumpModels.filter(model => model.name.trim()).map((model, index) => (
+                            <a
+                              key={index}
+                              href={model.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2 py-1 bg-blue-100 text-blue-800 hover:bg-blue-200 text-xs rounded transition-colors cursor-pointer"
+                            >
+                              {model.name}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Applications */}
+                    {formData.applications.some(app => app.name.trim()) && (
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-gray-800 mb-3">Applications Used:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {formData.applications.filter(app => app.name.trim()).map((app, index) => (
+                            <a
+                              key={index}
+                              href={app.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2 py-1 bg-purple-100 text-purple-800 hover:bg-purple-200 text-xs rounded transition-colors cursor-pointer"
+                            >
+                              {app.name}
+                            </a>
                           ))}
                         </div>
                       </div>

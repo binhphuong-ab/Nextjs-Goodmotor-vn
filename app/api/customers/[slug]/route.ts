@@ -20,6 +20,16 @@ export async function GET(request: Request, { params }: { params: { slug: string
       slug: params.slug,
       isActive: true 
     })
+    .populate({
+      path: 'businessType',
+      select: 'name slug',
+      strictPopulate: false
+    })
+    .populate({
+      path: 'industry',
+      select: 'name slug',
+      strictPopulate: false
+    })
     
     if (!customer) {
       return NextResponse.json(

@@ -7,47 +7,29 @@ export interface IIndustry {
   description?: string
   category?: 'manufacturing' | 'processing' | 'research' | 'energy' | 'healthcare' | 'technology' | 'other'
   
-  // Industry characteristics
-  characteristics?: {
-    typicalVacuumRequirements: string[]
-    commonApplications: string[]
-    regulatoryRequirements?: string[]
-    standardCertifications?: string[]
-  }
-  
-  // Market information
-  marketInfo?: {
-    marketSize?: string
-    growthRate?: string
-    keyDrivers?: string[]
-    challenges?: string[]
-  }
-  
-  // SEO and visibility
-  keywords?: string[]
-  isActive: boolean
+  // Visibility
   displayOrder?: number
   
   // Statistics (computed/cached values)
   stats?: {
     customerCount?: number
-    projectCount?: number
+    applicationCount?: number
     lastUpdated?: Date
   }
   
   // Virtual field for customers referencing this industry
   customers?: any[] // Will be populated with Customer documents
   
-  // Virtual field for projects referencing this industry
-  projects?: any[] // Will be populated with Project documents
+  // Virtual field for applications referencing this industry
+  applications?: any[] // Will be populated with Application documents
   
   // Methods
   getCustomers?: () => Promise<any[]>
   getCustomerCount?: () => Promise<number>
   updateCustomerCount?: () => Promise<IIndustry>
-  getProjects?: () => Promise<any[]>
-  getProjectCount?: () => Promise<number>
-  updateProjectCount?: () => Promise<IIndustry>
+  getApplications?: () => Promise<any[]>
+  getApplicationCount?: () => Promise<number>
+  updateApplicationCount?: () => Promise<IIndustry>
   
   createdAt: Date
   updatedAt: Date
@@ -81,56 +63,7 @@ const IndustrySchema = new Schema<IIndustry>({
     default: 'other'
   },
   
-  // Industry characteristics
-  characteristics: {
-    typicalVacuumRequirements: [{
-      type: String,
-      trim: true
-    }],
-    commonApplications: [{
-      type: String,
-      trim: true
-    }],
-    regulatoryRequirements: [{
-      type: String,
-      trim: true
-    }],
-    standardCertifications: [{
-      type: String,
-      trim: true
-    }]
-  },
-  
-  // Market information
-  marketInfo: {
-    marketSize: {
-      type: String,
-      trim: true
-    },
-    growthRate: {
-      type: String,
-      trim: true
-    },
-    keyDrivers: [{
-      type: String,
-      trim: true
-    }],
-    challenges: [{
-      type: String,
-      trim: true
-    }]
-  },
-  
-  // SEO and visibility
-  keywords: [{
-    type: String,
-    trim: true,
-    lowercase: true
-  }],
-  isActive: {
-    type: Boolean,
-    default: true
-  },
+  // Visibility
   displayOrder: {
     type: Number,
     default: 0
@@ -142,7 +75,7 @@ const IndustrySchema = new Schema<IIndustry>({
       type: Number,
       default: 0
     },
-    projectCount: {
+    applicationCount: {
       type: Number,
       default: 0
     },
@@ -160,6 +93,14 @@ IndustrySchema.virtual('customers', {
   ref: 'Customer',
   localField: '_id',
   foreignField: 'industry',
+  justOne: false
+})
+
+// Virtual field to populate applications that reference this industry
+IndustrySchema.virtual('applications', {
+  ref: 'Application',
+  localField: '_id',
+  foreignField: 'recommendedIndustries',
   justOne: false
 })
 
@@ -186,32 +127,24 @@ IndustrySchema.methods.updateCustomerCount = async function() {
   return await this.save()
 }
 
-// Virtual field to populate projects that reference this industry
-IndustrySchema.virtual('projects', {
-  ref: 'Project',
-  localField: '_id',
-  foreignField: 'industry',
-  justOne: false
-})
-
-// Method to get projects for this industry
-IndustrySchema.methods.getProjects = async function() {
-  const Project = models.Project || model('Project')
-  return await Project.find({ industry: { $in: [this._id] } }).populate('industry', 'name slug')
+// Method to get applications for this industry
+IndustrySchema.methods.getApplications = async function() {
+  const Application = models.Application || model('Application')
+  return await Application.find({ recommendedIndustries: { $in: [this._id] } }).populate('recommendedIndustries', 'name slug')
 }
 
-// Method to get project count for this industry
-IndustrySchema.methods.getProjectCount = async function() {
-  const Project = models.Project || model('Project')
-  return await Project.countDocuments({ industry: { $in: [this._id] } })
+// Method to get application count for this industry
+IndustrySchema.methods.getApplicationCount = async function() {
+  const Application = models.Application || model('Application')
+  return await Application.countDocuments({ recommendedIndustries: { $in: [this._id] } })
 }
 
-// Method to update project count in stats
-IndustrySchema.methods.updateProjectCount = async function() {
-  const count = await this.getProjectCount()
+// Method to update application count in stats
+IndustrySchema.methods.updateApplicationCount = async function() {
+  const count = await this.getApplicationCount()
   this.stats = {
     ...this.stats,
-    projectCount: count,
+    applicationCount: count,
     lastUpdated: new Date()
   }
   return await this.save()
@@ -223,13 +156,11 @@ IndustrySchema.set('toObject', { virtuals: true })
 
 // Indexes for better query performance
 IndustrySchema.index({ category: 1 })
-IndustrySchema.index({ isActive: 1 })
 IndustrySchema.index({ displayOrder: 1 })
-IndustrySchema.index({ name: 'text', description: 'text', keywords: 'text' })
+IndustrySchema.index({ name: 'text', description: 'text' })
 
 // Add compound indexes for common query patterns
-IndustrySchema.index({ isActive: 1, displayOrder: 1 }) // Active industries by display order
-IndustrySchema.index({ category: 1, isActive: 1 }) // Active industries by category
+IndustrySchema.index({ category: 1, displayOrder: 1 }) // Industries by category and display order
 
 // Input interface for creating/updating industries
 export interface IIndustryInput {
@@ -237,10 +168,6 @@ export interface IIndustryInput {
   slug: string
   description?: string
   category?: IIndustry['category']
-  characteristics?: IIndustry['characteristics']
-  marketInfo?: IIndustry['marketInfo']
-  keywords?: string[]
-  isActive?: boolean
   displayOrder?: number
 }
 

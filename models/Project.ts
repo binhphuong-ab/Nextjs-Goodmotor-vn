@@ -6,11 +6,17 @@ export interface IProject {
   slug: string
   description: string
   client: string
-  industry: any // Reference to Industry _id (ObjectId or populated object)
   location: string
   completionDate: Date
   projectType: string
-  pumpTypes: string[]
+  pumpModels: Array<{
+    name: string
+    url: string
+  }>
+  applications: Array<{
+    name: string
+    url: string
+  }>
   images: string[]
   specifications: {
     flowRate?: string
@@ -54,11 +60,6 @@ const ProjectSchema = new Schema<IProject>({
     trim: true,
     maxlength: [100, 'Client name cannot exceed 100 characters']
   },
-  industry: {
-    type: Schema.Types.ObjectId,
-    ref: 'Industry',
-    required: [true, 'Industry is required']
-  },
   location: {
     type: String,
     required: [true, 'Project location is required'],
@@ -81,18 +82,43 @@ const ProjectSchema = new Schema<IProject>({
       'custom-solution'
     ]
   },
-  pumpTypes: [{
-    type: String,
-    enum: [
-      'rotary-vane',
-      'scroll',
-      'diaphragm',
-      'turbomolecular',
-      'liquid-ring',
-      'roots-blower',
-      'claw-pump',
-      'other'
-    ]
+  pumpModels: [{
+    name: {
+      type: String,
+      required: [true, 'Pump model name is required'],
+      trim: true,
+      maxlength: [100, 'Pump model name cannot exceed 100 characters']
+    },
+    url: {
+      type: String,
+      required: [true, 'Pump model URL is required'],
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          return /^https?:\/\/.+/.test(v);
+        },
+        message: 'Please provide a valid URL starting with http:// or https://'
+      }
+    }
+  }],
+  applications: [{
+    name: {
+      type: String,
+      required: [true, 'Application name is required'],
+      trim: true,
+      maxlength: [100, 'Application name cannot exceed 100 characters']
+    },
+    url: {
+      type: String,
+      required: [true, 'Application URL is required'],
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          return /^https?:\/\/.+/.test(v);
+        },
+        message: 'Please provide a valid URL starting with http:// or https://'
+      }
+    }
   }],
   images: [{
     type: String,
@@ -152,7 +178,6 @@ const ProjectSchema = new Schema<IProject>({
 
 // Index for better query performance
 ProjectSchema.index({ featured: -1, completionDate: -1 })
-ProjectSchema.index({ industry: 1 })
 ProjectSchema.index({ status: 1 })
 
 export default models.Project || model<IProject>('Project', ProjectSchema) 

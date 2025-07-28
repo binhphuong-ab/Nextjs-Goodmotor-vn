@@ -34,11 +34,17 @@ interface Project {
   slug: string
   description: string
   client: string
-  industry: string
   location: string
   completionDate: string
   projectType: string
-  pumpTypes: string[]
+  pumpModels: Array<{
+    name: string
+    url: string
+  }>
+  applications: Array<{
+    name: string
+    url: string
+  }>
   images: string[]
   specifications: {
     flowRate?: string
@@ -57,7 +63,6 @@ export default function ProjectsPage() {
   // State management for projects data and UI
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedIndustry, setSelectedIndustry] = useState<string>('all')
 
   // Fetch projects data when component mounts
   useEffect(() => {
@@ -100,21 +105,7 @@ export default function ProjectsPage() {
     }
   }
 
-  // Industry filter options - must match enum values in Project model
-  const industries = [
-    { value: 'all', label: 'All Industries' },
-    { value: 'pharmaceutical', label: 'Pharmaceutical' },
-    { value: 'semiconductor', label: 'Semiconductor' },
-    { value: 'food-processing', label: 'Food Processing' },
-    { value: 'chemical', label: 'Chemical' },
-    { value: 'automotive', label: 'Automotive' },
-    { value: 'aerospace', label: 'Aerospace' },
-    { value: 'oil-gas', label: 'Oil & Gas' },
-    { value: 'power-generation', label: 'Power Generation' },
-    { value: 'manufacturing', label: 'Manufacturing' },
-    { value: 'research', label: 'Research' },
-  ]
-
+  // Project type and pump type labels
   const projectTypes = {
     'new-installation': 'New Installation',
     'system-upgrade': 'System Upgrade',
@@ -123,21 +114,6 @@ export default function ProjectsPage() {
     'consultation': 'Consultation',
     'custom-solution': 'Custom Solution'
   }
-
-  const pumpTypeLabels = {
-    'rotary-vane': 'Rotary Vane',
-    'scroll': 'Scroll',
-    'diaphragm': 'Diaphragm',
-    'turbomolecular': 'Turbomolecular',
-    'liquid-ring': 'Liquid Ring',
-    'roots-blower': 'Roots Blower',
-    'claw-pump': 'Claw Pump',
-    'other': 'Other'
-  }
-
-  const filteredProjects = selectedIndustry === 'all' 
-    ? projects 
-    : projects.filter(project => project.industry === selectedIndustry)
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -177,10 +153,6 @@ export default function ProjectsPage() {
                 <div className="text-blue-200">Completed Projects</div>
               </div>
               <div>
-                <div className="text-3xl font-bold">{new Set(projects.map(p => p.industry)).size}+</div>
-                <div className="text-blue-200">Industries Served</div>
-              </div>
-              <div>
                 <div className="text-3xl font-bold">{new Set(projects.map(p => p.location)).size}+</div>
                 <div className="text-blue-200">Locations Worldwide</div>
               </div>
@@ -189,37 +161,16 @@ export default function ProjectsPage() {
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="py-8 bg-white border-b">
-        <div className="container-custom">
-          <div className="flex flex-wrap justify-center gap-4">
-            {industries.map((industry) => (
-              <button
-                key={industry.value}
-                onClick={() => setSelectedIndustry(industry.value)}
-                className={`px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${
-                  selectedIndustry === industry.value
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {industry.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Projects Grid */}
       <section className="section-padding">
         <div className="container-custom">
-          {filteredProjects.length === 0 ? (
+          {projects.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-xl text-gray-600">No projects found for the selected industry.</p>
+              <p className="text-xl text-gray-600">No projects found.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {filteredProjects.map((project) => (
+              {projects.map((project) => (
                 <div key={project._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
                   {/* Project Header */}
                   <div className="relative">
@@ -263,10 +214,6 @@ export default function ProjectsPage() {
                         <Calendar className="w-4 h-4" />
                         <span>{formatDate(project.completionDate)}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Wrench className="w-4 h-4" />
-                        <span className="capitalize">{project.industry.replace('-', ' ')}</span>
-                      </div>
                     </div>
 
                     {/* Description */}
@@ -288,15 +235,41 @@ export default function ProjectsPage() {
                       </div>
                     )}
 
-                    {/* Pump Types */}
-                    {project.pumpTypes && project.pumpTypes.length > 0 && (
+                    {/* Pump Models */}
+                    {project.pumpModels && project.pumpModels.length > 0 && (
                       <div className="mb-4">
                         <h4 className="font-semibold text-gray-800 mb-2">Equipment Used:</h4>
                         <div className="flex flex-wrap gap-2">
-                          {project.pumpTypes.map((type, index) => (
-                            <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                              {pumpTypeLabels[type as keyof typeof pumpTypeLabels]}
-                            </span>
+                          {project.pumpModels.map((model, index) => (
+                            <a
+                              key={index}
+                              href={model.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2 py-1 bg-blue-100 text-blue-800 hover:bg-blue-200 text-xs rounded transition-colors cursor-pointer"
+                            >
+                              {model.name}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Applications */}
+                    {project.applications && project.applications.length > 0 && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold text-gray-800 mb-2">Applications:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {project.applications.map((app, index) => (
+                            <a
+                              key={index}
+                              href={app.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2 py-1 bg-purple-100 text-purple-800 hover:bg-purple-200 text-xs rounded transition-colors cursor-pointer"
+                            >
+                              {app.name}
+                            </a>
                           ))}
                         </div>
                       </div>
