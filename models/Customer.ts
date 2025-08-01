@@ -17,7 +17,7 @@ export interface ICustomer {
   
   // Description
   description?: string
-  isActive: boolean
+  featured: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -97,9 +97,9 @@ const CustomerSchema = new Schema<ICustomer>({
     type: String,
     trim: true
   },
-  isActive: {
+  featured: {
     type: Boolean,
-    default: true
+    default: false
   }
 }, {
   timestamps: true
@@ -109,10 +109,10 @@ const CustomerSchema = new Schema<ICustomer>({
 CustomerSchema.index({ businessType: 1 })
 CustomerSchema.index({ customerStatus: 1 })
 CustomerSchema.index({ customerTier: 1 })
-CustomerSchema.index({ isActive: 1 })
+CustomerSchema.index({ featured: 1 })
 
 // Add compound indexes for common query patterns
-CustomerSchema.index({ isActive: 1, customerStatus: 1 }) // Active customers by status
+CustomerSchema.index({ featured: 1, customerStatus: 1 }) // Featured customers by status
 CustomerSchema.index({ businessType: 1, customerTier: 1 }) // Business type + tier queries
 CustomerSchema.index({ customerStatus: 1, completeDate: -1 }) // Recent complete dates by status
 CustomerSchema.index({ industry: 1 }) // Industry references (array field)
@@ -132,7 +132,7 @@ export interface ICustomerInput {
   customerTier?: ICustomer['customerTier']
   completeDate?: Date
   description?: string
-  isActive?: boolean
+  featured?: boolean
 }
 
 export default models.Customer || model<ICustomer>('Customer', CustomerSchema) 

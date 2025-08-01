@@ -29,7 +29,7 @@ interface Customer {
   customerTier: string
   completeDate?: string
   description?: string
-  isActive: boolean
+  featured: boolean
   createdAt: string
   updatedAt: string
 }
@@ -303,9 +303,9 @@ export default function CustomerDetailPage() {
                 </div>
                 
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Active</span>
-                  <span className={`text-sm font-medium ${customer.isActive ? 'text-green-600' : 'text-red-600'}`}>
-                    {customer.isActive ? 'Yes' : 'No'}
+                  <span className="text-sm font-medium text-gray-600">Featured</span>
+                  <span className={`text-sm font-medium ${customer.featured ? 'text-blue-600' : 'text-gray-600'}`}>
+                    {customer.featured ? 'Yes' : 'No'}
                   </span>
                 </div>
               </div>

@@ -13,7 +13,7 @@ async function connectToDatabase() {
   await mongoose.connect(process.env.MONGODB_URI as string)
 }
 
-// GET /api/customers - Fetch active customers for public display
+// GET /api/customers - Fetch all customers for public display (featured customers can be filtered separately)
 export async function GET() {
   try {
     await connectToDatabase()
@@ -24,7 +24,7 @@ export async function GET() {
     try {
       // Try to fetch customers with full population
       customers = await Customer.find(
-        { isActive: true },
+        {},
         {
           name: 1,
           slug: 1,
@@ -36,7 +36,7 @@ export async function GET() {
           customerTier: 1,
           completeDate: 1,
           description: 1,
-          isActive: 1,
+          featured: 1,
           createdAt: 1
         }
       )
@@ -50,7 +50,7 @@ export async function GET() {
         select: 'name slug',
         strictPopulate: false
       })
-      .sort({ customerTier: -1, createdAt: -1 })
+      .sort({ featured: -1, customerTier: -1, createdAt: -1 })
       
       console.log(`[API] GET customers: Found ${customers.length} customers`)
       
@@ -59,7 +59,7 @@ export async function GET() {
       
       // Fallback: fetch without population if there are schema issues
       customers = await Customer.find(
-        { isActive: true },
+        {},
         {
           name: 1,
           slug: 1,
@@ -71,11 +71,11 @@ export async function GET() {
           customerTier: 1,
           completeDate: 1,
           description: 1,
-          isActive: 1,
+          featured: 1,
           createdAt: 1
         }
       )
-      .sort({ customerTier: -1, createdAt: -1 })
+      .sort({ featured: -1, customerTier: -1, createdAt: -1 })
       
       console.log(`[API] GET customers: Found ${customers.length} customers (without population)`)
     }

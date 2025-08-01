@@ -24,8 +24,7 @@ export async function GET(request: Request, { params }: { params: { slug: string
     try {
       // Try to fetch customer with full population
       customer = await Customer.findOne({ 
-        slug: params.slug,
-        isActive: true 
+        slug: params.slug
       })
       .populate({
         path: 'businessType',
@@ -45,8 +44,7 @@ export async function GET(request: Request, { params }: { params: { slug: string
       
       // Fallback: fetch without population if there are schema issues
       customer = await Customer.findOne({ 
-        slug: params.slug,
-        isActive: true 
+        slug: params.slug
       })
       
       console.log(`[API] GET customer: Customer found without population: ${customer ? 'Yes' : 'No'}`)

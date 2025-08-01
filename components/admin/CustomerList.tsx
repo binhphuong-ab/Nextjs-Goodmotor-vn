@@ -10,7 +10,7 @@ interface Industry {
   name: string
   slug: string
   category: string
-  isActive: boolean
+  featured: boolean
 }
 
 interface BusinessType {
@@ -19,7 +19,7 @@ interface BusinessType {
   slug: string
   description?: string
   category: string
-  isActive: boolean
+  featured: boolean
   displayOrder: number
 }
 
@@ -250,8 +250,8 @@ export default function CustomerList({ customers, onEdit, onDelete }: CustomerLi
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[customer.customerStatus]}`}>
                     {customer.customerStatus.charAt(0).toUpperCase() + customer.customerStatus.slice(1)}
                   </span>
-                  {!customer.isActive && (
-                    <div className="text-xs text-red-600 mt-1 font-medium">Inactive</div>
+                  {customer.featured && (
+                    <div className="text-xs text-blue-600 mt-1 font-medium">Featured</div>
                   )}
                 </td>
                 

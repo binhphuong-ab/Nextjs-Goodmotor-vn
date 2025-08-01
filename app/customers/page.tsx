@@ -24,7 +24,7 @@ interface Customer {
   customerTier: string
   completeDate?: string
   description?: string
-  isActive: boolean
+  featured: boolean
   createdAt: string
   updatedAt: string
 }

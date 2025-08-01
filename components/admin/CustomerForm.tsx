@@ -20,7 +20,7 @@ interface Industry {
   name: string
   slug: string
   category: string
-  isActive: boolean
+  featured: boolean
 }
 
 interface CustomerFormProps {
@@ -67,7 +67,7 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
     businessType: '',
     industry: [], // Optional now
     completeDate: customer ? undefined : new Date(), // Auto-fill with today for new customers
-    isActive: true
+    featured: false
   })
 
   const [loading, setLoading] = useState(false)
@@ -136,7 +136,7 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
         customerTier: customer.customerTier,
         completeDate: customer.completeDate,
         description: customer.description,
-        isActive: customer.isActive
+        featured: customer.featured
       })
     }
   }, [customer])
@@ -229,8 +229,8 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
           </h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[80vh]">
-          <div className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[80vh] flex flex-col">
+          <div className="p-6 space-y-6 flex-1">
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900">Basic Information</h3>
@@ -433,74 +433,82 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Complete Date
-                </label>
-                <input
-                  type="date"
-                  name="completeDate"
-                  value={formData.completeDate ? new Date(formData.completeDate).toISOString().split('T')[0] : ''}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Complete Date
+                  </label>
+                  <input
+                    type="date"
+                    name="completeDate"
+                    value={formData.completeDate ? new Date(formData.completeDate).toISOString().split('T')[0] : ''}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Settings
+                  </label>
+                  <div className="pt-2">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="featured"
+                        checked={formData.featured || false}
+                        onChange={handleInputChange}
+                        className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm font-medium text-gray-700">Featured Customer</span>
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1 ml-6">
+                      Featured customers will be highlighted on the homepage and other promotional areas
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Description and Settings */}
+            {/* Description */}
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
                 </label>
-                <div className="border border-gray-300 rounded-md">
-                  <ReactQuill
-                    value={formData.description || ''}
-                    onChange={handleDescriptionChange}
-                    placeholder="Add detailed description about this customer..."
-                    modules={{
-                      toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['link'],
-                        ['clean']
-                      ],
-                    }}
-                    formats={[
-                      'header', 'bold', 'italic', 'underline', 'strike',
-                      'list', 'bullet', 'link'
-                    ]}
-                    style={{ 
-                      backgroundColor: 'white',
-                      borderRadius: '0.375rem',
-                      height: '250px'
-                    }}
-                  />
-                </div>
+                <ReactQuill
+                  value={formData.description || ''}
+                  onChange={handleDescriptionChange}
+                  placeholder="Add detailed description about this customer..."
+                  modules={{
+                    toolbar: [
+                      [{ 'header': [1, 2, 3, false] }],
+                      ['bold', 'italic', 'underline', 'strike'],
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                      ['link'],
+                      ['clean']
+                    ],
+                  }}
+                  formats={[
+                    'header', 'bold', 'italic', 'underline', 'strike',
+                    'list', 'bullet', 'link'
+                  ]}
+                  style={{ 
+                    backgroundColor: 'white',
+                    borderRadius: '0.375rem',
+                    height: '240px'
+                  }}
+                />
                 <style jsx global>{`
                   .ql-editor {
                     min-height: 180px !important;
                   }
                 `}</style>
               </div>
-
-              <div>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={formData.isActive || false}
-                    onChange={handleInputChange}
-                    className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm font-medium text-gray-700">Active Customer</span>
-                </label>
-              </div>
             </div>
           </div>
 
-          <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+          <div className="px-6 py-6 flex justify-end space-x-3">
             <button
               type="button"
               onClick={onCancel}
