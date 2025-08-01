@@ -1,5 +1,9 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import { Calendar, MapPin, Building, Star } from 'lucide-react'
+import Notification from '../Notification'
 
 interface Project {
   _id: string
@@ -189,6 +193,8 @@ export default function ProjectList({ projects, onEdit, onDelete }: ProjectListP
           <p className="mt-1 text-sm text-gray-500">Get started by creating your first project.</p>
         </div>
       )}
+
+      
     </div>
   )
 } 

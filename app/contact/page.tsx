@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ContactInput } from '@/models/Contact'
+import Notification from '@/components/Notification'
 
 export default function ContactPage() {
   const [formData, setFormData] = useState<ContactInput>({
@@ -15,6 +16,23 @@ export default function ContactPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [notification, setNotification] = useState<{
+    type: 'success' | 'error' | 'info'
+    message: string
+    show: boolean
+  }>({
+    type: 'success',
+    message: '',
+    show: false
+  })
+
+  const showNotification = (type: 'success' | 'error' | 'info', message: string) => {
+    setNotification({ type, message, show: true })
+  }
+
+  const hideNotification = () => {
+    setNotification(prev => ({ ...prev, show: false }))
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -49,11 +67,11 @@ export default function ContactPage() {
           inquiryType: 'general',
         })
       } else {
-        alert('Error submitting form. Please try again.')
+        showNotification('error', 'Error submitting form. Please try again.')
       }
     } catch (error) {
       console.error('Error submitting form:', error)
-      alert('Error submitting form. Please try again.')
+      showNotification('error', 'Error submitting form. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -291,6 +309,14 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
+      
+      {notification.show && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={hideNotification}
+        />
+      )}
     </div>
   )
 } 

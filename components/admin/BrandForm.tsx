@@ -44,9 +44,10 @@ interface BrandFormProps {
   brand?: IBrand | null
   onSave: (data: IBrandInput) => void
   onCancel: () => void
+  onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
-export default function BrandForm({ brand, onSave, onCancel }: BrandFormProps) {
+export default function BrandForm({ brand, onSave, onCancel, onShowNotification }: BrandFormProps) {
   const [formData, setFormData] = useState<IBrandInput>({
     name: '',
     country: '',
@@ -150,7 +151,8 @@ export default function BrandForm({ brand, onSave, onCancel }: BrandFormProps) {
     const usage = isProductLineInUse(index)
     
     if (usage.inUse) {
-      alert(`Cannot remove "${productLine.name}" because it's being used by ${usage.products.length} product(s): ${usage.products.join(', ')}`)
+      const message = `Cannot remove "${productLine.name}" because it's being used by ${usage.products.length} product(s): ${usage.products.join(', ')}`
+      onShowNotification?.('error', message)
       return
     }
     

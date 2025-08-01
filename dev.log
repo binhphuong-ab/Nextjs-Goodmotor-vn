@@ -1,0 +1,767 @@
+
+> good-motor-website@0.1.0 dev
+> next dev
+
+   ▲ Next.js 14.0.0
+   - Local:        http://localhost:3000
+   - Environments: .env.local, .env
+
+ ✓ Ready in 1645ms
+ ✓ Compiled /api/admin/business-types/route in 165ms (34 modules)
+[API] POST business-types: Received request to create business type
+[API] POST business-types: Connecting to database...
+[MongoDB] Establishing new connection...
+[MongoDB] Connected successfully!
+[API] POST business-types: Database connected successfully
+[API] POST business-types: Request body: { name: 'Test New Business Type' }
+[API] POST business-types: Checking for existing business type with name: "Test New Business Type"
+[API] POST business-types: Business type with this name already exists
+[API] POST business-types: Received request to create business type
+[API] POST business-types: Connecting to database...
+[API] POST business-types: Database connected successfully
+[API] POST business-types: Request body: { name: 'Energy & Utilities' }
+[API] POST business-types: Checking for existing business type with name: "Energy & Utilities"
+[API] POST business-types: No existing business type found. Creating new one...
+[API] POST business-types: New BusinessType instance created: {
+  name: 'Energy & Utilities',
+  _id: new ObjectId('688a1ccdb58e52996afebd99'),
+  id: '688a1ccdb58e52996afebd99'
+}
+[API] POST business-types: Saving to database...
+[API] POST business-types: Business type saved successfully with ID: new ObjectId('688a1ccdb58e52996afebd99')
+[API] POST business-types: Populating virtual fields...
+[API] POST business-types: Error creating business type: MissingSchemaError: Schema hasn't been registered for model "Customer".
+Use mongoose.model(name, schema)
+    at NativeConnection.model (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/connection.js:1491:13)
+    at _getModelFromConn (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:579:15)
+    at addModelNamesToMap (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:507:17)
+    at _virtualPopulate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:464:7)
+    at getModelsMapForPopulate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:42:12)
+    at _populatePath (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/model.js:4468:21)
+    at model.populate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/model.js:4435:21)
+    at model.populate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/document.js:4619:24)
+    at POST (webpack-internal:///(rsc)/./app/api/admin/business-types/route.ts:91:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:61856
+ ✓ Compiled in 137ms (34 modules)
+[API] POST business-types: Received request to create business type
+[API] POST business-types: Connecting to database...
+[API] POST business-types: Database connected successfully
+[API] POST business-types: Request body: { name: 'Energy & Utilities' }
+[API] POST business-types: Checking for existing business type with name: "Energy & Utilities"
+[API] POST business-types: Business type with this name already exists
+[API] POST business-types: Received request to create business type
+[API] POST business-types: Connecting to database...
+[API] POST business-types: Database connected successfully
+[API] POST business-types: Request body: { name: 'Marine Industries' }
+[API] POST business-types: Checking for existing business type with name: "Marine Industries"
+[API] POST business-types: No existing business type found. Creating new one...
+[API] POST business-types: New BusinessType instance created: {
+  name: 'Marine Industries',
+  _id: new ObjectId('688a1cf9b58e52996afebd9d'),
+  id: '688a1cf9b58e52996afebd9d'
+}
+[API] POST business-types: Saving to database...
+[API] POST business-types: Business type saved successfully with ID: new ObjectId('688a1cf9b58e52996afebd9d')
+[API] POST business-types: Returning success response: {
+  _id: new ObjectId('688a1cf9b58e52996afebd9d'),
+  name: 'Marine Industries',
+  customers: [],
+  customerCount: 0,
+  createdAt: 2025-07-30T13:24:09.148Z,
+  updatedAt: 2025-07-30T13:24:09.148Z
+}
+[API] GET business-types: Database connected successfully
+Error fetching business types: MissingSchemaError: Schema hasn't been registered for model "Customer".
+Use mongoose.model(name, schema)
+    at NativeConnection.model (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/connection.js:1491:13)
+    at _getModelFromConn (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:579:15)
+    at addModelNamesToMap (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:507:17)
+    at _virtualPopulate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:464:7)
+    at getModelsMapForPopulate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:42:12)
+    at _populatePath (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/model.js:4468:21)
+    at model.populate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/model.js:4435:21)
+    at model.Query._find (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/query.js:2433:20)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async model.Query.exec (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/query.js:4604:63)
+    at async GET (webpack-internal:///(rsc)/./app/api/admin/business-types/route.ts:19:31)
+    at async /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:61856
+[API] GET business-types: Database connected successfully
+Error fetching business types: MissingSchemaError: Schema hasn't been registered for model "Customer".
+Use mongoose.model(name, schema)
+    at NativeConnection.model (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/connection.js:1491:13)
+    at _getModelFromConn (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:579:15)
+    at addModelNamesToMap (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:507:17)
+    at _virtualPopulate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:464:7)
+    at getModelsMapForPopulate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:42:12)
+    at _populatePath (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/model.js:4468:21)
+    at model.populate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/model.js:4435:21)
+    at model.Query._find (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/query.js:2433:20)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async model.Query.exec (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/query.js:4604:63)
+    at async GET (webpack-internal:///(rsc)/./app/api/admin/business-types/route.ts:19:31)
+    at async /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:61856
+[API] GET business-types: Database connected successfully
+Error fetching business types: MissingSchemaError: Schema hasn't been registered for model "Customer".
+Use mongoose.model(name, schema)
+    at NativeConnection.model (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/connection.js:1491:13)
+    at _getModelFromConn (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:579:15)
+    at addModelNamesToMap (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:507:17)
+    at _virtualPopulate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:464:7)
+    at getModelsMapForPopulate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:42:12)
+    at _populatePath (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/model.js:4468:21)
+    at model.populate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/model.js:4435:21)
+    at model.Query._find (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/query.js:2433:20)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async model.Query.exec (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/query.js:4604:63)
+    at async GET (webpack-internal:///(rsc)/./app/api/admin/business-types/route.ts:19:31)
+    at async /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:61856
+ ✓ Compiled in 156ms (34 modules)
+[API] GET business-types: Database connected successfully
+[API] GET business-types: Found 15 business types
+ ○ Compiling /admin/page ...
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for Compilation/modules|javascript/auto|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-flight-css-loader.js??ruleSet[1].rules[12].oneOf[12].use[0]!/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/mini-css-extract-plugin/loader.js??ruleSet[1].rules[12].oneOf[12].use[1]!/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[2]!/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[3]!/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/app/globals.css|app-pages-browser from pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for Compilation/modules|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[2]!/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[3]!/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/app/globals.css from pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for Compilation/modules|css|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[2]!/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[12].oneOf[12].use[3]!/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/app/globals.css|0 from pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for Compilation/codeGeneration|webpack/runtime/get javascript chunk filename|webpack from pack: Error: incorrect header check
+ ✓ Compiled /admin/page in 2.7s (808 modules)
+ ✓ Compiled in 153ms (415 modules)
+ ○ Compiling /api/admin/brands/route ...
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled /api/admin/brands/route in 1308ms (836 modules)
+[API] GET business-types: Database connected successfully
+Error fetching industries: MissingSchemaError: Schema hasn't been registered for model "Application".
+Use mongoose.model(name, schema)
+    at NativeConnection.model (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/connection.js:1491:13)
+    at _getModelFromConn (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:579:15)
+    at addModelNamesToMap (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:507:17)
+    at _virtualPopulate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:464:7)
+    at getModelsMapForPopulate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/helpers/populate/getModelsMapForPopulate.js:42:12)
+    at _populatePath (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/model.js:4468:21)
+    at model.populate (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/model.js:4435:21)
+    at model.Query._find (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/query.js:2433:20)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async model.Query.exec (/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/mongoose/lib/query.js:4604:63)
+    at async GET (webpack-internal:///(rsc)/./app/api/industries/route.ts:49:28)
+    at async /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:61856
+[API] GET business-types: Found 15 business types
+ ✓ Compiled /api/admin/pump-types/route in 54ms (438 modules)
+ ✓ Compiled /api/admin/applications/route in 48ms (441 modules)
+[API] GET business-types: Database connected successfully
+[API] GET business-types: Found 15 business types
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled /not-found in 395ms (847 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1316ms (808 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/3.pack.gz_' -> '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/3.pack.gz'
+ ✓ Compiled in 752ms (808 modules)
+ ✓ Compiled in 431ms (808 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 325ms (415 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/8.pack.gz_' -> '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/8.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 231ms (415 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1029ms (808 modules)
+ ✓ Compiled in 422ms (808 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 822ms (808 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 615ms (808 modules)
+ ✓ Compiled in 491ms (808 modules)
+ ⨯ ./components/admin/CustomerForm.tsx
+Error: 
+  [31mx[0m Unexpected token `div`. Expected jsx identifier
+     ,-[[36;1;4m/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/components/admin/CustomerForm.tsx[0m:192:1]
+ [2m192[0m |   }
+ [2m193[0m | 
+ [2m194[0m |   return (
+ [2m195[0m |     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+     : [31;1m     ^^^[0m
+ [2m196[0m |       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+ [2m197[0m |         <div className="px-6 py-4 border-b border-gray-200">
+ [2m198[0m |           <h2 className="text-xl font-semibold text-gray-900">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/admin/CustomerForm.tsx
+./app/admin/page.tsx
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/2.pack.gz_' -> '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/2.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack failed from /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development.pack.gz: Error: incorrect header check
+ ✓ Compiled in 903ms (808 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/0.pack.gz_' -> '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/0.pack.gz'
+ ✓ Compiled in 302ms (415 modules)
+ ✓ Compiled in 249ms (415 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ○ Compiling /page ...
+ ✓ Compiled /page in 973ms (839 modules)
+ ✓ Compiled /not-found in 177ms (830 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1028ms (809 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 461ms (809 modules)
+ ✓ Compiled in 334ms (809 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 220ms (416 modules)
+ ✓ Compiled in 568ms (809 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 370ms (416 modules)
+ ✓ Compiled in 185ms (416 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 265ms (416 modules)
+ ✓ Compiled in 429ms (416 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 421ms (416 modules)
+ ✓ Compiled in 466ms (416 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 488ms (416 modules)
+ ✓ Compiled in 304ms (416 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 401ms (416 modules)
+ ✓ Compiled in 268ms (416 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 399ms (416 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 844ms (809 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 463ms (809 modules)
+ ✓ Compiled in 391ms (809 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 726ms (809 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/2.pack.gz_' -> '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/2.pack.gz'
+ ○ Compiling /page ...
+ ✓ Compiled /page in 532ms (423 modules)
+ ✓ Compiled /api/admin/brands/route in 184ms (447 modules)
+ ✓ Compiled (465 modules)
+[API] GET customers: Database connected successfully
+[API] GET business-types: Database connected successfully
+[API] GET business-types: Found 13 business types
+ ✓ Compiled /api/admin/applications/route in 99ms (468 modules)
+[API] GET customers: Found 1 customers
+ ✓ Compiled in 0ms (471 modules)
+ ✓ Compiled in 1ms (471 modules)
+ ✓ Compiled in 0ms (471 modules)
+[API] GET customers: Database connected successfully
+[API] GET business-types: Database connected successfully
+[API] GET customers: Found 1 customers
+[API] GET business-types: Found 13 business types
+[API] GET business-types: Database connected successfully
+[API] GET business-types: Found 13 business types
+[API] GET business-types: Database connected successfully
+[API] GET business-types: Found 13 business types
+[API] GET business-types: Database connected successfully
+[API] GET business-types: Database connected successfully
+[API] GET business-types: Found 13 business types
+[API] GET business-types: Found 13 business types
+ ○ Compiling /customers/page ...
+ ✓ Compiled /customers/page in 654ms (821 modules)
+ ✓ Compiled /api/customers/route in 105ms (424 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for Compilation/modules|javascript/auto|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/navigation.js|app-pages-browser from pack: Error: incorrect header check
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for ResolverCachePlugin|normal|default|alias=[|server-only$=|next/dist/compiled/server-only/index|client-only$=|next/dist/compiled/client-only/index|next/dist/compiled/client-only$=|next/dist/compiled/client-only/index|next/dist/compiled/server-only=|next/dist/compiled/server-only/index|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/head.js=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/client/components/noop-head.js|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dynamic.js=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/shared/lib/app-dynamic.js|react$=|next/dist/compiled/react|react-dom$=|next/dist/compiled/react-dom|react/jsx-runtime$=|next/dist/compiled/react/jsx-runtime|react/jsx-dev-runtime$=|next/dist/compiled/react/jsx-dev-runtime|react-dom/client$=|next/dist/compiled/react-dom/client|react-dom/server$=|next/dist/compiled/react-dom/server|react-dom/static$=|next/dist/compiled/react-dom-experimental/static|react-dom/static.edge$=|next/dist/compiled/react-dom-experimental/static.edge|react-dom/static.browser$=|next/dist/compiled/react-dom-experimental/static.browser|react-dom/server.edge$=|next/dist/compiled/react-dom/server.edge|react-dom/server.browser$=|next/dist/compiled/react-dom/server.browser|react-server-dom-webpack/client$=|next/dist/compiled/react-server-dom-webpack/client|react-server-dom-webpack/client.edge$=|next/dist/compiled/react-server-dom-webpack/client.edge|react-server-dom-webpack/server.edge$=|next/dist/compiled/react-server-dom-webpack/server.edge|react-server-dom-webpack/server.node$=|next/dist/compiled/react-server-dom-webpack/server.node|./cjs/react-dom-server-legacy.browser.production.min.js=|next/dist/build/noop-react-dom-server-legacy|./cjs/react-dom-server-legacy.browser.development.js=|next/dist/build/noop-react-dom-server-legacy|@vercel/turbopack-ecmascript-runtime/dev/client/hmr-client.ts=|next/dist/client/dev/noop-turbopack-hmr|]|fullySpecified=|false|fallback=[|assert=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/assert/assert.js|buffer=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/buffer/index.js|constants=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/constants-browserify/constants.json|crypto=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/crypto-browserify/index.js|domain=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/domain-browser/index.js|http=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/stream-http/index.js|https=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/https-browserify/index.js|os=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/os-browserify/browser.js|path=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/path-browserify/index.js|punycode=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/punycode/punycode.js|process=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/polyfills/process.js|querystring=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/querystring-es3/index.js|stream=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/stream-browserify/index.js|string_decoder=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/string_decoder/string_decoder.js|sys=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/util/util.js|timers=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/timers-browserify/main.js|tty=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/tty-browserify/index.js|util=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/util/util.js|vm=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/vm-browserify/index.js|zlib=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/browserify-zlib/index.js|events=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/events/events.js|setImmediate=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/compiled/setimmediate/setImmediate.js|]|dependencyType=|unknown|path=|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next|request=|./dist/client/components/navigation from pack: Error: incorrect header check
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for Compilation/codeGeneration|javascript/auto|/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/navigation.js|app-pages-browser|webpack from pack: Error: incorrect header check
+ ✓ Compiled /customers/[slug]/page in 211ms (843 modules)
+ ✓ Compiled /api/customers/[slug]/route in 60ms (433 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 258ms (402 modules)
+ ✓ Compiled in 732ms (828 modules)
+ ✓ Compiled /not-found in 184ms (819 modules)
+ ✓ Compiled /api/customers/[slug]/route in 204ms (429 modules)
+ ✓ Compiled in 378ms (857 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 601ms (1001 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 447ms (1015 modules)
+ ✓ Compiled in 351ms (1015 modules)
+ ✓ Compiled in 818ms (1015 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 469ms (551 modules)
+ ✓ Compiled in 551ms (1015 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 626ms (1015 modules)
+ ✓ Compiled in 376ms (551 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/vendor-chunks'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/@heroicons' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/vendor-chunks/@heroicons.js', but to 'Error: Can't resolve './vendor-chunks/@heroicons' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/@heroicons (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/vendor-chunks/@heroicons.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/webpack-runtime.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/@swc' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/vendor-chunks/@swc.js', but to 'Error: Can't resolve './vendor-chunks/@swc' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/@swc (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/vendor-chunks/@swc.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/webpack-runtime.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/webpack-runtime.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+ ✓ Compiled in 1045ms (984 modules)
+ ✓ Compiled /not-found in 103ms (975 modules)
+ ✓ Compiled /page in 261ms (469 modules)
+ ✓ Compiled /_error in 198ms (1021 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 623ms (984 modules)
+ ✓ Compiled in 584ms (984 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 433ms (984 modules)
+ ✓ Compiled in 651ms (984 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/page' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/page.js', but to 'Error: Can't resolve '../../../../.next/server/app/page' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/page (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/page.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/pump-types/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/pump-types/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/pump-types/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/brands/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/brands/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/brands/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/brands/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/brands/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+ ✓ Compiled in 1100ms (984 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/page.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/page' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/page.js', but to 'Error: Can't resolve '../../../../.next/server/app/page' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/page (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/page.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/pump-types/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/pump-types/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/pump-types/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/brands/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/brands/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/brands/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/brands/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/brands/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 526ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 286ms (548 modules)
+ ✓ Compiled in 312ms (548 modules)
+ ✓ Compiled in 524ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ⨯ ./app/customers/page.tsx
+Error: 
+  [31mx[0m the name `businessTypes` is defined multiple times
+    ,-[[36;1;4m/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/app/customers/page.tsx[0m:51:1]
+ [2m51[0m | 
+ [2m52[0m | export default function CustomersPage() {
+ [2m53[0m |   const [customers, setCustomers] = useState<Customer[]>([])
+ [2m54[0m |   const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([])
+    : [31;1m         ^^^^^^|^^^^^^[0m
+    :                [31;1m`-- [31;1mprevious definition of `businessTypes` here[0m[0m
+ [2m55[0m |   const [loading, setLoading] = useState(true)
+ [2m56[0m |   const [filterByType, setFilterByType] = useState<string>('all')
+ [2m57[0m |   const [filterByTier, setFilterByTier] = useState<string>('all')
+ [2m58[0m | 
+ [2m59[0m |   useEffect(() => {
+ [2m60[0m |     fetchCustomers()
+ [2m61[0m |   }, [])
+ [2m62[0m | 
+ [2m63[0m |   const fetchCustomers = async () => {
+ [2m64[0m |     try {
+ [2m65[0m |       const response = await fetch('/api/customers')
+ [2m66[0m |       if (response.ok) {
+ [2m67[0m |         const customersData = await response.json()
+ [2m68[0m |         setCustomers(customersData)
+ [2m69[0m |       } else {
+ [2m70[0m |         console.error('Failed to fetch customers')
+ [2m71[0m |       }
+ [2m72[0m |     } catch (error) {
+ [2m73[0m |       console.error('Error fetching customers:', error)
+ [2m74[0m |     } finally {
+ [2m75[0m |       setLoading(false)
+ [2m76[0m |     }
+ [2m77[0m |   }
+ [2m78[0m | 
+ [2m79[0m |   const filteredCustomers = customers.filter(customer => {
+ [2m80[0m |     const typeMatch = filterByType === 'all' || customer.businessType?.slug === filterByType
+ [2m81[0m |     const tierMatch = filterByTier === 'all' || customer.customerTier === filterByTier
+ [2m82[0m |     return typeMatch && tierMatch
+ [2m83[0m |   })
+ [2m84[0m | 
+ [2m85[0m |   const businessTypes = Array.from(new Set(customers.map(c => c.businessType?.slug).filter(Boolean)))
+    : [33;1m        ^^^^^^|^^^^^^[0m
+    :               [33;1m`-- [33;1m`businessTypes` redefined here[0m[0m
+ [2m86[0m |   const customerTiers = Array.from(new Set(customers.map(c => c.customerTier)))
+ [2m87[0m | 
+ [2m88[0m |   if (loading) {
+    `----
+
+Import trace for requested module:
+./app/customers/page.tsx
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ⨯ ./app/customers/page.tsx
+Error: 
+  [31mx[0m the name `businessTypes` is defined multiple times
+    ,-[[36;1;4m/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/app/customers/page.tsx[0m:51:1]
+ [2m51[0m | 
+ [2m52[0m | export default function CustomersPage() {
+ [2m53[0m |   const [customers, setCustomers] = useState<Customer[]>([])
+ [2m54[0m |   const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([])
+    : [31;1m         ^^^^^^|^^^^^^[0m
+    :                [31;1m`-- [31;1mprevious definition of `businessTypes` here[0m[0m
+ [2m55[0m |   const [loading, setLoading] = useState(true)
+ [2m56[0m |   const [filterByType, setFilterByType] = useState<string>('all')
+ [2m57[0m |   const [filterByTier, setFilterByTier] = useState<string>('all')
+ [2m58[0m | 
+ [2m59[0m |   useEffect(() => {
+ [2m60[0m |     fetchCustomers()
+ [2m61[0m |     fetchBusinessTypes()
+ [2m62[0m |   }, [])
+ [2m63[0m | 
+ [2m64[0m |   const fetchCustomers = async () => {
+ [2m65[0m |     try {
+ [2m66[0m |       const response = await fetch('/api/customers')
+ [2m67[0m |       if (response.ok) {
+ [2m68[0m |         const customersData = await response.json()
+ [2m69[0m |         setCustomers(customersData)
+ [2m70[0m |       } else {
+ [2m71[0m |         console.error('Failed to fetch customers')
+ [2m72[0m |       }
+ [2m73[0m |     } catch (error) {
+ [2m74[0m |       console.error('Error fetching customers:', error)
+ [2m75[0m |     } finally {
+ [2m76[0m |       setLoading(false)
+ [2m77[0m |     }
+ [2m78[0m |   }
+ [2m79[0m | 
+ [2m80[0m |   const filteredCustomers = customers.filter(customer => {
+ [2m81[0m |     const typeMatch = filterByType === 'all' || customer.businessType?.slug === filterByType
+ [2m82[0m |     const tierMatch = filterByTier === 'all' || customer.customerTier === filterByTier
+ [2m83[0m |     return typeMatch && tierMatch
+ [2m84[0m |   })
+ [2m85[0m | 
+ [2m86[0m |   const businessTypes = Array.from(new Set(customers.map(c => c.businessType?.slug).filter(Boolean)))
+    : [33;1m        ^^^^^^|^^^^^^[0m
+    :               [33;1m`-- [33;1m`businessTypes` redefined here[0m[0m
+ [2m87[0m |   const customerTiers = Array.from(new Set(customers.map(c => c.customerTier)))
+ [2m88[0m | 
+ [2m89[0m |   if (loading) {
+    `----
+
+Import trace for requested module:
+./app/customers/page.tsx
+ ⨯ ./app/customers/page.tsx
+Error: 
+  [31mx[0m the name `businessTypes` is defined multiple times
+     ,-[[36;1;4m/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/app/customers/page.tsx[0m:51:1]
+ [2m 51[0m | 
+ [2m 52[0m | export default function CustomersPage() {
+ [2m 53[0m |   const [customers, setCustomers] = useState<Customer[]>([])
+ [2m 54[0m |   const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([])
+     : [31;1m         ^^^^^^|^^^^^^[0m
+     :                [31;1m`-- [31;1mprevious definition of `businessTypes` here[0m[0m
+ [2m 55[0m |   const [loading, setLoading] = useState(true)
+ [2m 56[0m |   const [filterByType, setFilterByType] = useState<string>('all')
+ [2m 57[0m |   const [filterByTier, setFilterByTier] = useState<string>('all')
+ [2m 58[0m | 
+ [2m 59[0m |   useEffect(() => {
+ [2m 60[0m |     fetchCustomers()
+ [2m 61[0m |     fetchBusinessTypes()
+ [2m 62[0m |   }, [])
+ [2m 63[0m | 
+ [2m 64[0m |   const fetchCustomers = async () => {
+ [2m 65[0m |     try {
+ [2m 66[0m |       const response = await fetch('/api/customers')
+ [2m 67[0m |       if (response.ok) {
+ [2m 68[0m |         const customersData = await response.json()
+ [2m 69[0m |         setCustomers(customersData)
+ [2m 70[0m |       } else {
+ [2m 71[0m |         console.error('Failed to fetch customers')
+ [2m 72[0m |       }
+ [2m 73[0m |     } catch (error) {
+ [2m 74[0m |       console.error('Error fetching customers:', error)
+ [2m 75[0m |     } finally {
+ [2m 76[0m |       setLoading(false)
+ [2m 77[0m |     }
+ [2m 78[0m |   }
+ [2m 79[0m | 
+ [2m 80[0m |   const fetchBusinessTypes = async () => {
+ [2m 81[0m |     try {
+ [2m 82[0m |       const response = await fetch('/api/admin/business-types')
+ [2m 83[0m |       if (response.ok) {
+ [2m 84[0m |         const businessTypesData = await response.json()
+ [2m 85[0m |         setBusinessTypes(businessTypesData)
+ [2m 86[0m |       } else {
+ [2m 87[0m |         console.error('Failed to fetch business types')
+ [2m 88[0m |       }
+ [2m 89[0m |     } catch (error) {
+ [2m 90[0m |       console.error('Error fetching business types:', error)
+ [2m 91[0m |     }
+ [2m 92[0m |   }
+ [2m 93[0m | 
+ [2m 94[0m |   const filteredCustomers = customers.filter(customer => {
+ [2m 95[0m |     const typeMatch = filterByType === 'all' || customer.businessType?.slug === filterByType
+ [2m 96[0m |     const tierMatch = filterByTier === 'all' || customer.customerTier === filterByTier
+ [2m 97[0m |     return typeMatch && tierMatch
+ [2m 98[0m |   })
+ [2m 99[0m | 
+ [2m100[0m |   const businessTypes = Array.from(new Set(customers.map(c => c.businessType?.slug).filter(Boolean)))
+     : [33;1m        ^^^^^^|^^^^^^[0m
+     :               [33;1m`-- [33;1m`businessTypes` redefined here[0m[0m
+ [2m101[0m |   const customerTiers = Array.from(new Set(customers.map(c => c.customerTier)))
+ [2m102[0m | 
+ [2m103[0m |   if (loading) {
+     `----
+
+Import trace for requested module:
+./app/customers/page.tsx
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 522ms (548 modules)
+ ✓ Compiled in 476ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 576ms (548 modules)
+ ✓ Compiled in 1085ms (984 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 382ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/page' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/page.js', but to 'Error: Can't resolve '../../../../.next/server/app/page' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/page (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/page.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/pump-types/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/pump-types/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/pump-types/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/brands/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/brands/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/brands/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/brands/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/brands/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/business-types/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/business-types/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/business-types/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/business-types/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/business-types/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/industries/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/industries/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/industries/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/industries/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/industries/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 845ms (984 modules)
+ ✓ Compiled in 392ms (984 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/page.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/page' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/page.js', but to 'Error: Can't resolve '../../../../.next/server/app/page' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/page (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/page.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/export/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 541ms (548 modules)
+ ✓ Compiled in 304ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 528ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 619ms (548 modules)
+ ✓ Compiled /page in 289ms (466 modules)
+ ✓ Compiled /not-found in 318ms (1019 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/pump-types/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/pump-types/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/pump-types/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/pump-types/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/brands/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/brands/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/brands/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/brands/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/brands/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/industries/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/industries/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/industries/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/industries/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/industries/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving '../../../../.next/server/app/api/admin/business-types/route' in /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server for build dependencies doesn't lead to expected result '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/business-types/route.js', but to 'Error: Can't resolve '../../../../.next/server/app/api/admin/business-types/route' in '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ../../../../.next/server/app/api/admin/business-types/route (expected /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/server/app/api/admin/business-types/route.js)
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/require.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/worker.js
+<w>  at file dependencies /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+ ✓ Compiled in 899ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1021ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 557ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 653ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 759ms (548 modules)
+ ✓ Compiled in 306ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled /not-found in 426ms (1019 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 777ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 449ms (548 modules)
+ ✓ Compiled in 280ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 353ms (548 modules)
+ ✓ Compiled in 729ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 421ms (548 modules)
+ ✓ Compiled in 523ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 449ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 565ms (548 modules)
+ ✓ Compiled in 264ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ○ Compiling /not-found ...
+ ✓ Compiled /not-found in 844ms (1019 modules)
+ ✓ Compiled /_error in 139ms (1007 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1433ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 445ms (548 modules)
+ ✓ Compiled in 346ms (548 modules)
+ ✓ Compiled in 156ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 464ms (548 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set

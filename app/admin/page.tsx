@@ -26,6 +26,7 @@ import { IIndustry, IIndustryInput } from '@/models/Industry'
 import { IBusinessType, IBusinessTypeInput } from '@/models/BusinessType'
 import { IBrand, IBrandInput } from '@/models/Brand'
 import { IPumpType, IPumpTypeInput } from '@/models/PumpType'
+import { IProject } from '@/models/Project'
 
 interface Project {
   _id: string
@@ -36,7 +37,14 @@ interface Project {
   location: string
   completionDate: string
   projectType: string
-  pumpTypes: string[]
+  pumpModels: Array<{
+    name: string
+    url: string
+  }>
+  applications: Array<{
+    name: string
+    url: string
+  }>
   images: string[]
   specifications: {
     flowRate?: string
@@ -618,15 +626,16 @@ export default function AdminPage() {
   }
 
   const handleSaveBusinessType = async (businessTypeData: IBusinessTypeInput) => {
+    console.log('[AdminPage] Saving business type:', businessTypeData);
     try {
       if (selectedBusinessType) {
         // Update existing business type
-        const response = await fetch('/api/admin/business-types', {
+        const response = await fetch(`/api/admin/business-types?id=${selectedBusinessType._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ _id: selectedBusinessType._id, ...businessTypeData }),
+          body: JSON.stringify(businessTypeData),
         })
         
         if (response.ok) {
@@ -1406,6 +1415,7 @@ export default function AdminPage() {
             setIsCustomerFormOpen(false)
             setSelectedCustomer(null)
           }}
+          onShowNotification={(type, message) => showNotification?.({ type, message })}
         />
       )}
 
@@ -1439,6 +1449,7 @@ export default function AdminPage() {
             setIsBrandFormOpen(false)
             setSelectedBrand(null)
           }}
+          onShowNotification={(type, message) => showNotification?.({ type, message })}
         />
       )}
 

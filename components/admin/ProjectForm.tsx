@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { Eye, Edit, CheckCircle } from 'lucide-react'
+import { Eye, Edit, CheckCircle, AlertCircle } from 'lucide-react'
 import 'react-quill/dist/quill.snow.css'
 
 // Dynamically import ReactQuill to avoid SSR issues
@@ -45,8 +45,14 @@ interface ProjectFormProps {
   onCancel: () => void
 }
 
+interface ValidationErrors {
+  [key: string]: string
+}
+
 export default function ProjectForm({ project, onSave, onCancel }: ProjectFormProps) {
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
+  const [showValidation, setShowValidation] = useState(false)
   
   const [formData, setFormData] = useState<Omit<Project, '_id' | 'createdAt' | 'updatedAt'>>({
     title: '',
@@ -170,11 +176,56 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
     }
   }
 
+  const validateForm = () => {
+    const errors: ValidationErrors = {}
+    
+    if (!formData.title.trim()) {
+      errors.title = 'Project title is required'
+    }
+    if (!formData.description.trim()) {
+      errors.description = 'Project description is required'
+    }
+    if (!formData.client.trim()) {
+      errors.client = 'Client name is required'
+    }
+    if (!formData.location.trim()) {
+      errors.location = 'Location is required'
+    }
+    if (!formData.completionDate.trim()) {
+      errors.completionDate = 'Completion date is required'
+    }
+    if (!formData.challenges.trim()) {
+      errors.challenges = 'Project challenges description is required'
+    }
+    if (!formData.solutions.trim()) {
+      errors.solutions = 'Solutions description is required'
+    }
+    if (!formData.results.trim()) {
+      errors.results = 'Results description is required'
+    }
+    
+    return errors
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
+    const errors = validateForm()
+    
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors)
+      setShowValidation(true)
+      return
+    }
+    
+    // Clear validation errors on successful validation
+    setValidationErrors({})
+    setShowValidation(false)
+    
     const cleanedData = {
       ...formData,
+      // Convert completionDate string to Date object for the API
+      completionDate: new Date(formData.completionDate).toISOString(),
       pumpModels: formData.pumpModels.filter(model => model.name.trim() !== ''),
       applications: formData.applications.filter(app => app.name.trim() !== ''),
       images: formData.images.filter(img => img.trim() !== ''),
@@ -317,6 +368,9 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    {showValidation && validationErrors.title && (
+                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.title}</p>
+                    )}
                   </div>
 
                   <div>
@@ -360,6 +414,9 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    {showValidation && validationErrors.client && (
+                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.client}</p>
+                    )}
                   </div>
                 </div>
 
@@ -382,6 +439,9 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                         </option>
                       ))}
                     </select>
+                    {showValidation && validationErrors.projectType && (
+                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.projectType}</p>
+                    )}
                   </div>
 
                   <div>
@@ -402,6 +462,9 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                         </option>
                       ))}
                     </select>
+                    {showValidation && validationErrors.status && (
+                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.status}</p>
+                    )}
                   </div>
                 </div>
 
@@ -419,6 +482,9 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    {showValidation && validationErrors.location && (
+                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.location}</p>
+                    )}
                   </div>
 
                   <div>
@@ -434,6 +500,9 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    {showValidation && validationErrors.completionDate && (
+                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.completionDate}</p>
+                    )}
                   </div>
                 </div>
 
@@ -451,6 +520,9 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       theme="snow"
                       placeholder="Enter detailed project description..."
                     />
+                    {showValidation && validationErrors.description && (
+                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.description}</p>
+                    )}
                   </div>
                 </div>
 
@@ -471,6 +543,7 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                         placeholder="e.g., 2000 CFM"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                      
                     </div>
 
                     <div>
@@ -486,6 +559,7 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                         placeholder="e.g., 29.8 inHg"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                      
                     </div>
 
                     <div>
@@ -501,6 +575,7 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                         placeholder="e.g., 45 kW"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                      
                     </div>
 
                     <div>
@@ -516,6 +591,7 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                         placeholder="e.g., 8 units"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                      
                     </div>
                   </div>
                 </div>
@@ -656,6 +732,9 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       theme="snow"
                       placeholder="Describe the main challenges faced in this project..."
                     />
+                    {showValidation && validationErrors.challenges && (
+                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.challenges}</p>
+                    )}
                   </div>
                 </div>
 
@@ -673,6 +752,9 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       theme="snow"
                       placeholder="Explain the solutions and approaches used..."
                     />
+                    {showValidation && validationErrors.solutions && (
+                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.solutions}</p>
+                    )}
                   </div>
                 </div>
 
@@ -690,6 +772,9 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
                       theme="snow"
                       placeholder="Detail the outcomes and achievements..."
                     />
+                    {showValidation && validationErrors.results && (
+                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.results}</p>
+                    )}
                   </div>
                 </div>
 

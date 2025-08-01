@@ -117,7 +117,7 @@ export default function CustomerList({ customers, onEdit, onDelete }: CustomerLi
 
   const fetchBusinessTypes = async () => {
     try {
-      const response = await fetch('/api/business-types')
+      const response = await fetch('/api/admin/business-types')
       if (response.ok) {
         const businessTypesData = await response.json()
         setBusinessTypes(businessTypesData)
@@ -178,16 +178,13 @@ export default function CustomerList({ customers, onEdit, onDelete }: CustomerLi
                 Business Type
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Contact
+                Industries
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Tier
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Location
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
@@ -236,21 +233,17 @@ export default function CustomerList({ customers, onEdit, onDelete }: CustomerLi
                   <div className="text-sm text-gray-900">
                     {getBusinessTypeName(customer.businessType.toString())}
                   </div>
-                  {customer.industry.length > 0 && (
+                </td>
+                
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {customer.industry && customer.industry.length > 0 ? (
                     <div className="text-sm text-gray-500">
                       {getIndustryNames(customer.industry).slice(0, 2).join(', ')}
                       {customer.industry.length > 2 && ` +${customer.industry.length - 2} more`}
                     </div>
+                  ) : (
+                    <div className="text-sm text-gray-400">-</div>
                   )}
-                </td>
-                
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {customer.contactInfo.primaryEmail}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {customer.contactInfo.primaryPhone}
-                  </div>
                 </td>
                 
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -268,14 +261,6 @@ export default function CustomerList({ customers, onEdit, onDelete }: CustomerLi
                   </span>
                 </td>
                 
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {customer.addresses.headquarters.city}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {customer.addresses.headquarters.country}
-                  </div>
-                </td>
                 
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex space-x-2">

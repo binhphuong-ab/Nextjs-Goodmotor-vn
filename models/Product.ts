@@ -113,9 +113,7 @@ const ProductSchema = new Schema<IProduct>({
 })
 
 // Indexes for better query performance
-ProductSchema.index({ pumpType: 1 })
-ProductSchema.index({ brand: 1 })
-ProductSchema.index({ productLineId: 1 })
+// Note: Removed duplicate basic indexes for optional fields - using sparse indexes instead
 ProductSchema.index({ name: 'text', description: 'text' })
 
 // Add compound indexes for common e-commerce query patterns

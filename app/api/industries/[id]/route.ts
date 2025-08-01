@@ -29,7 +29,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     if (includeCustomers) {
       industryQuery = industryQuery.populate({
         path: 'customers',
-        select: 'name slug businessType customerStatus contactInfo.primaryEmail',
+        select: 'name slug businessType customerStatus',
         populate: {
           path: 'businessType',
           select: 'name'

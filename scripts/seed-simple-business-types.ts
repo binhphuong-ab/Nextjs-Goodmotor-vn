@@ -1,7 +1,13 @@
 import dotenv from 'dotenv'
-dotenv.config({ path: '.env.local' })
+import path from 'path'
 
-import { getDatabase } from '@/lib/mongodb'
+// Load environment variables from .env.local
+dotenv.config({ path: path.join(process.cwd(), '.env.local') })
+
+// Debug: Check if MONGODB_URI is loaded
+console.log('MONGODB_URI loaded:', process.env.MONGODB_URI ? 'Yes' : 'No')
+
+import connectToDatabase from '@/lib/mongoose'
 import BusinessType from '@/models/BusinessType'
 
 const simpleBusinessTypes = [
@@ -21,7 +27,8 @@ const simpleBusinessTypes = [
 
 async function seedBusinessTypes() {
   try {
-    await getDatabase()
+    await connectToDatabase()
+    console.log('Connected to database successfully')
     
     console.log('Starting business type seeding...')
     
