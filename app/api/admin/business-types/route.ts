@@ -16,15 +16,44 @@ export async function GET() {
     
     console.log(`[API] GET business-types: Found ${businessTypes.length} business types`)
     
-    // Add customer count to each business type (simplified for now)
-    const businessTypesWithCount = businessTypes.map(bt => ({
-      _id: bt._id,
-      name: bt.name,
-      customers: [], // TODO: Fix customer population after Customer model is properly registered
-      customerCount: 0, // TODO: Calculate actual customer count
-      createdAt: bt.createdAt,
-      updatedAt: bt.updatedAt
-    }))
+    // Calculate actual customer count for each business type
+    const businessTypesWithCount = await Promise.all(
+      businessTypes.map(async (bt) => {
+        try {
+          // Count customers using this business type
+          const customerCount = await Customer.countDocuments({ businessType: bt._id })
+          
+          // Get customer details for display
+          const customers = await Customer.find({ businessType: bt._id })
+            .select('_id name slug')
+            .limit(10) // Limit to prevent too much data
+          
+          return {
+            _id: bt._id,
+            name: bt.name,
+            customers: customers,
+            customerCount: customerCount,
+            createdAt: bt.createdAt,
+            updatedAt: bt.updatedAt
+          }
+        } catch (error) {
+          console.error(`Error calculating customer count for business type ${bt.name}:`, error)
+          return {
+            _id: bt._id,
+            name: bt.name,
+            customers: [],
+            customerCount: 0,
+            createdAt: bt.createdAt,
+            updatedAt: bt.updatedAt
+          }
+        }
+      })
+    )
+    
+    console.log(`[API] GET business-types: Calculated customer counts for ${businessTypesWithCount.length} business types`)
+    businessTypesWithCount.forEach(bt => {
+      console.log(`  - ${bt.name}: ${bt.customerCount} customers`)
+    })
     
     return NextResponse.json(businessTypesWithCount)
   } catch (error) {

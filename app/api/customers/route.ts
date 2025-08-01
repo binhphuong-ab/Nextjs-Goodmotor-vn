@@ -36,6 +36,9 @@ export async function GET() {
           customerTier: 1,
           completeDate: 1,
           description: 1,
+          projects: 1,
+          pumpModelsUsed: 1,
+          applications: 1,
           featured: 1,
           createdAt: 1
         }
@@ -71,6 +74,9 @@ export async function GET() {
           customerTier: 1,
           completeDate: 1,
           description: 1,
+          projects: 1,
+          pumpModelsUsed: 1,
+          applications: 1,
           featured: 1,
           createdAt: 1
         }

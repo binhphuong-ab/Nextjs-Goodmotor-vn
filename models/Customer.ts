@@ -17,6 +17,12 @@ export interface ICustomer {
   
   // Description
   description?: string
+  
+  // Optional project-related fields
+  projects?: { name: string; url?: string }[]
+  pumpModelsUsed?: { name: string; url?: string }[]
+  applications?: { name: string; url?: string }[]
+  
   featured: boolean
   createdAt: Date
   updatedAt: Date
@@ -97,6 +103,68 @@ const CustomerSchema = new Schema<ICustomer>({
     type: String,
     trim: true
   },
+  
+  // Optional project-related fields
+  projects: [{
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: [200, 'Project name cannot exceed 200 characters']
+    },
+    url: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          if (!v) return true; // Optional field
+          return /^https?:\/\/.+\..+/.test(v);
+        },
+        message: 'Please provide a valid project URL'
+      }
+    }
+  }],
+  
+  pumpModelsUsed: [{
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: [200, 'Pump model name cannot exceed 200 characters']
+    },
+    url: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          if (!v) return true; // Optional field
+          return /^https?:\/\/.+\..+/.test(v);
+        },
+        message: 'Please provide a valid pump model URL'
+      }
+    }
+  }],
+  
+  applications: [{
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: [200, 'Application name cannot exceed 200 characters']
+    },
+    url: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          if (!v) return true; // Optional field
+          return /^https?:\/\/.+\..+/.test(v);
+        },
+        message: 'Please provide a valid application URL'
+      }
+    }
+  }],
+  
   featured: {
     type: Boolean,
     default: false
@@ -132,6 +200,9 @@ export interface ICustomerInput {
   customerTier?: ICustomer['customerTier']
   completeDate?: Date
   description?: string
+  projects?: { name: string; url?: string }[]
+  pumpModelsUsed?: { name: string; url?: string }[]
+  applications?: { name: string; url?: string }[]
   featured?: boolean
 }
 

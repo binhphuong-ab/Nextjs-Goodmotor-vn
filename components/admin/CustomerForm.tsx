@@ -19,12 +19,18 @@ interface Industry {
   _id: string
   name: string
   slug: string
-  category: string
-  featured: boolean
+  category?: string
+  displayOrder?: number
+}
+
+// Extended interface for populated customer data from API
+interface PopulatedCustomer extends Omit<ICustomer, 'industry' | 'businessType'> {
+  industry?: (string | { _id: string; name: string; slug: string })[]
+  businessType: string | { _id: string; name: string }
 }
 
 interface CustomerFormProps {
-  customer?: ICustomer | null
+  customer?: PopulatedCustomer | null
   onSave: (customerData: ICustomerInput) => Promise<void>
   onCancel: () => void
   onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
@@ -67,6 +73,9 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
     businessType: '',
     industry: [], // Optional now
     completeDate: customer ? undefined : new Date(), // Auto-fill with today for new customers
+    projects: [],
+    pumpModelsUsed: [],
+    applications: [],
     featured: false
   })
 
@@ -111,7 +120,7 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
       const response = await fetch('/api/industries')
       if (response.ok) {
         const industriesData = await response.json()
-        setIndustries(industriesData.filter((industry: Industry) => industry.isActive))
+        setIndustries(industriesData)
       } else {
         console.error('Failed to fetch industries')
       }
@@ -124,18 +133,33 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
 
   useEffect(() => {
     if (customer) {
+      // Convert industry data - handle both populated objects and ObjectId strings
+      const industryIds = customer.industry?.map(item => {
+        // Handle populated objects
+        if (typeof item === 'object' && item._id) {
+          return item._id.toString()
+        }
+        // Handle ObjectId strings
+        return item.toString()
+      }) || []
+
       setFormData({
         name: customer.name,
         slug: customer.slug,
         legalName: customer.legalName,
-        businessType: customer.businessType.toString(),
-        industry: customer.industry || [],
+        businessType: typeof customer.businessType === 'object' && customer.businessType._id 
+          ? customer.businessType._id.toString() 
+          : customer.businessType.toString(),
+        industry: industryIds,
         website: customer.website,
         logo: customer.logo,
         customerStatus: customer.customerStatus,
         customerTier: customer.customerTier,
         completeDate: customer.completeDate,
         description: customer.description,
+        projects: customer.projects || [],
+        pumpModelsUsed: customer.pumpModelsUsed || [],
+        applications: customer.applications || [],
         featured: customer.featured
       })
     }
@@ -176,6 +200,76 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
     setFormData(prev => ({
       ...prev,
       description: content
+    }))
+  }
+
+  // Handlers for dynamic array fields
+  const addProject = () => {
+    setFormData(prev => ({
+      ...prev,
+      projects: [...(prev.projects || []), { name: '', url: '' }]
+    }))
+  }
+
+  const removeProject = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      projects: prev.projects?.filter((_, i) => i !== index) || []
+    }))
+  }
+
+  const updateProject = (index: number, field: 'name' | 'url', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      projects: prev.projects?.map((project, i) => 
+        i === index ? { ...project, [field]: value } : project
+      ) || []
+    }))
+  }
+
+  const addPumpModel = () => {
+    setFormData(prev => ({
+      ...prev,
+      pumpModelsUsed: [...(prev.pumpModelsUsed || []), { name: '', url: '' }]
+    }))
+  }
+
+  const removePumpModel = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      pumpModelsUsed: prev.pumpModelsUsed?.filter((_, i) => i !== index) || []
+    }))
+  }
+
+  const updatePumpModel = (index: number, field: 'name' | 'url', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      pumpModelsUsed: prev.pumpModelsUsed?.map((model, i) => 
+        i === index ? { ...model, [field]: value } : model
+      ) || []
+    }))
+  }
+
+  const addApplication = () => {
+    setFormData(prev => ({
+      ...prev,
+      applications: [...(prev.applications || []), { name: '', url: '' }]
+    }))
+  }
+
+  const removeApplication = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      applications: prev.applications?.filter((_, i) => i !== index) || []
+    }))
+  }
+
+  const updateApplication = (index: number, field: 'name' | 'url', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      applications: prev.applications?.map((app, i) => 
+        i === index ? { ...app, [field]: value } : app
+      ) || []
     }))
   }
 
@@ -288,60 +382,89 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Business Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Business Type *
                   </label>
                   {loadingBusinessTypes ? (
-                    <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                    <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
                       Loading business types...
                     </div>
                   ) : (
-                    <select
-                      name="businessType"
-                      value={formData.businessType}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required
-                    >
-                      <option value="">Select Business Type</option>
-                      {businessTypes.map(type => (
-                        <option key={type._id} value={type._id}>
-                          {type.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        name="businessType"
+                        value={formData.businessType}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none cursor-pointer transition-colors duration-200 hover:border-gray-400"
+                        required
+                      >
+                        <option value="">Choose a business type...</option>
+                        {businessTypes.map(type => (
+                          <option key={type._id} value={type._id}>
+                            {type.name}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
                   )}
                 </div>
 
+                {/* Industries */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Industries (Optional)
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Industries <span className="text-gray-400 font-normal">(Optional)</span>
                   </label>
                   {loadingIndustries ? (
-                    <div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                    <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
                       Loading industries...
                     </div>
                   ) : (
-                    <select
-                      name="industry"
-                      multiple
-                      value={formData.industry || []}
-                      onChange={handleIndustryChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
-                      size={4}
-                    >
-                      {industries.map(industry => (
-                        <option key={industry._id} value={industry._id}>
-                          {industry.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <select
+                          name="industry"
+                          multiple
+                          value={formData.industry || []}
+                          onChange={handleIndustryChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                          size={5}
+                        >
+                          {industries.map(industry => (
+                            <option 
+                              key={industry._id} 
+                              value={industry._id}
+                              className="py-2 px-2 hover:bg-blue-50 cursor-pointer"
+                            >
+                              {industry.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex items-start space-x-2 text-xs text-gray-500">
+                        <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                          <div>Hold <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded">Ctrl</kbd> (Windows) or <kbd className="px-1.5 py-0.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded">Cmd</kbd> (Mac) to select multiple industries</div>
+                          {formData.industry && formData.industry.length > 0 && (
+                            <div className="mt-1 text-blue-600 font-medium">
+                              {formData.industry.length} industr{formData.industry.length === 1 ? 'y' : 'ies'} selected
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   )}
-                  <p className="text-xs text-gray-500 mt-1">
-                    Hold Ctrl/Cmd to select multiple industries
-                  </p>
                 </div>
               </div>
 
@@ -476,34 +599,205 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
                 </label>
-                <ReactQuill
-                  value={formData.description || ''}
-                  onChange={handleDescriptionChange}
-                  placeholder="Add detailed description about this customer..."
-                  modules={{
-                    toolbar: [
-                      [{ 'header': [1, 2, 3, false] }],
-                      ['bold', 'italic', 'underline', 'strike'],
-                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                      ['link'],
-                      ['clean']
-                    ],
-                  }}
-                  formats={[
-                    'header', 'bold', 'italic', 'underline', 'strike',
-                    'list', 'bullet', 'link'
-                  ]}
-                  style={{ 
-                    backgroundColor: 'white',
-                    borderRadius: '0.375rem',
-                    height: '240px'
-                  }}
-                />
-                <style jsx global>{`
-                  .ql-editor {
-                    min-height: 180px !important;
-                  }
-                `}</style>
+                <div className="mb-4">
+                  <ReactQuill
+                    value={formData.description || ''}
+                    onChange={handleDescriptionChange}
+                    placeholder="Add detailed description about this customer..."
+                    modules={{
+                      toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link'],
+                        ['clean']
+                      ],
+                    }}
+                    formats={[
+                      'header', 'bold', 'italic', 'underline', 'strike',
+                      'list', 'bullet', 'link'
+                    ]}
+                    style={{ 
+                      backgroundColor: 'white',
+                      borderRadius: '0.375rem'
+                    }}
+                  />
+                  <style jsx global>{`
+                    .ql-container {
+                      height: 200px !important;
+                    }
+                    .ql-editor {
+                      min-height: 180px !important;
+                      max-height: 180px !important;
+                      overflow-y: auto;
+                    }
+                  `}</style>
+                </div>
+              </div>
+            </div>
+
+            {/* Projects, Pump Models, and Applications */}
+            <div className="space-y-6 mt-8">
+              {/* Projects */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-md font-medium text-gray-900">Projects (Optional)</h4>
+                  <button
+                    type="button"
+                    onClick={addProject}
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Add Project
+                  </button>
+                </div>
+                {formData.projects?.map((project, index) => (
+                  <div key={index} className="border border-gray-200 rounded-md p-4 mb-3">
+                    <div className="flex justify-between items-start mb-3">
+                      <span className="text-sm font-medium text-gray-700">Project {index + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeProject(index)}
+                        className="text-red-600 hover:text-red-800 text-sm"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Project Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={project.name}
+                          onChange={(e) => updateProject(index, 'name', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Enter project name"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Project URL
+                        </label>
+                        <input
+                          type="url"
+                          value={project.url || ''}
+                          onChange={(e) => updateProject(index, 'url', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="https://example.com/project"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pump Models Used */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-md font-medium text-gray-900">Pump Models Used (Optional)</h4>
+                  <button
+                    type="button"
+                    onClick={addPumpModel}
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Add Pump Model
+                  </button>
+                </div>
+                {formData.pumpModelsUsed?.map((model, index) => (
+                  <div key={index} className="border border-gray-200 rounded-md p-4 mb-3">
+                    <div className="flex justify-between items-start mb-3">
+                      <span className="text-sm font-medium text-gray-700">Pump Model {index + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => removePumpModel(index)}
+                        className="text-red-600 hover:text-red-800 text-sm"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Pump Model Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={model.name}
+                          onChange={(e) => updatePumpModel(index, 'name', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Enter pump model name"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Pump Model URL
+                        </label>
+                        <input
+                          type="url"
+                          value={model.url || ''}
+                          onChange={(e) => updatePumpModel(index, 'url', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="https://example.com/pump-model"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Applications */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-md font-medium text-gray-900">Applications (Optional)</h4>
+                  <button
+                    type="button"
+                    onClick={addApplication}
+                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Add Application
+                  </button>
+                </div>
+                {formData.applications?.map((application, index) => (
+                  <div key={index} className="border border-gray-200 rounded-md p-4 mb-3">
+                    <div className="flex justify-between items-start mb-3">
+                      <span className="text-sm font-medium text-gray-700">Application {index + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeApplication(index)}
+                        className="text-red-600 hover:text-red-800 text-sm"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Application Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={application.name}
+                          onChange={(e) => updateApplication(index, 'name', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Enter application name"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Application URL
+                        </label>
+                        <input
+                          type="url"
+                          value={application.url || ''}
+                          onChange={(e) => updateApplication(index, 'url', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="https://example.com/application"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

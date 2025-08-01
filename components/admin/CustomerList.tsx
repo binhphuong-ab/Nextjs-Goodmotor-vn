@@ -9,8 +9,8 @@ interface Industry {
   _id: string
   name: string
   slug: string
-  category: string
-  featured: boolean
+  category?: string
+  displayOrder?: number
 }
 
 interface BusinessType {
@@ -131,15 +131,35 @@ export default function CustomerList({ customers, onEdit, onDelete }: CustomerLi
     }
   }
 
-  const getIndustryNames = (industryIds: string[]) => {
-    return industryIds
-      .map(id => industries.find(industry => industry._id === id)?.name)
+  const getIndustryNames = (industryData: any[]) => {
+    if (!industryData || !Array.isArray(industryData)) return []
+    
+    return industryData
+      .map(item => {
+        // Handle populated objects
+        if (typeof item === 'object' && item?.name) {
+          return item.name
+        }
+        // Handle ObjectId strings (fallback)
+        if (typeof item === 'string') {
+          const industry = industries.find(industry => industry._id === item)
+          return industry ? industry.name : null
+        }
+        return null
+      })
       .filter(name => name) as string[]
   }
 
-  const getBusinessTypeName = (businessTypeId: string) => {
-    const businessType = businessTypes.find(bt => bt._id === businessTypeId)
-    return businessType ? businessType.name : 'Unknown'
+  const getBusinessTypeName = (businessType: any) => {
+    // Handle both populated object and ObjectId string
+    if (typeof businessType === 'object' && businessType?.name) {
+      return businessType.name
+    }
+    if (typeof businessType === 'string') {
+      const bt = businessTypes.find(bt => bt._id === businessType)
+      return bt ? bt.name : 'Unknown'
+    }
+    return 'Unknown'
   }
 
   if (customers.length === 0) {
@@ -187,6 +207,9 @@ export default function CustomerList({ customers, onEdit, onDelete }: CustomerLi
                 Tier
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Projects & Models
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -231,7 +254,7 @@ export default function CustomerList({ customers, onEdit, onDelete }: CustomerLi
                 
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {getBusinessTypeName(customer.businessType.toString())}
+                    {getBusinessTypeName(customer.businessType)}
                   </div>
                 </td>
                 
@@ -261,6 +284,28 @@ export default function CustomerList({ customers, onEdit, onDelete }: CustomerLi
                   </span>
                 </td>
                 
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-xs text-gray-600 space-y-1">
+                    {customer.projects && customer.projects.length > 0 && (
+                      <div>
+                        <span className="font-medium text-blue-600">Projects:</span> {customer.projects.length}
+                      </div>
+                    )}
+                    {customer.pumpModelsUsed && customer.pumpModelsUsed.length > 0 && (
+                      <div>
+                        <span className="font-medium text-green-600">Pumps:</span> {customer.pumpModelsUsed.length}
+                      </div>
+                    )}
+                    {customer.applications && customer.applications.length > 0 && (
+                      <div>
+                        <span className="font-medium text-purple-600">Apps:</span> {customer.applications.length}
+                      </div>
+                    )}
+                    {(!customer.projects?.length && !customer.pumpModelsUsed?.length && !customer.applications?.length) && (
+                      <div className="text-gray-400">-</div>
+                    )}
+                  </div>
+                </td>
                 
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex space-x-2">

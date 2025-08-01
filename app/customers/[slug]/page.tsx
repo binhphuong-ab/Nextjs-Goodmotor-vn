@@ -29,6 +29,9 @@ interface Customer {
   customerTier: string
   completeDate?: string
   description?: string
+  projects?: { name: string; url?: string }[]
+  pumpModelsUsed?: { name: string; url?: string }[]
+  applications?: { name: string; url?: string }[]
   featured: boolean
   createdAt: string
   updatedAt: string
