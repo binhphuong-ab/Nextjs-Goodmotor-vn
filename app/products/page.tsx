@@ -29,6 +29,33 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const getPrimaryImageUrl = (product: PopulatedProduct) => {
+    if (product.images && product.images.length > 0) {
+      // Find primary image first
+      const primaryImage = product.images.find(img => img.isPrimary)
+      if (primaryImage) return primaryImage.url
+      
+      // If no primary image, use first image
+      return product.images[0].url
+    }
+    
+    return null
+  }
+
+  const getPrimaryImageAlt = (product: PopulatedProduct) => {
+    if (product.images && product.images.length > 0) {
+      // Find primary image first
+      const primaryImage = product.images.find(img => img.isPrimary)
+      if (primaryImage && primaryImage.alt) return primaryImage.alt
+      
+      // If no primary image or alt, use first image alt or product name
+      return product.images[0].alt || product.name
+    }
+    
+    // Fallback to product name
+    return product.name
+  }
+
   useEffect(() => {
     fetchProducts()
   }, [])
@@ -118,11 +145,15 @@ export default function ProductsPage() {
           {filteredProducts.map((product) => (
             <div key={product._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 relative flex flex-col h-full">
               <Image
-                src={product.image}
-                alt={product.name}
+                src={getPrimaryImageUrl(product) || '/images/placeholder-product.jpg'}
+                alt={getPrimaryImageAlt(product)}
                 width={400}
                 height={250}
                 className="w-full h-48 object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.src = '/images/placeholder-product.jpg'
+                }}
               />
               <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{product.name}</h3>

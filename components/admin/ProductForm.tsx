@@ -43,7 +43,12 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
     },
     features: [''],
     applications: [''],
-    image: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
+    images: [{
+      url: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
+      alt: '',
+      caption: '',
+      isPrimary: true
+    }],
     price: undefined,
   })
 
@@ -75,7 +80,12 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
           },
           features: [''],
           applications: [''],
-          image: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
+          images: [{
+            url: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
+            alt: '',
+            caption: '',
+            isPrimary: true
+          }],
           price: undefined,
         })
       }
@@ -107,7 +117,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
       specifications: { ...product.specifications },
       features: [...product.features],
       applications: [...product.applications],
-      image: product.image,
+      images: [...product.images],
       price: product.price || undefined,
     })
   }, [product, brands.length])
@@ -241,6 +251,52 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
     }
   }
 
+  // Image array management functions
+  const handleImageChange = (index: number, field: 'url' | 'alt' | 'caption' | 'isPrimary', value: string | boolean) => {
+    setFormData(prev => {
+      const newImages = [...prev.images]
+      
+      if (field === 'isPrimary' && value === true) {
+        // If setting this as primary, unset all others
+        newImages.forEach((img, i) => {
+          img.isPrimary = i === index
+        })
+      } else {
+        newImages[index] = { ...newImages[index], [field]: value }
+      }
+      
+      return {
+        ...prev,
+        images: newImages
+      }
+    })
+  }
+
+  const addImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, { url: '', alt: '', caption: '', isPrimary: false }]
+    }))
+  }
+
+  const removeImage = (index: number) => {
+    if (formData.images.length > 1) {
+      setFormData(prev => {
+        const newImages = prev.images.filter((_, i) => i !== index)
+        
+        // If we removed the primary image, make the first one primary
+        if (prev.images[index].isPrimary && newImages.length > 0) {
+          newImages[0].isPrimary = true
+        }
+        
+        return {
+          ...prev,
+          images: newImages
+        }
+      })
+    }
+  }
+
   const handleDescriptionChange = (value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -291,6 +347,15 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
       pumpType: formData.pumpType && formData.pumpType.trim() !== '' ? formData.pumpType : undefined,
       features: formData.features.filter(feature => feature.trim() !== ''),
       applications: formData.applications.filter(app => app.trim() !== ''),
+      images: formData.images.filter(img => img.url.trim() !== '').map((img, index) => ({
+        ...img,
+        isPrimary: index === 0 || img.isPrimary // Ensure at least the first image is primary
+      }))
+    }
+    
+    // Ensure at least one image has isPrimary set
+    if (cleanedData.images.length > 0 && !cleanedData.images.some(img => img.isPrimary)) {
+      cleanedData.images[0].isPrimary = true
     }
     
     onSave(cleanedData)
@@ -806,22 +871,108 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
               </p>
             </div>
 
-            <div>
-              <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
-                Image URL *
-              </label>
-              <input
-                type="url"
-                id="image"
-                name="image"
-                value={formData.image}
-                onChange={handleInputChange}
-                required
-                placeholder="https://example.com/image.jpg"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Enter a valid image URL (jpg, jpeg, png, gif, webp, svg)
+            <div className="md:col-span-2">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Product Images *</h4>
+              <div className="space-y-4">
+                {formData.images.map((image, index) => (
+                  <div key={index} className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Image URL *
+                        </label>
+                        <input
+                          type="url"
+                          value={image.url}
+                          onChange={(e) => handleImageChange(index, 'url', e.target.value)}
+                          required
+                          placeholder="https://example.com/image.jpg"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Alt Text
+                        </label>
+                        <input
+                          type="text"
+                          value={image.alt || ''}
+                          onChange={(e) => handleImageChange(index, 'alt', e.target.value)}
+                          placeholder="Descriptive text for accessibility"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Caption (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={image.caption || ''}
+                        onChange={(e) => handleImageChange(index, 'caption', e.target.value)}
+                        placeholder="Image caption or description"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={image.isPrimary || false}
+                          onChange={(e) => handleImageChange(index, 'isPrimary', e.target.checked)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">
+                          Primary Image {image.isPrimary && <span className="text-blue-600 font-medium">(Default)</span>}
+                        </span>
+                      </label>
+                      
+                      {formData.images.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="px-3 py-1 text-red-600 border border-red-300 rounded-md hover:bg-red-50 text-sm"
+                        >
+                          Remove Image
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Image Preview */}
+                    {image.url && (
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Preview:
+                        </label>
+                        <div className="relative w-32 h-32 border border-gray-200 rounded-lg overflow-hidden">
+                          <img
+                            src={image.url}
+                            alt={image.alt || 'Product image'}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement
+                              target.style.display = 'none'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                <button
+                  type="button"
+                  onClick={addImage}
+                  className="w-full py-3 px-4 border border-dashed border-gray-300 rounded-lg text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                >
+                  + Add Another Image
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Add multiple product images. The primary image will be used as the main display image.
               </p>
             </div>
 

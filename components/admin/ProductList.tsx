@@ -92,6 +92,33 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
     return null
   }
 
+  const getPrimaryImageUrl = (product: Product) => {
+    if (product.images && product.images.length > 0) {
+      // Find primary image first
+      const primaryImage = product.images.find(img => img.isPrimary)
+      if (primaryImage) return primaryImage.url
+      
+      // If no primary image, use first image
+      return product.images[0].url
+    }
+    
+    return null
+  }
+
+  const getPrimaryImageAlt = (product: Product) => {
+    if (product.images && product.images.length > 0) {
+      // Find primary image first
+      const primaryImage = product.images.find(img => img.isPrimary)
+      if (primaryImage && primaryImage.alt) return primaryImage.alt
+      
+      // If no primary image or alt, use first image alt or product name
+      return product.images[0].alt || product.name
+    }
+    
+    // Fallback to product name
+    return product.name
+  }
+
   return (
     <>
       <div className="overflow-x-auto">
@@ -126,8 +153,8 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                     <div className="flex-shrink-0 h-12 w-12">
                       <Image
                         className="h-12 w-12 rounded-lg object-cover border border-gray-200"
-                        src={product.image || '/images/placeholder-product.jpg'}
-                        alt={product.name}
+                        src={getPrimaryImageUrl(product) || '/images/placeholder-product.jpg'}
+                        alt={getPrimaryImageAlt(product)}
                         width={48}
                         height={48}
                         onError={(e) => {

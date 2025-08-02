@@ -17,7 +17,12 @@ export interface IProduct {
   }
   features: string[]
   applications: string[]
-  image: string
+  images: Array<{
+    url: string
+    alt?: string
+    caption?: string
+    isPrimary?: boolean
+  }>
   price?: number
   createdAt: Date
   updatedAt: Date
@@ -93,17 +98,31 @@ const ProductSchema = new Schema<IProduct>({
     type: String,
     trim: true
   }],
-  image: {
-    type: String,
-    required: [true, 'Product image is required'],
-    trim: true,
-    validate: {
-      validator: function(v: string) {
-        return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)$/i.test(v);
-      },
-      message: 'Please provide a valid image URL'
+  images: [{
+    url: {
+      type: String,
+      required: [true, 'Image URL is required'],
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)$/i.test(v);
+        },
+        message: 'Please provide a valid image URL'
+      }
+    },
+    alt: {
+      type: String,
+      trim: true
+    },
+    caption: {
+      type: String,
+      trim: true
+    },
+    isPrimary: {
+      type: Boolean,
+      default: false
     }
-  },
+  }],
   price: {
     type: Number,
     min: [0, 'Price cannot be negative']
@@ -138,7 +157,12 @@ export interface IProductInput {
   specifications: IProduct['specifications']
   features: string[]
   applications: string[]
-  image: string
+  images: Array<{
+    url: string
+    alt?: string
+    caption?: string
+    isPrimary?: boolean
+  }>
   price?: number
 }
 

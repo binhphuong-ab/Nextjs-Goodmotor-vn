@@ -58,6 +58,20 @@ export default function ProductDetailPage() {
     router.push(`/contact?product=${encodeURIComponent(product?.name || '')}`)
   }
 
+  const getSelectedImageAlt = (product: Product, index: number) => {
+    if (product.images && Array.isArray(product.images) && product.images[index]) {
+      return product.images[index].alt || `${product.name} - Image ${index + 1}`
+    }
+    return product.name
+  }
+
+  const getSelectedImageCaption = (product: Product, index: number) => {
+    if (product.images && Array.isArray(product.images) && product.images[index]) {
+      return product.images[index].caption
+    }
+    return null
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -105,11 +119,10 @@ export default function ProductDetailPage() {
     )
   }
 
-  // Mock additional images for carousel (you can extend the Product model to include multiple images)
-  const productImages = [
-    product.image,
-    // Add more images here when you extend the model
-  ]
+  // Get product images array
+  const productImages = product.images && product.images.length > 0
+    ? product.images.map(img => img.url)
+    : ['/images/placeholder-product.jpg']
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -144,12 +157,23 @@ export default function ProductDetailPage() {
             <div className="aspect-square bg-white rounded-lg overflow-hidden shadow-lg">
               <Image
                 src={productImages[selectedImage]}
-                alt={product.name}
+                alt={getSelectedImageAlt(product, selectedImage)}
                 width={600}
                 height={600}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.src = '/images/placeholder-product.jpg'
+                }}
               />
             </div>
+            
+            {/* Image Caption */}
+            {getSelectedImageCaption(product, selectedImage) && (
+              <div className="text-center text-sm text-gray-600 italic">
+                {getSelectedImageCaption(product, selectedImage)}
+              </div>
+            )}
             
             {/* Image thumbnails (if multiple images) */}
             {productImages.length > 1 && (
