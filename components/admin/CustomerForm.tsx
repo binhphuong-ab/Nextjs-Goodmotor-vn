@@ -388,25 +388,39 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                       Loading business types...
                     </div>
                   ) : (
-                    <div className="relative">
-                      <select
-                        name="businessType"
-                        value={formData.businessType}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none cursor-pointer transition-colors duration-200 hover:border-gray-400"
-                        required
-                      >
-                        <option value="">Choose a business type...</option>
-                        {businessTypes.map(type => (
-                          <option key={type._id} value={type._id}>
-                            {type.name}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <select
+                          name="businessType"
+                          value={formData.businessType}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors duration-200 hover:border-gray-400"
+                          required
+                        >
+                          <option value="">Choose a business type...</option>
+                          {businessTypes.map(type => (
+                            <option 
+                              key={type._id} 
+                              value={type._id}
+                              className="py-2 px-2 hover:bg-blue-50 cursor-pointer"
+                            >
+                              {type.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex items-start space-x-2 text-xs text-gray-500">
+                        <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
+                        <div>
+                          <div>Select the primary business category for this customer</div>
+                          {formData.businessType && (
+                            <div className="mt-1 text-blue-600 font-medium">
+                              Business type selected: {businessTypes.find(bt => bt._id === formData.businessType)?.name}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
