@@ -374,46 +374,84 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
               <label htmlFor="pumpType" className="block text-sm font-medium text-gray-700 mb-2">
                 Pump Type (Optional)
               </label>
-              <select
-                id="pumpType"
-                name="pumpType"
-                value={formData.pumpType || ''}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select a pump type (optional)</option>
-                {pumpTypes.map(pumpType => (
-                  <option key={pumpType._id} value={pumpType._id}>
-                    {pumpType.pumpType}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                Choose the type of pump for this product
-              </p>
+              <div className="space-y-2">
+                <div className="relative">
+                  <select
+                    id="pumpType"
+                    name="pumpType"
+                    value={formData.pumpType || ''}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                    size={5}
+                  >
+                    <option value="">Select a pump type (optional)</option>
+                    {pumpTypes.map(pumpType => (
+                      <option 
+                        key={pumpType._id} 
+                        value={pumpType._id}
+                        className="py-2 px-2 hover:bg-blue-50 cursor-pointer"
+                      >
+                        {pumpType.pumpType}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-start space-x-2 text-xs text-gray-500">
+                  <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <div>Choose the type of pump for this product</div>
+                    {formData.pumpType && (
+                      <div className="mt-1 text-blue-600 font-medium">
+                        {pumpTypes.find(type => type._id === formData.pumpType)?.pumpType} selected
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div>
               <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-2">
                 Brand (Optional)
               </label>
-              <select
-                id="brand"
-                name="brand"
-                value={formData.brand || ''}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select a brand (optional)</option>
-                {brands.map(brand => (
-                  <option key={brand._id} value={brand._id}>
-                    {brand.name}{brand.country ? ` (${brand.country})` : ''}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                Choose the manufacturer/brand of this product
-              </p>
+              <div className="space-y-2">
+                <div className="relative">
+                  <select
+                    id="brand"
+                    name="brand"
+                    value={formData.brand || ''}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                    size={5}
+                  >
+                    <option value="">Select a brand (optional)</option>
+                    {brands.map(brand => (
+                      <option 
+                        key={brand._id} 
+                        value={brand._id}
+                        className="py-2 px-2 hover:bg-blue-50 cursor-pointer"
+                      >
+                        {brand.name}{brand.country ? ` (${brand.country})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-start space-x-2 text-xs text-gray-500">
+                  <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <div>Choose the manufacturer/brand of this product</div>
+                    {formData.brand && (
+                      <div className="mt-1 text-blue-600 font-medium">
+                        {brands.find(brand => brand._id === formData.brand)?.name} selected
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Product Line Selection */}
@@ -423,29 +461,46 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
                   Product Line (Optional)
                 </label>
                 {availableProductLines.length > 0 ? (
-                  <>
-                    <select
-                      id="productLineId"
-                      name="productLineId"
-                      value={formData.productLineId || ''}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">Select product line (optional)</option>
-                      {availableProductLines.map(line => (
-                        <option key={line._id} value={line._id}>
-                          {line.name}
-                          {line.description && ` - ${line.description}`}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Choose a specific product line within {selectedBrand.name}
-                    </p>
-                  </>
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <select
+                        id="productLineId"
+                        name="productLineId"
+                        value={formData.productLineId || ''}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                        size={5}
+                      >
+                        <option value="">Select product line (optional)</option>
+                        {availableProductLines.map(line => (
+                          <option 
+                            key={line._id} 
+                            value={line._id}
+                            className="py-2 px-2 hover:bg-blue-50 cursor-pointer"
+                          >
+                            {line.name}
+                            {line.description && ` - ${line.description}`}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex items-start space-x-2 text-xs text-gray-500">
+                      <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div>
+                        <div>Choose a specific product line within {selectedBrand.name}</div>
+                        {formData.productLineId && (
+                          <div className="mt-1 text-blue-600 font-medium">
+                            {availableProductLines.find(line => line._id === formData.productLineId)?.name} selected
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <>
-                    <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500">
+                    <div className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500">
                       No product lines defined for this brand
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
