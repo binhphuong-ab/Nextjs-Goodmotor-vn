@@ -1429,6 +1429,7 @@ export default function AdminPage() {
             setIsIndustryFormOpen(false)
             setSelectedIndustry(null)
           }}
+          onShowNotification={(type, message) => showNotification?.({ type, message })}
         />
       )}
 
@@ -1440,6 +1441,7 @@ export default function AdminPage() {
             setIsBusinessTypeFormOpen(false)
             setSelectedBusinessType(null)
           }}
+          onShowNotification={(type, message) => showNotification?.({ type, message })}
         />
       )}
 
@@ -1463,6 +1465,7 @@ export default function AdminPage() {
             setIsPumpTypeFormOpen(false)
             setSelectedPumpType(null)
           }}
+          onShowNotification={(type, message) => showNotification?.({ type, message })}
         />
       )}
 
@@ -1474,6 +1477,7 @@ export default function AdminPage() {
             setIsApplicationFormOpen(false)
             setSelectedApplication(null)
           }}
+          onShowNotification={(type, message) => showNotification?.({ type, message })}
         />
       )}
       

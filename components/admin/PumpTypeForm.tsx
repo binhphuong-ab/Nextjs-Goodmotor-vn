@@ -7,9 +7,10 @@ interface PumpTypeFormProps {
   pumpType?: IPumpType | null
   onSave: (data: IPumpTypeInput) => void
   onCancel: () => void
+  onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
-export default function PumpTypeForm({ pumpType, onSave, onCancel }: PumpTypeFormProps) {
+export default function PumpTypeForm({ pumpType, onSave, onCancel, onShowNotification }: PumpTypeFormProps) {
   const [formData, setFormData] = useState<IPumpTypeInput>({
     pumpType: ''
   })

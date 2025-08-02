@@ -16,6 +16,7 @@ interface IndustryFormProps {
   industry?: Industry
   onSubmit: (industryData: Omit<Industry, '_id'>) => void
   onCancel: () => void
+  onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
 const categoryOptions = [
@@ -30,7 +31,7 @@ const categoryOptions = [
 
 
 
-export default function IndustryForm({ industry, onSubmit, onCancel }: IndustryFormProps) {
+export default function IndustryForm({ industry, onSubmit, onCancel, onShowNotification }: IndustryFormProps) {
   const [formData, setFormData] = useState<Omit<Industry, '_id'>>({
     name: industry?.name || '',
     slug: industry?.slug || '',
