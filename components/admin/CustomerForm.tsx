@@ -394,7 +394,8 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                           name="businessType"
                           value={formData.businessType}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors duration-200 hover:border-gray-400"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                          size={5}
                           required
                         >
                           <option value="">Choose a business type...</option>
@@ -414,10 +415,10 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div>
-                          <div>Select the primary business category for this customer</div>
+                          <div>Click to select a business type</div>
                           {formData.businessType && (
                             <div className="mt-1 text-blue-600 font-medium">
-                              Business type selected: {businessTypes.find(bt => bt._id === formData.businessType)?.name}
+                              {businessTypes.find(type => type._id === formData.businessType)?.name} selected
                             </div>
                           )}
                         </div>
