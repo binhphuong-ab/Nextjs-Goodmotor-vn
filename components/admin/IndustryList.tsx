@@ -201,7 +201,7 @@ export default function IndustryList({ industries, onEdit, onDelete, onCreate }:
         </div>
       </div>
 
-      {/* Industries Grid */}
+      {/* Industries Table */}
       {sortedIndustries.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
           <div className="text-gray-400 text-6xl mb-4">🏭</div>
@@ -223,177 +223,173 @@ export default function IndustryList({ industries, onEdit, onDelete, onCreate }:
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {sortedIndustries.map((industry) => {
-            const hasCustomers = hasLinkedEntities(industry)
-            
-            return (
-              <div
-                key={industry._id}
-                className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
-              >
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900">{industry.name}</h3>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${categoryColors[industry.category as keyof typeof categoryColors]}`}>
-                        {categoryLabels[industry.category as keyof typeof categoryLabels]}
-                      </span>
-                      {industry.displayOrder !== undefined && industry.displayOrder > 0 && (
-                        <span className="text-xs text-gray-500">
-                          Order: {industry.displayOrder}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-1 ml-4">
-                    <button
-                      onClick={() => window.open(`/api/industries/${industry._id}/customers`, '_blank')}
-                      className="p-1 text-gray-400 hover:text-blue-600"
-                      title="View Customers"
-                    >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => onEdit(industry)}
-                      className="p-1 text-gray-400 hover:text-primary-600"
-                      title="Edit Industry"
-                    >
-                      <PencilIcon className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(industry)}
-                      disabled={hasCustomers}
-                      className={`p-1 ${
-                        hasCustomers 
-                          ? 'text-gray-300 cursor-not-allowed' 
-                          : 'text-gray-400 hover:text-red-600'
-                      }`}
-                      title={
-                        hasCustomers 
-                          ? `Cannot delete: ${industry.stats?.customerCount || industry.customers?.length || 0} linked customers, ${industry.stats?.applicationCount || industry.applications?.length || 0} linked applications`
-                          : "Delete Industry"
-                      }
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Description */}
-                {industry.description && (
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                    {industry.description}
-                  </p>
-                )}
-
-                {/* Stats */}
-                <div className="space-y-3">
-                  {/* Usage Stats */}
-                  <div className="flex gap-4 text-xs text-gray-600 pt-2 border-t border-gray-100">
-                    <div>
-                      <span className="font-medium">{industry.stats?.customerCount || 0}</span> customers
-                    </div>
-                    <div>
-                      <span className="font-medium">{industry.stats?.applicationCount || 0}</span> applications
-                      {hasCustomers && (
-                        <span className="ml-1 text-amber-600" title="Has linked entities - deletion disabled">
-                          🔒
-                        </span>
-                      )}
-                    </div>
-                    {industry.stats?.lastUpdated && (
-                      <div className="text-gray-500">
-                        Updated: {new Date(industry.stats.lastUpdated).toLocaleDateString()}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Customers Section */}
-                  {industry.customers && industry.customers.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-100">
-                      <h4 className="text-xs font-medium text-gray-700 mb-2">
-                        Customers ({industry.customers.length}):
-                      </h4>
-                      <div className="space-y-1">
-                        {industry.customers.slice(0, 3).map((customer) => (
-                          <div
-                            key={customer._id}
-                            className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
-                          >
-                            <div className="flex-1 min-w-0">
-                              <div className="text-xs font-medium text-gray-900 truncate">
-                                {customer.name}
-                              </div>
-                              {customer.businessType && (
-                                <div className="text-xs text-gray-500 truncate">
-                                  {customer.businessType.name}
-                                </div>
-                              )}
+        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Industry
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Description
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Statistics
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Recent Customers
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {sortedIndustries.map((industry) => {
+                  const hasCustomers = hasLinkedEntities(industry)
+                  
+                  return (
+                    <tr key={industry._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {industry.name}
                             </div>
-                            {customer.customerStatus && (
-                              <span className={`ml-2 inline-flex px-2 py-1 text-xs font-medium rounded-full ${customerStatusColors[customer.customerStatus]}`}>
-                                {customerStatusLabels[customer.customerStatus]}
-                              </span>
+                            <div className="text-sm text-gray-500">
+                              {industry.slug}
+                            </div>
+                            {industry.displayOrder !== undefined && industry.displayOrder > 0 && (
+                              <div className="text-xs text-gray-400">
+                                Order: {industry.displayOrder}
+                              </div>
                             )}
                           </div>
-                        ))}
-                        {industry.customers.length > 3 && (
-                          <div className="text-xs text-gray-500 text-center py-1">
-                            + {industry.customers.length - 3} more customers
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Applications Section */}
-                  {industry.applications && industry.applications.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-100">
-                      <h4 className="text-xs font-medium text-gray-700 mb-2">
-                        Applications ({industry.applications.length}):
-                      </h4>
-                      <div className="space-y-1">
-                        {industry.applications.slice(0, 3).map((application) => (
-                          <div
-                            key={application._id}
-                            className="flex items-center justify-between p-2 bg-blue-50 rounded-md"
-                          >
-                            <div className="flex-1 min-w-0">
-                              <div className="text-xs font-medium text-gray-900 truncate">
-                                {application.name}
-                              </div>
-                              {application.category && (
-                                <div className="text-xs text-gray-500 truncate">
-                                  {application.category}
-                                </div>
+                        </div>
+                      </td>
+                      
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${categoryColors[industry.category as keyof typeof categoryColors]}`}>
+                          {categoryLabels[industry.category as keyof typeof categoryLabels]}
+                        </span>
+                      </td>
+                      
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900 max-w-xs">
+                          {industry.description ? (
+                            industry.description.length > 100 
+                              ? industry.description.substring(0, 100) + '...'
+                              : industry.description
+                          ) : (
+                            <span className="text-gray-400 italic">No description</span>
+                          )}
+                        </div>
+                      </td>
+                      
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900">
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1">
+                              <span className="font-medium">{industry.stats?.customerCount || 0}</span>
+                              <span className="text-gray-500">customers</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="font-medium">{industry.stats?.applicationCount || 0}</span>
+                              <span className="text-gray-500">apps</span>
+                              {hasCustomers && (
+                                <span className="ml-1 text-amber-600" title="Has linked entities - deletion disabled">
+                                  🔒
+                                </span>
                               )}
                             </div>
                           </div>
-                        ))}
-                        {industry.applications.length > 3 && (
-                          <div className="text-xs text-gray-500 text-center py-1">
-                            + {industry.applications.length - 3} more applications
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Footer */}
-                <div className="mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
-                  Created: {new Date(industry.createdAt).toLocaleDateString()}
-                </div>
-              </div>
-            )
-          })}
+                          {industry.stats?.lastUpdated && (
+                            <div className="text-xs text-gray-500 mt-1">
+                              Updated: {new Date(industry.stats.lastUpdated).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900">
+                          {industry.customers && industry.customers.length > 0 ? (
+                            <div className="space-y-1">
+                              {industry.customers.slice(0, 2).map((customer) => (
+                                <div key={customer._id} className="flex items-center justify-between">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-xs font-medium text-gray-900 truncate">
+                                      {customer.name}
+                                    </div>
+                                    {customer.businessType && (
+                                      <div className="text-xs text-gray-500 truncate">
+                                        {customer.businessType.name}
+                                      </div>
+                                    )}
+                                  </div>
+                                  {customer.customerStatus && (
+                                    <span className={`ml-2 inline-flex px-1 py-0.5 text-xs font-medium rounded ${customerStatusColors[customer.customerStatus]}`}>
+                                      {customerStatusLabels[customer.customerStatus]}
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                              {industry.customers.length > 2 && (
+                                <div className="text-xs text-gray-500">
+                                  +{industry.customers.length - 2} more
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 italic text-xs">No customers</span>
+                          )}
+                        </div>
+                      </td>
+                      
+                      <td className="px-6 py-4 text-sm font-medium">
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => window.open(`/api/industries/${industry._id}/customers`, '_blank')}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="View Customers"
+                          >
+                            <EyeIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => onEdit(industry)}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="Edit Industry"
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(industry)}
+                            disabled={hasCustomers}
+                            className={`${
+                              hasCustomers 
+                                ? 'text-gray-300 cursor-not-allowed' 
+                                : 'text-red-600 hover:text-red-900'
+                            }`}
+                            title={
+                              hasCustomers 
+                                ? `Cannot delete: ${industry.stats?.customerCount || industry.customers?.length || 0} linked customers, ${industry.stats?.applicationCount || industry.applications?.length || 0} linked applications`
+                                : "Delete Industry"
+                            }
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
       

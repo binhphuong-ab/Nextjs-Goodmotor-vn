@@ -47,7 +47,7 @@ export default function ApplicationList({ applications, onEdit, onDelete, onCrea
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards')
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
   const [industries, setIndustries] = useState<Array<{ _id: string, name: string, slug: string }>>([])
   
   // Confirmation dialog state
