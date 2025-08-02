@@ -55,7 +55,6 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
   const handleConfirmDelete = () => {
     if (confirmDialog.product) {
       onDelete(confirmDialog.product._id || '')
-      showNotification('success', `Product "${confirmDialog.product.name}" will be deleted`)
       setConfirmDialog({ isOpen: false, product: null })
     }
   }

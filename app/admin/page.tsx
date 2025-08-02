@@ -453,10 +453,10 @@ export default function AdminPage() {
             project._id === selectedProject._id ? updatedProject : project
           )
           setProjects(updatedProjects)
-          alert('Project updated successfully!')
+          showNotification?.({ type: 'success', message: 'Project updated successfully!' })
         } else {
           const error = await response.json()
-          alert(`Error updating project: ${error.error}`)
+          showNotification?.({ type: 'error', message: `Error updating project: ${error.error}` })
         }
       } else {
         // Add new project
@@ -471,17 +471,17 @@ export default function AdminPage() {
         if (response.ok) {
           const newProject = await response.json()
           setProjects([...projects, newProject])
-          alert('Project added successfully!')
+          showNotification?.({ type: 'success', message: 'Project added successfully!' })
         } else {
           const error = await response.json()
-          alert(`Error adding project: ${error.error}`)
+          showNotification?.({ type: 'error', message: `Error adding project: ${error.error}` })
         }
       }
       setIsProjectFormOpen(false)
       setSelectedProject(null)
     } catch (error) {
       console.error('Error saving project:', error)
-      alert('Error saving project')
+      showNotification?.({ type: 'error', message: 'Error saving project' })
     }
   }
 
@@ -917,10 +917,10 @@ export default function AdminPage() {
         
         if (response.ok) {
           await fetchIndustries() // Refetch to get updated customer data
-          alert('Industry updated successfully!')
+          showNotification?.({ type: 'success', message: 'Industry updated successfully!' })
         } else {
           const error = await response.json()
-          alert(`Error updating industry: ${error.error}`)
+          showNotification?.({ type: 'error', message: `Error updating industry: ${error.error}` })
         }
       } else {
         // Add new industry
@@ -934,17 +934,17 @@ export default function AdminPage() {
         
         if (response.ok) {
           await fetchIndustries() // Refetch to get updated customer data
-          alert('Industry added successfully!')
+          showNotification?.({ type: 'success', message: 'Industry added successfully!' })
         } else {
           const error = await response.json()
-          alert(`Error adding industry: ${error.error}`)
+          showNotification?.({ type: 'error', message: `Error adding industry: ${error.error}` })
         }
       }
       setIsIndustryFormOpen(false)
       setSelectedIndustry(null)
     } catch (error) {
       console.error('Error saving industry:', error)
-      alert('Error saving industry')
+      showNotification?.({ type: 'error', message: 'Error saving industry' })
     }
   }
 
@@ -959,7 +959,7 @@ export default function AdminPage() {
     setIsApplicationFormOpen(true)
   }
 
-  const handleDeleteApplication = async (applicationId: string) => {
+  const executeDeleteApplication = async (applicationId: string) => {
     try {
       const response = await fetch(`/api/admin/applications/${applicationId}`, {
         method: 'DELETE',
@@ -1271,7 +1271,7 @@ export default function AdminPage() {
                 <ProductList
                   products={products}
                   onEdit={handleEditProduct}
-                  onDelete={handleDeleteProduct}
+                  onDelete={executeDeleteProduct}
                 />
                 )}
 
@@ -1279,7 +1279,7 @@ export default function AdminPage() {
                   <BrandList
                     brands={brands}
                     onEdit={handleEditBrand}
-                    onDelete={handleDeleteBrand}
+                    onDelete={executeDeleteBrand}
                   />
                 )}
 
@@ -1287,7 +1287,7 @@ export default function AdminPage() {
                   <PumpTypeList
                     pumpTypes={pumpTypes}
                     onEdit={handleEditPumpType}
-                    onDelete={handleDeletePumpType}
+                    onDelete={executeDeletePumpType}
                   />
                 )}
               </>
@@ -1298,7 +1298,7 @@ export default function AdminPage() {
                 <ProjectList
                   projects={projects}
                   onEdit={handleEditProject}
-                  onDelete={handleDeleteProject}
+                  onDelete={executeDeleteProject}
                 />
               </>
             )}
@@ -1348,7 +1348,7 @@ export default function AdminPage() {
                   <CustomerList
                     customers={customers}
                     onEdit={handleEditCustomer}
-                    onDelete={handleDeleteCustomer}
+                    onDelete={executeDeleteCustomer}
                   />
                 )}
 
@@ -1356,7 +1356,7 @@ export default function AdminPage() {
                   <BusinessTypeList
                     businessTypes={businessTypes}
                     onEdit={handleEditBusinessType}
-                    onDelete={handleDeleteBusinessType}
+                    onDelete={executeDeleteBusinessType}
                   />
                 )}
 
@@ -1364,7 +1364,7 @@ export default function AdminPage() {
                   <IndustryList
                     industries={industries as any[]}
                     onEdit={handleEditIndustry as any}
-                    onDelete={handleDeleteIndustry}
+                    onDelete={executeDeleteIndustry}
                     onCreate={handleAddIndustry}
                   />
                 )}
@@ -1376,7 +1376,7 @@ export default function AdminPage() {
                 <ApplicationList
                   applications={applications}
                   onEdit={handleEditApplication}
-                  onDelete={handleDeleteApplication}
+                  onDelete={executeDeleteApplication}
                   onCreate={handleAddApplication}
                 />
               </>

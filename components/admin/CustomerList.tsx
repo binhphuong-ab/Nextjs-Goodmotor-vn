@@ -90,7 +90,6 @@ export default function CustomerList({ customers, onEdit, onDelete }: CustomerLi
   const handleConfirmDelete = () => {
     if (confirmDialog.customer) {
       onDelete(confirmDialog.customer._id)
-      showNotification('success', `Customer "${confirmDialog.customer.name}" will be deleted`)
       setConfirmDialog({ isOpen: false, customer: null })
     }
   }

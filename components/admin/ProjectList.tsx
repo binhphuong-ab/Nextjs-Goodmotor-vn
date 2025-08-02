@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Calendar, MapPin, Building, Star } from 'lucide-react'
 import Notification from '../Notification'
+import ConfirmDialog from '../ConfirmDialog'
 
 interface Project {
   _id: string
@@ -45,6 +46,14 @@ interface ProjectListProps {
 }
 
 export default function ProjectList({ projects, onEdit, onDelete }: ProjectListProps) {
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean
+    project: Project | null
+  }>({
+    isOpen: false,
+    project: null
+  })
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -78,6 +87,24 @@ export default function ProjectList({ projects, onEdit, onDelete }: ProjectListP
     }
     
     return typeLabels[projectType as keyof typeof typeLabels] || projectType
+  }
+
+  const handleDelete = (project: Project) => {
+    setConfirmDialog({
+      isOpen: true,
+      project
+    })
+  }
+
+  const handleConfirmDelete = () => {
+    if (confirmDialog.project) {
+      onDelete(confirmDialog.project._id)
+      setConfirmDialog({ isOpen: false, project: null })
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setConfirmDialog({ isOpen: false, project: null })
   }
 
   return (
@@ -174,7 +201,7 @@ export default function ProjectList({ projects, onEdit, onDelete }: ProjectListP
                     Edit
                   </button>
                   <button
-                    onClick={() => onDelete(project._id)}
+                    onClick={() => handleDelete(project)}
                     className="text-red-600 hover:text-red-900 font-medium"
                   >
                     Delete
@@ -194,7 +221,17 @@ export default function ProjectList({ projects, onEdit, onDelete }: ProjectListP
         </div>
       )}
 
-      
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Delete Project"
+        message={`Are you sure you want to delete "${confirmDialog.project?.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        danger={true}
+      />
     </div>
   )
 } 

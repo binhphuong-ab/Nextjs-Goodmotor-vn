@@ -54,13 +54,19 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
   const [showValidation, setShowValidation] = useState(false)
   
+  // Helper function to get today's date in YYYY-MM-DD format for date input
+  const getTodayDate = () => {
+    const today = new Date()
+    return today.toISOString().split('T')[0]
+  }
+  
   const [formData, setFormData] = useState<Omit<Project, '_id' | 'createdAt' | 'updatedAt'>>({
     title: '',
     slug: '',
     description: '',
     client: '',
     location: '',
-    completionDate: '',
+    completionDate: project ? '' : getTodayDate(), // Auto-fill with today for new projects
     projectType: 'new-installation',
     pumpModels: [{ name: '', url: '' }],
     applications: [{ name: '', url: '' }],
@@ -91,13 +97,18 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
 
   useEffect(() => {
     if (project) {
+      // Format completion date for date input (YYYY-MM-DD)
+      const formattedDate = project.completionDate ? 
+        new Date(project.completionDate).toISOString().split('T')[0] : 
+        getTodayDate()
+      
       setFormData({
         title: project.title,
         slug: project.slug,
         description: project.description,
         client: project.client,
         location: project.location,
-        completionDate: project.completionDate,
+        completionDate: formattedDate,
         projectType: project.projectType,
         pumpModels: [...project.pumpModels],
         applications: [...project.applications],
