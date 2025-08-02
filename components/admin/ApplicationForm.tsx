@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, memo, useRef } from 'react'
 import { Eye, Edit, CheckCircle } from 'lucide-react'
+import { generateSlug } from '@/lib/utils'
 import type { IApplication, IApplicationInput } from '@/models/Application'
 import dynamic from 'next/dynamic'
 
@@ -344,9 +345,10 @@ interface ApplicationFormProps {
   application?: IApplication | null
   onSave: (applicationData: IApplicationInput) => void
   onCancel: () => void
+  onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
-export default function ApplicationForm({ application, onSave, onCancel }: ApplicationFormProps) {
+export default function ApplicationForm({ application, onSave, onCancel, onShowNotification }: ApplicationFormProps) {
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
   const [industries, setIndustries] = useState<Array<{ _id: string, name: string, slug: string }>>([])
   
@@ -430,16 +432,7 @@ export default function ApplicationForm({ application, onSave, onCancel }: Appli
     }
   }, [application])
 
-  // Simple utility functions
-  const generateSlug = (name: string): string => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-  }
+
 
   // Simple handlers without complex dependencies
   const updateField = (field: string, value: any) => {

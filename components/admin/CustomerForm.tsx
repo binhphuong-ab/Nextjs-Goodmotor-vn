@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import { generateSlug } from '@/lib/utils'
 import { ICustomer, ICustomerInput } from '@/models/Customer'
 
 // Dynamically import ReactQuill to avoid SSR issues
@@ -51,14 +52,7 @@ const customerTiers = [
   { value: 'enterprise', label: 'Enterprise' }
 ]
 
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
-}
+
 
 export default function CustomerForm({ customer, onSave, onCancel, onShowNotification }: CustomerFormProps) {
   // Helper function to get today's date in YYYY-MM-DD format

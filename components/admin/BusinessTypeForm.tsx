@@ -7,9 +7,10 @@ interface BusinessTypeFormProps {
   businessType?: IBusinessType | null
   onSave: (data: IBusinessTypeInput) => void
   onCancel: () => void
+  onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
-export default function BusinessTypeForm({ businessType, onSave, onCancel }: BusinessTypeFormProps) {
+export default function BusinessTypeForm({ businessType, onSave, onCancel, onShowNotification }: BusinessTypeFormProps) {
   const [formData, setFormData] = useState<IBusinessTypeInput>({
     name: ''
   })
@@ -58,6 +59,9 @@ export default function BusinessTypeForm({ businessType, onSave, onCancel }: Bus
       onSave({
         name: formData.name.trim()
       })
+    } else {
+      const errorMessages = Object.values(errors).filter(Boolean)
+      onShowNotification?.('error', 'Please fix the following errors: ' + errorMessages.join(', '))
     }
   }
 

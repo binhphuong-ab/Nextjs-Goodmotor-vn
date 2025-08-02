@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
+import { generateSlug } from '@/lib/utils'
 import 'react-quill/dist/quill.snow.css'
 import { Product, ProductInput } from '@/models/Product'
 import { IBrand } from '@/models/Brand'
@@ -14,25 +15,17 @@ interface ProductFormProps {
   product?: Product | null
   onSave: (productData: ProductInput) => void
   onCancel: () => void
+  onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
-export default function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
+export default function ProductForm({ product, onSave, onCancel, onShowNotification }: ProductFormProps) {
   const [brands, setBrands] = useState<IBrand[]>([])
   const [pumpTypes, setPumpTypes] = useState<IPumpType[]>([])
   const [selectedBrand, setSelectedBrand] = useState<IBrand | null>(null)
   const [availableProductLines, setAvailableProductLines] = useState<any[]>([])
   const isInitializedRef = useRef(false)
   
-  // Function to generate slug from name
-  const generateSlug = (name: string): string => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-  }
+
   
   const [formData, setFormData] = useState<ProductInput>({
     name: '',

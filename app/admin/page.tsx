@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { SUCCESS_MESSAGES, ERROR_MESSAGES, extractApiError } from '@/lib/utils'
 import ProductForm from '@/components/admin/ProductForm'
 import ProductList from '@/components/admin/ProductList'
 import ProjectForm from '@/components/admin/ProjectForm'
@@ -545,11 +546,11 @@ export default function AdminPage() {
           setCustomers(updatedCustomers)
           // Refresh business types to update customer counts
           fetchBusinessTypes()
-          showNotification?.({ type: 'success', message: 'Customer updated successfully!' })
+          showNotification?.({ type: 'success', message: SUCCESS_MESSAGES.UPDATED('Customer') })
         } else {
           const error = await response.json()
           console.error('Customer update error:', error)
-                      showNotification?.({ type: 'error', message: `Error updating customer: ${error.error || error.message || 'Unknown error'}` })
+                      showNotification?.({ type: 'error', message: ERROR_MESSAGES.UPDATE_FAILED('Customer') + ': ' + extractApiError(error) })
         }
       } else {
         // Add new customer
@@ -1404,6 +1405,7 @@ export default function AdminPage() {
             setIsProjectFormOpen(false)
             setSelectedProject(null)
           }}
+          onShowNotification={(type, message) => showNotification?.({ type, message })}
         />
       )}
 

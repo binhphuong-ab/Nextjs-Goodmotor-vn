@@ -973,3 +973,156 @@ Import trace for requested module:
  ✓ Compiled in 1016ms (1014 modules)
  ✓ Compiled in 784ms (1014 modules)
 <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1128ms (1014 modules)
+ ✓ Compiled in 1182ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 806ms (1016 modules)
+ ⨯ ./components/admin/CustomerForm.tsx
+Error: 
+  [31mx[0m the name `generateSlug` is defined multiple times
+    ,-[[36;1;4m/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/components/admin/CustomerForm.tsx[0m:2:1]
+ [2m 2[0m | 
+ [2m 3[0m | import { useState, useEffect } from 'react'
+ [2m 4[0m | import dynamic from 'next/dynamic'
+ [2m 5[0m | import { generateSlug } from '@/lib/utils'
+    : [31;1m         ^^^^^^|^^^^^[0m
+    :                [31;1m`-- [31;1mprevious definition of `generateSlug` here[0m[0m
+ [2m 6[0m | import { ICustomer, ICustomerInput } from '@/models/Customer'
+ [2m 7[0m | 
+ [2m 8[0m | // Dynamically import ReactQuill to avoid SSR issues
+ [2m 9[0m | const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
+ [2m10[0m | 
+ [2m11[0m | // Import ReactQuill styles
+ [2m12[0m | import 'react-quill/dist/quill.snow.css'
+ [2m13[0m | 
+ [2m14[0m | interface BusinessType {
+ [2m15[0m |   _id: string
+ [2m16[0m |   name: string
+ [2m17[0m | }
+ [2m18[0m | 
+ [2m19[0m | interface Industry {
+ [2m20[0m |   _id: string
+ [2m21[0m |   name: string
+ [2m22[0m |   slug: string
+ [2m23[0m |   category?: string
+ [2m24[0m |   displayOrder?: number
+ [2m25[0m | }
+ [2m26[0m | 
+ [2m27[0m | // Extended interface for populated customer data from API
+ [2m28[0m | interface PopulatedCustomer extends Omit<ICustomer, 'industry' | 'businessType'> {
+ [2m29[0m |   industry?: (string | { _id: string; name: string; slug: string })[]
+ [2m30[0m |   businessType: string | { _id: string; name: string }
+ [2m31[0m | }
+ [2m32[0m | 
+ [2m33[0m | interface CustomerFormProps {
+ [2m34[0m |   customer?: PopulatedCustomer | null
+ [2m35[0m |   onSave: (customerData: ICustomerInput) => Promise<void>
+ [2m36[0m |   onCancel: () => void
+ [2m37[0m |   onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
+ [2m38[0m | }
+ [2m39[0m | 
+ [2m40[0m | const customerStatuses = [
+ [2m41[0m |   { value: 'prospect', label: 'Prospect' },
+ [2m42[0m |   { value: 'active', label: 'Active' },
+ [2m43[0m |   { value: 'inactive', label: 'Inactive' },
+ [2m44[0m |   { value: 'partner', label: 'Partner' },
+ [2m45[0m |   { value: 'distributor', label: 'Distributor' }
+ [2m46[0m | ]
+ [2m47[0m | 
+ [2m48[0m | const customerTiers = [
+ [2m49[0m |   { value: 'standard', label: 'Standard' },
+ [2m50[0m |   { value: 'preferred', label: 'Preferred' },
+ [2m51[0m |   { value: 'premium', label: 'Premium' },
+ [2m52[0m |   { value: 'enterprise', label: 'Enterprise' }
+ [2m53[0m | ]
+ [2m54[0m | 
+ [2m55[0m | function generateSlug(name: string): string {
+    : [33;1m         ^^^^^^|^^^^^[0m
+    :                [33;1m`-- [33;1m`generateSlug` redefined here[0m[0m
+ [2m56[0m |   return name
+ [2m57[0m |     .toLowerCase()
+ [2m58[0m |     .replace(/[^a-z0-9\s-]/g, '')
+    `----
+
+Import trace for requested module:
+./components/admin/CustomerForm.tsx
+./app/admin/page.tsx
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1101ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ⨯ ./components/admin/IndustryForm.tsx
+Error: 
+  [31mx[0m the name `generateSlug` is defined multiple times
+    ,-[[36;1;4m/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/components/admin/IndustryForm.tsx[0m:1:1]
+ [2m 1[0m | 'use client'
+ [2m 2[0m | 
+ [2m 3[0m | import { useState } from 'react'
+ [2m 4[0m | import { generateSlug } from '@/lib/utils'
+    : [31;1m         ^^^^^^|^^^^^[0m
+    :                [31;1m`-- [31;1mprevious definition of `generateSlug` here[0m[0m
+ [2m 5[0m | 
+ [2m 6[0m | interface Industry {
+ [2m 7[0m |   _id?: string
+ [2m 8[0m |   name: string
+ [2m 9[0m |   slug: string
+ [2m10[0m |   description?: string
+ [2m11[0m |   category?: string
+ [2m12[0m |   displayOrder?: number
+ [2m13[0m | }
+ [2m14[0m | 
+ [2m15[0m | interface IndustryFormProps {
+ [2m16[0m |   industry?: Industry
+ [2m17[0m |   onSubmit: (industryData: Omit<Industry, '_id'>) => void
+ [2m18[0m |   onCancel: () => void
+ [2m19[0m | }
+ [2m20[0m | 
+ [2m21[0m | const categoryOptions = [
+ [2m22[0m |   { value: 'manufacturing', label: 'Manufacturing' },
+ [2m23[0m |   { value: 'processing', label: 'Processing' },
+ [2m24[0m |   { value: 'research', label: 'Research' },
+ [2m25[0m |   { value: 'energy', label: 'Energy' },
+ [2m26[0m |   { value: 'healthcare', label: 'Healthcare' },
+ [2m27[0m |   { value: 'technology', label: 'Technology' },
+ [2m28[0m |   { value: 'other', label: 'Other' }
+ [2m29[0m | ]
+ [2m30[0m | 
+ [2m31[0m | // Helper function to generate slug from name
+ [2m32[0m | function generateSlug(name: string): string {
+    : [33;1m         ^^^^^^|^^^^^[0m
+    :                [33;1m`-- [33;1m`generateSlug` redefined here[0m[0m
+ [2m33[0m |   return name
+ [2m34[0m |     .toLowerCase()
+ [2m35[0m |     .replace(/[^a-z0-9]+/g, '-')
+    `----
+
+Import trace for requested module:
+./components/admin/IndustryForm.tsx
+./app/admin/page.tsx
+ ✓ Compiled in 384ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 977ms (1016 modules)
+ ✓ Compiled in 812ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1180ms (1016 modules)
+ ✓ Compiled in 625ms (1016 modules)
+ ✓ Compiled in 615ms (1016 modules)
+ ✓ Compiled in 853ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 610ms (1016 modules)
+ ✓ Compiled in 904ms (1016 modules)
+ ✓ Compiled in 604ms (1016 modules)
+ ✓ Compiled in 638ms (1016 modules)
+ ✓ Compiled in 573ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 680ms (1016 modules)
+ ✓ Compiled in 317ms (1016 modules)
+ ✓ Compiled in 401ms (1016 modules)
+ ✓ Compiled in 515ms (1016 modules)
+ ✓ Compiled in 811ms (1016 modules)
+ ✓ Compiled in 1018ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 674ms (1016 modules)
+ ✓ Compiled in 631ms (1016 modules)
+ ✓ Compiled in 737ms (1016 modules)
+ ✓ Compiled in 673ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set

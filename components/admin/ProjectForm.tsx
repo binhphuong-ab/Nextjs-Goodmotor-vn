@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Eye, Edit, CheckCircle, AlertCircle } from 'lucide-react'
+import { generateSlug, getTodayDate } from '@/lib/utils'
 import 'react-quill/dist/quill.snow.css'
 
 // Dynamically import ReactQuill to avoid SSR issues
@@ -43,22 +44,19 @@ interface ProjectFormProps {
   project?: Project | null
   onSave: (projectData: Omit<Project, '_id' | 'createdAt' | 'updatedAt'>) => void
   onCancel: () => void
+  onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
 interface ValidationErrors {
   [key: string]: string
 }
 
-export default function ProjectForm({ project, onSave, onCancel }: ProjectFormProps) {
+export default function ProjectForm({ project, onSave, onCancel, onShowNotification }: ProjectFormProps) {
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
   const [showValidation, setShowValidation] = useState(false)
   
-  // Helper function to get today's date in YYYY-MM-DD format for date input
-  const getTodayDate = () => {
-    const today = new Date()
-    return today.toISOString().split('T')[0]
-  }
+
   
   const [formData, setFormData] = useState<Omit<Project, '_id' | 'createdAt' | 'updatedAt'>>({
     title: '',
@@ -84,16 +82,7 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
     status: 'completed'
   })
 
-  // Function to generate slug from title
-  const generateSlug = (title: string): string => {
-    return title
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
-  }
+
 
   useEffect(() => {
     if (project) {
@@ -226,6 +215,8 @@ export default function ProjectForm({ project, onSave, onCancel }: ProjectFormPr
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors)
       setShowValidation(true)
+      const errorMessage = 'Please fix the following errors: ' + Object.values(errors).join(', ')
+      onShowNotification?.('error', errorMessage)
       return
     }
     

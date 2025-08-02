@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { generateSlug } from '@/lib/utils'
 
 interface Industry {
   _id?: string
@@ -27,13 +28,7 @@ const categoryOptions = [
   { value: 'other', label: 'Other' }
 ]
 
-// Helper function to generate slug from name
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}
+
 
 export default function IndustryForm({ industry, onSubmit, onCancel }: IndustryFormProps) {
   const [formData, setFormData] = useState<Omit<Industry, '_id'>>({

@@ -27,6 +27,7 @@ interface CustomerListProps {
   customers: ICustomer[]
   onEdit: (customer: ICustomer) => void
   onDelete: (customerId: string) => void
+  onCreate?: () => void
 }
 
 interface NotificationState {
@@ -50,7 +51,7 @@ const tierColors = {
   'enterprise': 'bg-gold-100 text-gold-800'
 }
 
-export default function CustomerList({ customers, onEdit, onDelete }: CustomerListProps) {
+export default function CustomerList({ customers, onEdit, onDelete, onCreate }: CustomerListProps) {
   const [industries, setIndustries] = useState<Industry[]>([])
   const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([])
   const [notification, setNotification] = useState<NotificationState | null>(null)
