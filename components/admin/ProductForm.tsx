@@ -40,6 +40,8 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
       power: '',
       inletSize: '',
       weight: '',
+      country: '',
+      equipment: '',
     },
     features: [''],
     applications: [''],
@@ -77,6 +79,8 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
             power: '',
             inletSize: '',
             weight: '',
+            country: '',
+            equipment: '',
           },
           features: [''],
           applications: [''],
@@ -781,6 +785,48 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
                   placeholder="e.g., 450 lbs"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="spec_country" className="block text-sm font-medium text-gray-700 mb-2">
+                  Country of Origin
+                </label>
+                <select
+                  id="spec_country"
+                  name="spec_country"
+                  value={formData.specifications.country || ''}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="">Select Country</option>
+                  <option value="Germany">Germany</option>
+                  <option value="Japan">Japan</option>
+                  <option value="Korea">Korea</option>
+                  <option value="United States">United States</option>
+                  <option value="UK">UK</option>
+                  <option value="France">France</option>
+                  <option value="China">China</option>
+                  <option value="Vietnam">Vietnam</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="spec_equipment" className="block text-sm font-medium text-gray-700 mb-2">
+                  Equipment Type
+                </label>
+                <select
+                  id="spec_equipment"
+                  name="spec_equipment"
+                  value={formData.specifications.equipment || ''}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="">Select Equipment Type</option>
+                  <option value="Bơm chân không">Bơm chân không</option>
+                  <option value="Phụ tùng bơm">Phụ tùng bơm</option>
+                  <option value="Thiết bị chân không">Thiết bị chân không</option>
+                </select>
               </div>
             </div>
           </div>

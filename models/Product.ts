@@ -14,6 +14,8 @@ export interface IProduct {
     power?: string // HP or kW
     inletSize?: string // inches
     weight?: string // lbs or kg
+    country?: string // Germany, Japan, Korea, United States, UK, France, China, Vietnam, Other
+    equipment?: string // Bơm chân không, Phụ tùng bơm, Thiết bị chân không
   }
   features: string[]
   applications: string[]
@@ -88,6 +90,18 @@ const ProductSchema = new Schema<IProduct>({
       type: String,
       required: false,
       trim: true
+    },
+    country: {
+      type: String,
+      required: false,
+      trim: true,
+      enum: ['Germany', 'Japan', 'Korea', 'United States', 'UK', 'France', 'China', 'Vietnam', 'Other']
+    },
+    equipment: {
+      type: String,
+      required: false,
+      trim: true,
+      enum: ['Bơm chân không', 'Phụ tùng bơm', 'Thiết bị chân không']
     }
   },
   features: [{

@@ -138,6 +138,12 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                 Product Line
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Country
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Equipment
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Price
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -212,6 +218,28 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                   ) : (
                     <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
                       No product line
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  {product.specifications?.country ? (
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                      {product.specifications.country}
+                    </span>
+                  ) : (
+                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
+                      No country
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  {product.specifications?.equipment ? (
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
+                      {product.specifications.equipment}
+                    </span>
+                  ) : (
+                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
+                      No equipment
                     </span>
                   )}
                 </td>
