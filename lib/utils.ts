@@ -5,6 +5,7 @@
 /**
  * Generate a URL-friendly slug from a string
  * Standardized implementation used across all admin forms
+ * Supports Vietnamese characters by properly handling accents and special characters
  * 
  * @param input - The string to convert to a slug
  * @returns A URL-friendly slug
@@ -12,11 +13,14 @@
 export function generateSlug(input: string): string {
   return input
     .toLowerCase()
+    .normalize('NFD')                     // separate accents from characters
+    .replace(/[\u0300-\u036f]/g, '')      // remove accent marks
+    .replace(/đ/g, 'd')                   // Vietnamese: đ → d
+    .replace(/[^a-z0-9\s-]/g, '')         // remove non-alphanumeric chars
     .trim()
-    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-    .replace(/\s+/g, '-')         // Replace spaces with hyphens
-    .replace(/-+/g, '-')          // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, '')        // Remove leading/trailing hyphens
+    .replace(/\s+/g, '-')                 // replace spaces with hyphens
+    .replace(/-+/g, '-')                  // collapse multiple hyphens
+    .replace(/^-|-$/g, '')                // remove leading/trailing hyphens
 }
 
 /**
