@@ -98,10 +98,11 @@ const CustomerSchema = new Schema<ICustomer>({
     type: Date
   },
   
-  // Description
+  // Description - Rich HTML content from ReactQuill
   description: {
     type: String,
-    trim: true
+    required: false,
+    maxlength: [50000, 'Description cannot exceed 50,000 characters'] // Allows rich HTML content
   },
   
   // Optional project-related fields

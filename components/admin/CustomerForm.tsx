@@ -11,6 +11,43 @@ const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 // Import ReactQuill styles
 import 'react-quill/dist/quill.snow.css'
 
+// Full-featured Quill editor configuration
+const quillModules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+    [{ 'font': [] }],
+    [{ 'size': ['small', false, 'large', 'huge'] }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ 'color': [] }, { 'background': [] }],
+    [{ 'script': 'sub'}, { 'script': 'super' }],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'indent': '-1'}, { 'indent': '+1' }],
+    [{ 'direction': 'rtl' }],
+    [{ 'align': [] }],
+    ['link', 'image', 'video'],
+    ['code-block'],
+    ['clean']
+  ],
+  clipboard: {
+    matchVisual: false,
+  },
+  history: {
+    delay: 1000,
+    maxStack: 50,
+    userOnly: true
+  }
+}
+
+const quillFormats = [
+  'header', 'font', 'size',
+  'bold', 'italic', 'underline', 'strike', 'blockquote',
+  'color', 'background',
+  'script',
+  'list', 'bullet', 'indent',
+  'direction', 'align',
+  'link', 'image', 'video',
+  'code-block'
+]
+
 interface BusinessType {
   _id: string
   name: string
@@ -625,43 +662,118 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
             {/* Description */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Customer Description (Rich Text Editor)
                 </label>
-                <div className="mb-4">
+                <div className="quill-editor-wrapper mb-4">
                   <ReactQuill
                     value={formData.description || ''}
                     onChange={handleDescriptionChange}
-                    placeholder="Add detailed description about this customer..."
-                    modules={{
-                      toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['link'],
-                        ['clean']
-                      ],
-                    }}
-                    formats={[
-                      'header', 'bold', 'italic', 'underline', 'strike',
-                      'list', 'bullet', 'link'
-                    ]}
-                    style={{ 
-                      backgroundColor: 'white',
-                      borderRadius: '0.375rem'
-                    }}
+                    modules={quillModules}
+                    formats={quillFormats}
+                    theme="snow"
+                    placeholder="Add detailed description about this customer - their business, partnerships, projects, and relationship with your company..."
                   />
-                  <style jsx global>{`
-                    .ql-container {
-                      height: 200px !important;
-                    }
-                    .ql-editor {
-                      min-height: 180px !important;
-                      max-height: 180px !important;
-                      overflow-y: auto;
-                    }
-                  `}</style>
                 </div>
+                
+                {/* Live Preview Section */}
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Live Preview:
+                  </label>
+                  <div className="border border-gray-200 rounded-md p-4 bg-gray-50 min-h-[120px] max-h-[300px] overflow-y-auto">
+                    {formData.description ? (
+                      <div 
+                        className="prose prose-sm max-w-none"
+                        dangerouslySetInnerHTML={{ __html: formData.description }}
+                      />
+                    ) : (
+                      <p className="text-gray-400 italic">Preview will appear here as you type...</p>
+                    )}
+                  </div>
+                </div>
+                
+                {/* ReactQuill Custom Styles */}
+                <style jsx global>{`
+                  .quill-editor-wrapper .ql-container {
+                    min-height: 250px;
+                    font-family: inherit;
+                  }
+                  
+                  .quill-editor-wrapper .ql-editor {
+                    min-height: 220px;
+                    font-size: 14px;
+                    line-height: 1.6;
+                  }
+                  
+                  .quill-editor-wrapper .ql-toolbar {
+                    border-top: 1px solid #ccc;
+                    border-left: 1px solid #ccc;
+                    border-right: 1px solid #ccc;
+                    background: #f8f9fa;
+                  }
+                  
+                  .quill-editor-wrapper .ql-container {
+                    border-bottom: 1px solid #ccc;
+                    border-left: 1px solid #ccc;
+                    border-right: 1px solid #ccc;
+                  }
+                  
+                  .quill-editor-wrapper .ql-tooltip {
+                    z-index: 9999;
+                  }
+                  
+                  /* Enhanced toolbar styling */
+                  .quill-editor-wrapper .ql-toolbar .ql-formats {
+                    margin-right: 15px;
+                  }
+                  
+                  .quill-editor-wrapper .ql-toolbar button:hover {
+                    color: #2563eb;
+                  }
+                  
+                  .quill-editor-wrapper .ql-toolbar button.ql-active {
+                    color: #2563eb;
+                  }
+                  
+                  /* Prose styling for preview */
+                  .prose h1 { font-size: 1.875rem; font-weight: 700; margin-bottom: 0.5rem; }
+                  .prose h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+                  .prose h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+                  .prose h4 { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+                  .prose h5 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+                  .prose h6 { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
+                  .prose p { margin-bottom: 1rem; }
+                  .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+                  .prose li { margin-bottom: 0.25rem; }
+                  .prose blockquote { 
+                    border-left: 4px solid #e5e7eb; 
+                    padding-left: 1rem; 
+                    font-style: italic; 
+                    margin: 1rem 0; 
+                  }
+                  .prose code { 
+                    background-color: #f3f4f6; 
+                    padding: 0.125rem 0.25rem; 
+                    border-radius: 0.25rem; 
+                    font-size: 0.875rem; 
+                  }
+                  .prose pre { 
+                    background-color: #1f2937; 
+                    color: #f9fafb; 
+                    padding: 1rem; 
+                    border-radius: 0.5rem; 
+                    overflow-x: auto; 
+                    margin: 1rem 0; 
+                  }
+                  .prose a { 
+                    color: #2563eb; 
+                    text-decoration: underline; 
+                  }
+                  .prose a:hover { 
+                    color: #1d4ed8; 
+                  }
+                `}</style>
               </div>
             </div>
 
