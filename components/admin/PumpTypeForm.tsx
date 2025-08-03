@@ -12,7 +12,8 @@ interface PumpTypeFormProps {
 
 export default function PumpTypeForm({ pumpType, onSave, onCancel, onShowNotification }: PumpTypeFormProps) {
   const [formData, setFormData] = useState<IPumpTypeInput>({
-    pumpType: ''
+    pumpType: '',
+    slug: ''
   })
   
   const [error, setError] = useState<string>('')
@@ -20,16 +21,39 @@ export default function PumpTypeForm({ pumpType, onSave, onCancel, onShowNotific
   useEffect(() => {
     if (pumpType) {
       setFormData({
-        pumpType: pumpType.pumpType
+        pumpType: pumpType.pumpType,
+        slug: pumpType.slug
       })
     }
   }, [pumpType])
 
+  // Helper function to generate slug from pump type
+  const generateSlug = (text: string): string => {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target
-    setFormData({
-      pumpType: value
-    })
+    const { name, value } = e.target
+    
+    if (name === 'pumpType') {
+      setFormData(prev => ({
+        ...prev,
+        pumpType: value,
+        // Auto-generate slug when pump type changes (only if creating new or slug is empty)
+        slug: (!pumpType || !prev.slug) ? generateSlug(value) : prev.slug
+      }))
+    } else if (name === 'slug') {
+      setFormData(prev => ({
+        ...prev,
+        slug: generateSlug(value)
+      }))
+    }
     
     // Clear error when user starts typing
     if (error) {
@@ -43,6 +67,18 @@ export default function PumpTypeForm({ pumpType, onSave, onCancel, onShowNotific
       return false
     }
 
+    if (!formData.slug.trim()) {
+      setError('Slug is required')
+      return false
+    }
+
+    // Validate slug format
+    const slugPattern = /^[a-z0-9-]+$/
+    if (!slugPattern.test(formData.slug)) {
+      setError('Slug can only contain lowercase letters, numbers, and hyphens')
+      return false
+    }
+
     return true
   }
 
@@ -51,7 +87,8 @@ export default function PumpTypeForm({ pumpType, onSave, onCancel, onShowNotific
     
     if (validateForm()) {
       onSave({
-        pumpType: formData.pumpType.trim()
+        pumpType: formData.pumpType.trim(),
+        slug: formData.slug.trim()
       })
     }
   }
@@ -95,14 +132,37 @@ export default function PumpTypeForm({ pumpType, onSave, onCancel, onShowNotific
               value={formData.pumpType}
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                error ? 'border-red-500' : 'border-gray-300'
+                error && error.includes('Pump type') ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="e.g. Rotary Vane, Screw, Liquid Ring, Diaphragm"
             />
-            {error && (
-              <p className="mt-1 text-sm text-red-600">{error}</p>
-            )}
           </div>
+
+          <div>
+            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-1">
+              Slug *
+            </label>
+            <input
+              type="text"
+              id="slug"
+              name="slug"
+              value={formData.slug}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                error && (error.includes('Slug') || error.includes('slug')) ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="e.g. rotary-vane, screw, liquid-ring, diaphragm"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              URL-friendly identifier. Auto-generated from pump type, but can be customized.
+            </p>
+          </div>
+
+          {error && (
+            <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
+              {error}
+            </div>
+          )}
 
         </form>
       </div>

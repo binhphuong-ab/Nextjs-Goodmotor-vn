@@ -70,6 +70,13 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    if (!data.slug) {
+      return NextResponse.json(
+        { error: 'Slug is required' },
+        { status: 400 }
+      )
+    }
     
     // Check if pump type already exists
     const existingPumpType = await PumpType.findOne({ 
@@ -81,9 +88,21 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       )
     }
+
+    // Check if slug already exists
+    const existingSlug = await PumpType.findOne({ 
+      slug: data.slug.trim().toLowerCase()
+    })
+    if (existingSlug) {
+      return NextResponse.json(
+        { error: 'Pump type with this slug already exists' },
+        { status: 409 }
+      )
+    }
     
     const pumpType = new PumpType({
-      pumpType: data.pumpType.trim()
+      pumpType: data.pumpType.trim(),
+      slug: data.slug.trim().toLowerCase()
     })
     
     await pumpType.save()
@@ -120,6 +139,13 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    if (!data.slug) {
+      return NextResponse.json(
+        { error: 'Slug is required' },
+        { status: 400 }
+      )
+    }
     
     // Check if pump type already exists (excluding current pump type)
     const existingPumpType = await PumpType.findOne({ 
@@ -132,11 +158,24 @@ export async function PUT(request: NextRequest) {
         { status: 409 }
       )
     }
+
+    // Check if slug already exists (excluding current pump type)
+    const existingSlug = await PumpType.findOne({ 
+      slug: data.slug.trim().toLowerCase(),
+      _id: { $ne: id }
+    })
+    if (existingSlug) {
+      return NextResponse.json(
+        { error: 'Pump type with this slug already exists' },
+        { status: 409 }
+      )
+    }
     
     const pumpType = await PumpType.findByIdAndUpdate(
       id,
       {
-        pumpType: data.pumpType.trim()
+        pumpType: data.pumpType.trim(),
+        slug: data.slug.trim().toLowerCase()
       },
       { new: true, runValidators: true }
     )

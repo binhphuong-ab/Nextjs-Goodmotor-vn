@@ -66,6 +66,11 @@ export default function PumpTypeList({ pumpTypes, onEdit, onDelete }: PumpTypeLi
                     </span>
                   )}
                 </div>
+                <div className="mt-1">
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
+                    slug: {pumpType.slug}
+                  </span>
+                </div>
                 <div className="mt-1 text-xs text-gray-500">
                   Created: {new Date(pumpType.createdAt).toLocaleDateString()}
                   {pumpType.updatedAt !== pumpType.createdAt && (

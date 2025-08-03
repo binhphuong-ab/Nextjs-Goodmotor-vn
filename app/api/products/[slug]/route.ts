@@ -23,7 +23,7 @@ export async function GET(
     try {
       product = await Product.findOne({ slug })
         .populate('brand', 'name country productLines')
-        .populate('pumpType', 'pumpType')
+        .populate('pumpType', 'pumpType slug')
     } catch (populateError) {
       console.warn('Population failed for product, fetching without population:', populateError)
       product = await Product.findOne({ slug })
