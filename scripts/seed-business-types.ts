@@ -4,7 +4,8 @@ import path from 'path'
 // Load environment variables
 config({ path: path.join(__dirname, '..', '.env.local') })
 
-import { getDatabase } from '@/lib/mongodb'
+import mongoose from 'mongoose'
+import connectToDatabase from '@/lib/mongoose'
 import BusinessType from '@/models/BusinessType'
 
 const businessTypes = [
@@ -98,7 +99,8 @@ export async function seedBusinessTypes() {
   try {
     console.log('🌱 Starting BusinessType seeding...')
     
-    const db = await getDatabase()
+    await connectToDatabase()
+  const db = mongoose.connection.db
     
     // Check if business types already exist
     const existingCount = await BusinessType.countDocuments()

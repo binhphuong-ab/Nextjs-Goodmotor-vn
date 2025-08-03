@@ -1,15 +1,9 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
+import connectToDatabase from '@/lib/mongoose'
 
 // Load environment variables
 dotenv.config()
-
-const MONGODB_URI = process.env.MONGODB_URI
-
-if (!MONGODB_URI) {
-  console.error('MONGODB_URI environment variable is not defined')
-  process.exit(1)
-}
 
 // Define the Project schema directly in this script to avoid import issues
 const ProjectSchema = new mongoose.Schema({
@@ -42,9 +36,9 @@ const Project = mongoose.models.Project || mongoose.model('Project', ProjectSche
 
 async function createSampleProject() {
   try {
-    // Connect to MongoDB
-    await mongoose.connect(MONGODB_URI as string)
-    console.log('Connected to MongoDB')
+      // Connect to MongoDB
+  await connectToDatabase()
+  console.log('Connected to MongoDB')
 
     // Sample project data (without industry field)
     const sampleProject = {
@@ -80,10 +74,7 @@ async function createSampleProject() {
     console.log('Created sample project:')
     console.log(JSON.stringify(savedProject.toObject(), null, 2))
 
-    // Disconnect from MongoDB
-    await mongoose.disconnect()
-    console.log('Disconnected from MongoDB')
-    
+    // Close database connection
     process.exit(0)
   } catch (error) {
     console.error('Error creating sample project:', error)

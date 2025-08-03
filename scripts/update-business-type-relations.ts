@@ -1,15 +1,7 @@
 import mongoose from 'mongoose'
+import connectToDatabase from '@/lib/mongoose'
 import BusinessType from '../models/BusinessType'
 import Customer from '../models/Customer'
-
-// Connect to MongoDB using Mongoose
-async function connectToDatabase() {
-  if (mongoose.connections[0].readyState) {
-    return
-  }
-  
-  await mongoose.connect(process.env.MONGODB_URI as string)
-}
 
 async function updateBusinessTypeRelations() {
   try {

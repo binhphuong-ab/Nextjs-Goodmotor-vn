@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
-import { getDatabase } from '@/lib/mongodb'
+import mongoose from 'mongoose'
+import connectToDatabase from '@/lib/mongoose'
 
 interface Props {
   params: { slug: string }
@@ -15,7 +16,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       }
     }
 
-    const db = await getDatabase()
+    await connectToDatabase()
+    const db = mongoose.connection.db
     const product = await db.collection('products').findOne({ slug: params.slug })
 
     if (!product) {

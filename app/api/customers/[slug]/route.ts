@@ -3,15 +3,7 @@ import mongoose from 'mongoose'
 import Customer from '@/models/Customer'
 import BusinessType from '@/models/BusinessType'
 import Industry from '@/models/Industry' // Import Industry model to register schema
-
-// Connect to MongoDB using Mongoose
-async function connectToDatabase() {
-  if (mongoose.connections[0].readyState) {
-    return
-  }
-  
-  await mongoose.connect(process.env.MONGODB_URI as string)
-}
+import connectToDatabase from '@/lib/mongoose'
 
 // GET /api/customers/[slug] - Fetch individual customer by slug
 export async function GET(request: Request, { params }: { params: { slug: string } }) {

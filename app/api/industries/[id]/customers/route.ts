@@ -2,15 +2,7 @@ import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Industry from '@/models/Industry'
 import Customer from '@/models/Customer'
-
-// Connect to MongoDB using Mongoose
-async function connectToDatabase() {
-  if (mongoose.connections[0].readyState) {
-    return
-  }
-  
-  await mongoose.connect(process.env.MONGODB_URI as string)
-}
+import connectToDatabase from '@/lib/mongoose'
 
 // GET /api/industries/[id]/customers - Get customers for a specific industry
 export async function GET(request: Request, { params }: { params: { id: string } }) {

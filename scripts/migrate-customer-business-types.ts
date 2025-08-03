@@ -4,7 +4,8 @@ import path from 'path'
 // Load environment variables
 config({ path: path.join(__dirname, '..', '.env.local') })
 
-import { getDatabase } from '@/lib/mongodb'
+import mongoose from 'mongoose'
+import connectToDatabase from '@/lib/mongoose'
 import Customer from '@/models/Customer'
 import BusinessType from '@/models/BusinessType'
 
@@ -12,7 +13,8 @@ async function migrateCustomerBusinessTypes() {
   try {
     console.log('🔄 Starting Customer BusinessType migration...')
     
-    const db = await getDatabase()
+    await connectToDatabase()
+    const db = mongoose.connection.db
     
     // Fetch all business types to create mapping
     const businessTypes = await BusinessType.find({})

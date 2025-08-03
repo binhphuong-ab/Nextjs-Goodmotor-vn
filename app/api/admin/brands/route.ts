@@ -1,21 +1,13 @@
-import { getDatabase } from '@/lib/mongodb'
 import { NextRequest, NextResponse } from 'next/server'
 import Brand, { IBrandInput } from '@/models/Brand'
 import mongoose from 'mongoose'
+import connectToDatabase from '@/lib/mongoose'
 
 // GET all brands
 export async function GET() {
   try {
     // Ensure database connection
-    await getDatabase()
-    
-    // Ensure mongoose is connected
-    if (mongoose.connection.readyState !== 1) {
-      if (!process.env.MONGODB_URI) {
-        throw new Error('MONGODB_URI not found')
-      }
-      await mongoose.connect(process.env.MONGODB_URI)
-    }
+    await connectToDatabase()
     
     const brands = await Brand.find({})
       .sort({ name: 1 })
@@ -88,7 +80,8 @@ export async function GET() {
 // POST new brand
 export async function POST(request: NextRequest) {
   try {
-    const db = await getDatabase()
+    await connectToDatabase()
+    const db = mongoose.connection.db
     const data: IBrandInput = await request.json()
     
     // Validate required fields
@@ -153,7 +146,8 @@ export async function POST(request: NextRequest) {
 // PUT update brand
 export async function PUT(request: NextRequest) {
   try {
-    const db = await getDatabase()
+    await connectToDatabase()
+    const db = mongoose.connection.db
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
     const data: IBrandInput = await request.json()
@@ -237,7 +231,8 @@ export async function PUT(request: NextRequest) {
 // DELETE brand
 export async function DELETE(request: NextRequest) {
   try {
-    const db = await getDatabase()
+    await connectToDatabase()
+    const db = mongoose.connection.db
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
     

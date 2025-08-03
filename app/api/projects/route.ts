@@ -29,27 +29,9 @@
 import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Project from '@/models/Project'
+import connectToDatabase from '@/lib/mongoose'
 
-/**
- * Connects to MongoDB database if not already connected
- * Reuses existing connection to improve performance
- * 
- * @throws {Error} If MONGODB_URI environment variable is missing
- */
-async function connectToDatabase() {
-  // Check if already connected to avoid redundant connections
-  if (mongoose.connections[0].readyState) {
-    return
-  }
-  
-  // Ensure MongoDB URI is configured
-  if (!process.env.MONGODB_URI) {
-    throw new Error('MONGODB_URI is not defined')
-  }
-  
-  // Establish new connection
-  await mongoose.connect(process.env.MONGODB_URI)
-}
+// Database connection imported from shared utility
 
 /**
  * GET /api/projects

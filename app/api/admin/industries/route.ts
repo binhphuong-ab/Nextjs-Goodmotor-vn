@@ -1,19 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Industry from '@/models/Industry'
-
-// Connect to MongoDB
-async function connectToDatabase() {
-  if (mongoose.connections[0].readyState) {
-    return
-  }
-  
-  if (!process.env.MONGODB_URI) {
-    throw new Error('MONGODB_URI is not defined')
-  }
-  
-  await mongoose.connect(process.env.MONGODB_URI)
-}
+import connectToDatabase from '@/lib/mongoose'
 
 // GET /api/admin/industries - Get all industries for admin forms
 export async function GET() {

@@ -50,7 +50,7 @@ mongosh "mongodb+srv://goodmotorvn:L4lfPMzmN5t6VYa8@cluster0.lcv0mgg.mongodb.net
 
 ### Database Operations from Your Application
 
-The application uses the MongoDB client configured in `lib/mongodb.ts` to connect to the database. This connection is set up to use the MongoDB Atlas URI from the environment variables.
+The application uses the Mongoose connection configured in `lib/mongoose.ts` to connect to the database. This connection is set up to use the MongoDB Atlas URI from the environment variables.
 
 ## Migrating Data
 

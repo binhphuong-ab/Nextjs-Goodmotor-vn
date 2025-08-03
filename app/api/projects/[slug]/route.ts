@@ -1,19 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Project from '@/models/Project'
-
-// Connect to MongoDB
-async function connectToDatabase() {
-  if (mongoose.connections[0].readyState) {
-    return
-  }
-  
-  if (!process.env.MONGODB_URI) {
-    throw new Error('MONGODB_URI is not defined')
-  }
-  
-  await mongoose.connect(process.env.MONGODB_URI)
-}
+import connectToDatabase from '@/lib/mongoose'
 
 // GET /api/projects/[slug] - Get project by slug
 export async function GET(
