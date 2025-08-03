@@ -70,8 +70,6 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
     projects: [],
     pumpModelsUsed: [],
     applications: [],
-    countryOfOrigin: '',
-    equipmentType: '',
     featured: false
   })
 
@@ -156,8 +154,6 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
         projects: customer.projects || [],
         pumpModelsUsed: customer.pumpModelsUsed || [],
         applications: customer.applications || [],
-        countryOfOrigin: customer.countryOfOrigin || '',
-        equipmentType: customer.equipmentType || '',
         featured: customer.featured
       })
     }
@@ -498,87 +494,6 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Country of Origin and Equipment Type */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Country of Origin */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Country of Origin <span className="text-gray-400 font-normal">(Optional)</span>
-                  </label>
-                  <div className="space-y-2">
-                    <div className="relative">
-                      <select
-                        name="countryOfOrigin"
-                        value={formData.countryOfOrigin || ''}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
-                        size={5}
-                      >
-                        <option value="">Select country of origin...</option>
-                        <option value="Germany" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Germany</option>
-                        <option value="Japan" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Japan</option>
-                        <option value="Korea" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Korea</option>
-                        <option value="United States" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">United States</option>
-                        <option value="UK" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">UK</option>
-                        <option value="France" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">France</option>
-                        <option value="China" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">China</option>
-                        <option value="Vietnam" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Vietnam</option>
-                        <option value="Other" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Other</option>
-                      </select>
-                    </div>
-                    <div className="flex items-start space-x-2 text-xs text-gray-500">
-                      <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <div>
-                        <div>Select the primary country where equipment originates</div>
-                        {formData.countryOfOrigin && (
-                          <div className="mt-1 text-blue-600 font-medium">
-                            {formData.countryOfOrigin} selected
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Equipment Type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Equipment Type <span className="text-gray-400 font-normal">(Optional)</span>
-                  </label>
-                  <div className="space-y-2">
-                    <div className="relative">
-                      <select
-                        name="equipmentType"
-                        value={formData.equipmentType || ''}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
-                        size={5}
-                      >
-                        <option value="">Select equipment type...</option>
-                        <option value="Bơm chân không" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Bơm chân không</option>
-                        <option value="Phụ tùng bơm" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Phụ tùng bơm</option>
-                        <option value="Thiết bị chân không" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Thiết bị chân không</option>
-                      </select>
-                    </div>
-                    <div className="flex items-start space-x-2 text-xs text-gray-500">
-                      <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <div>
-                        <div>Choose the primary type of equipment</div>
-                        {formData.equipmentType && (
-                          <div className="mt-1 text-blue-600 font-medium">
-                            {formData.equipmentType} selected
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
 

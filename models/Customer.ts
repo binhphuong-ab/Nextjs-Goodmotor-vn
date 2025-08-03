@@ -23,10 +23,6 @@ export interface ICustomer {
   pumpModelsUsed?: { name: string; url?: string }[]
   applications?: { name: string; url?: string }[]
   
-  // Country and Equipment information
-  countryOfOrigin?: string // Germany, Japan, Korea, United States, UK, France, China, Vietnam, Other
-  equipmentType?: string // Bơm chân không, Phụ tùng bơm, Thiết bị chân không
-  
   featured: boolean
   createdAt: Date
   updatedAt: Date
@@ -169,20 +165,6 @@ const CustomerSchema = new Schema<ICustomer>({
     }
   }],
   
-  // Country and Equipment information
-  countryOfOrigin: {
-    type: String,
-    required: false,
-    trim: true,
-    enum: ['Germany', 'Japan', 'Korea', 'United States', 'UK', 'France', 'China', 'Vietnam', 'Other']
-  },
-  equipmentType: {
-    type: String,
-    required: false,
-    trim: true,
-    enum: ['Bơm chân không', 'Phụ tùng bơm', 'Thiết bị chân không']
-  },
-  
   featured: {
     type: Boolean,
     default: false
@@ -221,8 +203,6 @@ export interface ICustomerInput {
   projects?: { name: string; url?: string }[]
   pumpModelsUsed?: { name: string; url?: string }[]
   applications?: { name: string; url?: string }[]
-  countryOfOrigin?: string
-  equipmentType?: string
   featured?: boolean
 }
 
