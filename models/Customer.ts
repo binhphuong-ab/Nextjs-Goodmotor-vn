@@ -174,19 +174,25 @@ const CustomerSchema = new Schema<ICustomer>({
   timestamps: true
 })
 
-// Indexes for better query performance
-CustomerSchema.index({ businessType: 1 })
-CustomerSchema.index({ customerStatus: 1 })
-CustomerSchema.index({ customerTier: 1 })
-CustomerSchema.index({ featured: 1 })
+// Indexes optimized for actual query patterns
 
-// Add compound indexes for common query patterns
-CustomerSchema.index({ featured: 1, customerStatus: 1 }) // Featured customers by status
-CustomerSchema.index({ businessType: 1, customerTier: 1 }) // Business type + tier queries
-CustomerSchema.index({ customerStatus: 1, completeDate: -1 }) // Recent complete dates by status
-CustomerSchema.index({ industry: 1 }) // Industry references (array field)
+// CRITICAL: Unique index for customer detail page lookups (/api/customers/[slug])
+CustomerSchema.index({ slug: 1 }, { unique: true })
+
+// Essential single-field indexes for filtering and sorting
+CustomerSchema.index({ businessType: 1 })     // Used in frontend filtering
+CustomerSchema.index({ customerStatus: 1 })   // Used in admin queries and counts
+CustomerSchema.index({ customerTier: 1 })     // Used in frontend filtering and counts
+CustomerSchema.index({ featured: 1 })         // Used for featured customer queries
+CustomerSchema.index({ industry: 1 })         // Industry references (array field)
+CustomerSchema.index({ createdAt: -1 })       // Admin list sorting
+
+// Compound indexes for actual query patterns
+CustomerSchema.index({ featured: -1, customerTier: -1, createdAt: -1 }) // Main public page sort pattern
+CustomerSchema.index({ businessType: 1, customerTier: 1 }) // Frontend business type + tier filtering
+
 // Sparse indexes for optional fields (only indexes documents that have these fields)
-CustomerSchema.index({ completeDate: -1 }, { sparse: true }) // Recent complete dates
+CustomerSchema.index({ completeDate: -1 }, { sparse: true }) // Optional date sorting
 
 // Input interface for creating/updating customers
 export interface ICustomerInput {
