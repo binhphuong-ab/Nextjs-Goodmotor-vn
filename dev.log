@@ -1262,3 +1262,44 @@ Import trace for requested module:
  ✓ Compiled in 423ms (1016 modules)
  ✓ Compiled in 529ms (1016 modules)
 <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1077ms (1016 modules)
+ ✓ Compiled in 550ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1015ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 985ms (1016 modules)
+ ✓ Compiled in 709ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 861ms (1016 modules)
+ ✓ Compiled in 552ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 706ms (1016 modules)
+ ✓ Compiled in 600ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check
+ ✓ Compiled in 954ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1249ms (1016 modules)
+ ✓ Compiled in 743ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 832ms (1016 modules)
+ ✓ Compiled in 660ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1176ms (1016 modules)
+ ✓ Compiled in 734ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 1028ms (1016 modules)
+ ✓ Compiled in 420ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 469ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 753ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/0.pack.gz_' -> '/Users/nguyenbinhphuong/Library/CloudStorage/Dropbox/Cursor Code/NextJS/.next/cache/webpack/server-development/0.pack.gz'
+ ✓ Compiled in 1468ms (1016 modules)
+ ✓ Compiled in 839ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ✓ Compiled in 587ms (1016 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid code lengths set
+ ○ Compiling /api/admin/products/route ...
+[?25h

@@ -11,14 +11,17 @@ export interface IProduct {
   specifications: {
     flowRate?: string // CFM
     vacuumLevel?: string // torr or mbar
-    power?: string // HP or kW
+    power?: string // <400W, 400W, 550W, 0.75Kw, 1.1Kw, 1.5kw, 2.2Kw, 3Kw, 3.7Kw, 5.5Kw, 7.5Kw, 9Kw, 11Kw, 15Kw, 22Kw, >22Kw
     inletSize?: string // inches
     weight?: string // lbs or kg
     country?: string // Germany, Japan, Korea, United States, UK, France, China, Vietnam, Other
     equipment?: string // Bơm chân không, Phụ tùng bơm, Thiết bị chân không
   }
   features: string[]
-  applications: string[]
+  applications: Array<{
+    name: string
+    url?: string
+  }>
   images: Array<{
     url: string
     alt?: string
@@ -79,7 +82,8 @@ const ProductSchema = new Schema<IProduct>({
     power: {
       type: String,
       required: false,
-      trim: true
+      trim: true,
+      enum: ['<400W', '400W', '550W', '0.75Kw', '1.1Kw', '1.5kw', '2.2Kw', '3Kw', '3.7Kw', '5.5Kw', '7.5Kw', '9Kw', '11Kw', '15Kw', '22Kw', '>22Kw']
     },
     inletSize: {
       type: String,
@@ -109,8 +113,22 @@ const ProductSchema = new Schema<IProduct>({
     trim: true
   }],
   applications: [{
-    type: String,
-    trim: true
+    name: {
+      type: String,
+      required: [true, 'Application name is required'],
+      trim: true
+    },
+    url: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          if (!v) return true // url is optional
+          return /^https?:\/\/.+/.test(v);
+        },
+        message: 'Please provide a valid URL starting with http:// or https://'
+      }
+    }
   }],
   images: [{
     url: {
@@ -170,7 +188,10 @@ export interface IProductInput {
   pumpType?: string // PumpType ID as string
   specifications: IProduct['specifications']
   features: string[]
-  applications: string[]
+  applications: Array<{
+    name: string
+    url?: string
+  }>
   images: Array<{
     url: string
     alt?: string

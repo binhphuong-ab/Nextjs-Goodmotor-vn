@@ -315,13 +315,33 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900">
             {customer ? 'Edit Customer' : 'Add New Customer'}
           </h2>
+          
+          {/* Action Buttons in Header */}
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="customer-form"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : customer ? 'Update Customer' : 'Create Customer'}
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[80vh] flex flex-col">
+        <form id="customer-form" onSubmit={handleSubmit} className="overflow-y-auto max-h-[80vh] flex flex-col">
           <div className="p-6 space-y-6 flex-1">
             {/* Basic Information */}
             <div className="space-y-4">
@@ -896,23 +916,6 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
             </div>
           </div>
 
-          <div className="px-6 py-6 flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-              disabled={loading}
-            >
-              {loading ? 'Saving...' : customer ? 'Update Customer' : 'Create Customer'}
-            </button>
-          </div>
         </form>
       </div>
     </div>

@@ -99,6 +99,13 @@ export async function POST(request: NextRequest) {
       )
     }
     
+    if (!data.slug) {
+      return NextResponse.json(
+        { error: 'Brand slug is required' },
+        { status: 400 }
+      )
+    }
+    
     // Check if name already exists
     const existingBrand = await Brand.findOne({ 
       name: { $regex: new RegExp(`^${data.name.trim()}$`, 'i') }
@@ -110,8 +117,20 @@ export async function POST(request: NextRequest) {
       )
     }
     
+    // Check if slug already exists
+    const existingSlug = await Brand.findOne({ 
+      slug: data.slug.trim().toLowerCase()
+    })
+    if (existingSlug) {
+      return NextResponse.json(
+        { error: 'Brand slug already exists' },
+        { status: 409 }
+      )
+    }
+    
     const brand = new Brand({
       name: data.name.trim(),
+      slug: data.slug.trim().toLowerCase(),
       country: data.country?.trim() || undefined,
       yearEstablished: data.yearEstablished || undefined,
       revenue: data.revenue?.trim() || undefined,
@@ -153,6 +172,13 @@ export async function PUT(request: NextRequest) {
       )
     }
     
+    if (!data.slug) {
+      return NextResponse.json(
+        { error: 'Brand slug is required' },
+        { status: 400 }
+      )
+    }
+    
     // Check if name already exists (excluding current brand)
     const existingBrand = await Brand.findOne({ 
       name: { $regex: new RegExp(`^${data.name.trim()}$`, 'i') },
@@ -165,10 +191,23 @@ export async function PUT(request: NextRequest) {
       )
     }
     
+    // Check if slug already exists (excluding current brand)
+    const existingSlug = await Brand.findOne({ 
+      slug: data.slug.trim().toLowerCase(),
+      _id: { $ne: id }
+    })
+    if (existingSlug) {
+      return NextResponse.json(
+        { error: 'Brand slug already exists' },
+        { status: 409 }
+      )
+    }
+    
     const brand = await Brand.findByIdAndUpdate(
       id,
       {
         name: data.name.trim(),
+        slug: data.slug.trim().toLowerCase(),
         country: data.country?.trim() || undefined,
         yearEstablished: data.yearEstablished || undefined,
         revenue: data.revenue?.trim() || undefined,

@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         'industrial pump',
         'good motor',
         ...product.features?.slice(0, 3) || [],
-        ...product.applications?.slice(0, 3) || [],
+        ...product.applications?.slice(0, 3).map(app => app.name) || [],
       ].join(', '),
       openGraph: {
         title: product.name,

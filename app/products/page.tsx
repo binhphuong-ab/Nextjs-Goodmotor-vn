@@ -186,13 +186,15 @@ export default function ProductsPage() {
                 )}
                 
                 {/* Specifications */}
-                {(product.specifications?.flowRate || product.specifications?.vacuumLevel || product.specifications?.power) && (
+                {(product.specifications?.equipment || product.specifications?.country || product.specifications?.power || product.specifications?.flowRate || product.specifications?.vacuumLevel) && (
                   <div className="mb-4">
                     <h4 className="font-semibold text-gray-800 mb-2">Specifications:</h4>
                     <div className="text-sm text-gray-600 space-y-1">
+                      {product.specifications?.equipment && <div>Equipment Type: {product.specifications.equipment}</div>}
+                      {product.specifications?.country && <div>Country of Origin: {product.specifications.country}</div>}
+                      {product.specifications?.power && <div>Power: {product.specifications.power}</div>}
                       {product.specifications?.flowRate && <div>Flow Rate: {product.specifications.flowRate}</div>}
                       {product.specifications?.vacuumLevel && <div>Vacuum Level: {product.specifications.vacuumLevel}</div>}
-                      {product.specifications?.power && <div>Power: {product.specifications.power}</div>}
                     </div>
                   </div>
                 )}

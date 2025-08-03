@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import 'react-quill/dist/quill.snow.css'
 import { IBrand, IBrandInput, IProductLine } from '@/models/Brand'
+import { generateSlug } from '@/lib/utils'
 
 // Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
@@ -50,6 +51,7 @@ interface BrandFormProps {
 export default function BrandForm({ brand, onSave, onCancel, onShowNotification }: BrandFormProps) {
   const [formData, setFormData] = useState<IBrandInput>({
     name: '',
+    slug: '',
     country: '',
     yearEstablished: undefined,
     revenue: '',
@@ -80,6 +82,7 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
     if (brand) {
       setFormData({
         name: brand.name,
+        slug: brand.slug,
         country: brand.country || '',
         yearEstablished: brand.yearEstablished || undefined,
         revenue: brand.revenue || '',
@@ -91,9 +94,18 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
+    const updatedData: Partial<IBrandInput> = {
+      [name]: name === 'yearEstablished' ? (value ? parseInt(value) : undefined) : value
+    }
+    
+    // Auto-generate slug when name changes (only for new brands)
+    if (name === 'name' && !brand) {
+      updatedData.slug = generateSlug(value)
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'yearEstablished' ? (value ? parseInt(value) : undefined) : value
+      ...updatedData
     }))
     
     // Clear error when user starts typing
@@ -169,6 +181,12 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
       newErrors.name = 'Brand name is required'
     }
 
+    if (!formData.slug.trim()) {
+      newErrors.slug = 'Brand slug is required'
+    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
+      newErrors.slug = 'Slug can only contain lowercase letters, numbers, and hyphens'
+    }
+
     // Optional validations - only validate if provided
     if (formData.yearEstablished && (formData.yearEstablished < 1800 || formData.yearEstablished > new Date().getFullYear())) {
       newErrors.yearEstablished = `Year established must be between 1800 and ${new Date().getFullYear()}`
@@ -187,6 +205,7 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
       
       onSave({
         name: formData.name.trim(),
+        slug: formData.slug.trim(),
         country: formData.country?.trim() || undefined,
         yearEstablished: formData.yearEstablished || undefined,
         revenue: formData.revenue?.trim() || undefined,
@@ -198,12 +217,32 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6 text-gray-900">
-          {brand ? 'Edit Brand' : 'Add New Brand'}
-        </h2>
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-xl font-medium text-gray-900">
+            {brand ? 'Edit Brand' : 'Add New Brand'}
+          </h2>
+          
+          {/* Action Buttons in Header */}
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="brand-form"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {brand ? 'Update' : 'Create'} Brand
+            </button>
+          </div>
+        </div>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form id="brand-form" onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
               Brand Name *
@@ -222,6 +261,31 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
             {errors.name && (
               <p className="mt-1 text-sm text-red-600">{errors.name}</p>
             )}
+          </div>
+
+          <div>
+            <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-1">
+              URL Slug * {!brand && <span className="text-xs text-gray-500">(Auto-generated from name)</span>}
+            </label>
+            <input
+              type="text"
+              id="slug"
+              name="slug"
+              value={formData.slug}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.slug ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="e.g. busch-vacuum, edwards-pumps"
+              pattern="[a-z0-9-]+"
+              title="Only lowercase letters, numbers, and hyphens are allowed"
+            />
+            {errors.slug && (
+              <p className="mt-1 text-sm text-red-600">{errors.slug}</p>
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              URL-friendly identifier for this brand. Used in web addresses.
+            </p>
           </div>
 
           <div>
@@ -436,21 +500,6 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
             )}
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {brand ? 'Update' : 'Create'} Brand
-            </button>
-          </div>
         </form>
         
         <style jsx global>{`

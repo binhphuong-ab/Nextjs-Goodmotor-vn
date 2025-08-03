@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       .populate('pumpType', 'pumpType')
       .sort({ name: 1 })
     
-    return NextResponse.json({ products })
+    return NextResponse.json(products)
   } catch (error) {
     console.error('Error fetching products:', error)
     return NextResponse.json(

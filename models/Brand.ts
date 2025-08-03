@@ -11,6 +11,7 @@ export interface IProductLine {
 export interface IBrand {
   _id: string
   name: string
+  slug: string // URL-friendly identifier (e.g., "busch-vacuum", "edwards-pumps")
   country?: string
   yearEstablished?: number
   revenue?: string // Optional since not all brands may disclose revenue
@@ -51,8 +52,16 @@ const BrandSchema = new Schema<IBrand>({
     type: String,
     required: [true, 'Brand name is required'],
     trim: true,
-    unique: true,
     maxlength: [100, 'Brand name cannot exceed 100 characters']
+  },
+  slug: {
+    type: String,
+    required: [true, 'Brand slug is required'],
+    unique: true,
+    trim: true,
+    lowercase: true,
+    maxlength: [100, 'Slug cannot exceed 100 characters'],
+    match: [/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens']
   },
   country: {
     type: String,
@@ -88,7 +97,7 @@ const BrandSchema = new Schema<IBrand>({
 })
 
 // Indexes for better query performance
-// Note: name index automatically created by unique: true
+// Note: slug and name indexes automatically created by unique: true
 BrandSchema.index({ country: 1 })
 BrandSchema.index({ yearEstablished: 1 })
 BrandSchema.index({ name: 'text', description: 'text' }) // Text search on name and description
@@ -125,6 +134,7 @@ BrandSchema.methods.getActiveProductLines = function() {
 // Input interface for creating/updating brands
 export interface IBrandInput {
   name: string
+  slug: string
   country?: string
   yearEstablished?: number
   revenue?: string

@@ -44,7 +44,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
       equipment: '',
     },
     features: [''],
-    applications: [''],
+    applications: [{ name: '', url: '' }],
     images: [{
       url: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
       alt: '',
@@ -83,7 +83,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
             equipment: '',
           },
           features: [''],
-          applications: [''],
+          applications: [{ name: '', url: '' }],
           images: [{
             url: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
             alt: '',
@@ -232,27 +232,53 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
     }
   }
 
-  const handleArrayChange = (arrayName: 'features' | 'applications', index: number, value: string) => {
+  const handleArrayChange = (arrayName: 'features', index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
       [arrayName]: prev[arrayName].map((item, i) => i === index ? value : item),
     }))
   }
 
-  const addArrayItem = (arrayName: 'features' | 'applications') => {
+  const addArrayItem = (arrayName: 'features') => {
     setFormData(prev => ({
       ...prev,
       [arrayName]: [...prev[arrayName], ''],
     }))
   }
 
-  const removeArrayItem = (arrayName: 'features' | 'applications', index: number) => {
+  const removeArrayItem = (arrayName: 'features', index: number) => {
     if (formData[arrayName].length > 1) {
       setFormData(prev => ({
         ...prev,
         [arrayName]: prev[arrayName].filter((_, i) => i !== index),
       }))
     }
+  }
+
+  // Application-specific functions
+  const addApplication = () => {
+    setFormData(prev => ({
+      ...prev,
+      applications: [...prev.applications, { name: '', url: '' }]
+    }))
+  }
+
+  const removeApplication = (index: number) => {
+    if (formData.applications.length > 1) {
+      setFormData(prev => ({
+        ...prev,
+        applications: prev.applications.filter((_, i) => i !== index)
+      }))
+    }
+  }
+
+  const updateApplication = (index: number, field: 'name' | 'url', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      applications: prev.applications.map((app, i) => 
+        i === index ? { ...app, [field]: value } : app
+      )
+    }))
   }
 
   // Image array management functions
@@ -350,7 +376,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
       productLineId: formData.productLineId && formData.productLineId.trim() !== '' ? formData.productLineId : undefined,
       pumpType: formData.pumpType && formData.pumpType.trim() !== '' ? formData.pumpType : undefined,
       features: formData.features.filter(feature => feature.trim() !== ''),
-      applications: formData.applications.filter(app => app.trim() !== ''),
+      applications: formData.applications.filter(app => app.name.trim() !== ''),
       images: formData.images.filter(img => img.url.trim() !== '').map((img, index) => ({
         ...img,
         isPrimary: index === 0 || img.isPrimary // Ensure at least the first image is primary
@@ -712,6 +738,137 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
           <div>
             <h4 className="text-md font-medium text-gray-900 mb-4">Specifications (Optional)</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Equipment Type - Scrollable Selection */}
+              <div>
+                <label htmlFor="spec_equipment" className="block text-sm font-medium text-gray-700 mb-2">
+                  Equipment Type
+                </label>
+                <div className="space-y-2">
+                  <div className="relative">
+                    <select
+                      id="spec_equipment"
+                      name="spec_equipment"
+                      value={formData.specifications.equipment || ''}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                      size={5}
+                    >
+                      <option value="">Select Equipment Type</option>
+                      <option value="Bơm chân không" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Bơm chân không</option>
+                      <option value="Phụ tùng bơm" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Phụ tùng bơm</option>
+                      <option value="Thiết bị chân không" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Thiết bị chân không</option>
+                    </select>
+                  </div>
+                  <div className="flex items-start space-x-2 text-xs text-gray-500">
+                    <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <div>Choose the equipment type</div>
+                      {formData.specifications.equipment && (
+                        <div className="mt-1 text-blue-600 font-medium">
+                          {formData.specifications.equipment} selected
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Country of Origin - Scrollable Selection */}
+              <div>
+                <label htmlFor="spec_country" className="block text-sm font-medium text-gray-700 mb-2">
+                  Country of Origin
+                </label>
+                <div className="space-y-2">
+                  <div className="relative">
+                    <select
+                      id="spec_country"
+                      name="spec_country"
+                      value={formData.specifications.country || ''}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                      size={5}
+                    >
+                      <option value="">Select Country</option>
+                      <option value="Germany" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Germany</option>
+                      <option value="Japan" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Japan</option>
+                      <option value="Korea" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Korea</option>
+                      <option value="United States" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">United States</option>
+                      <option value="UK" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">UK</option>
+                      <option value="France" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">France</option>
+                      <option value="China" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">China</option>
+                      <option value="Vietnam" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Vietnam</option>
+                      <option value="Other" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">Other</option>
+                    </select>
+                  </div>
+                  <div className="flex items-start space-x-2 text-xs text-gray-500">
+                    <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <div>Choose the country of origin</div>
+                      {formData.specifications.country && (
+                        <div className="mt-1 text-blue-600 font-medium">
+                          {formData.specifications.country} selected
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Power Rating - Scrollable Selection */}
+              <div>
+                <label htmlFor="spec_power" className="block text-sm font-medium text-gray-700 mb-2">
+                  Power
+                </label>
+                <div className="space-y-2">
+                  <div className="relative">
+                    <select
+                      id="spec_power"
+                      name="spec_power"
+                      value={formData.specifications.power || ''}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                      size={5}
+                    >
+                      <option value="">Select Power</option>
+                      <option value="<400W" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">&lt;400W</option>
+                      <option value="400W" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">400W</option>
+                      <option value="550W" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">550W</option>
+                      <option value="0.75Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">0.75Kw</option>
+                      <option value="1.1Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">1.1Kw</option>
+                      <option value="1.5kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">1.5kw</option>
+                      <option value="2.2Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">2.2Kw</option>
+                      <option value="3Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">3Kw</option>
+                      <option value="3.7Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">3.7Kw</option>
+                      <option value="5.5Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">5.5Kw</option>
+                      <option value="7.5Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">7.5Kw</option>
+                      <option value="9Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">9Kw</option>
+                      <option value="11Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">11Kw</option>
+                      <option value="15Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">15Kw</option>
+                      <option value="22Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">22Kw</option>
+                      <option value=">22Kw" className="py-2 px-2 hover:bg-blue-50 cursor-pointer">&gt;22Kw</option>
+                    </select>
+                  </div>
+                  <div className="flex items-start space-x-2 text-xs text-gray-500">
+                    <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <div>Choose the power rating</div>
+                      {formData.specifications.power && (
+                        <div className="mt-1 text-blue-600 font-medium">
+                          {formData.specifications.power} selected
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Performance Specifications */}
               <div>
                 <label htmlFor="spec_flowRate" className="block text-sm font-medium text-gray-700 mb-2">
                   Flow Rate
@@ -727,6 +884,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
                 />
               </div>
 
+              {/* Vacuum Level Specification */}
               <div>
                 <label htmlFor="spec_vacuumLevel" className="block text-sm font-medium text-gray-700 mb-2">
                   Vacuum Level
@@ -742,21 +900,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
                 />
               </div>
 
-              <div>
-                <label htmlFor="spec_power" className="block text-sm font-medium text-gray-700 mb-2">
-                  Power
-                </label>
-                <input
-                  type="text"
-                  id="spec_power"
-                  name="spec_power"
-                  value={formData.specifications.power}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 15 HP"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
+              {/* Physical Dimensions */}
               <div>
                 <label htmlFor="spec_inletSize" className="block text-sm font-medium text-gray-700 mb-2">
                   Inlet Size
@@ -772,6 +916,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
                 />
               </div>
 
+              {/* Weight Specification */}
               <div>
                 <label htmlFor="spec_weight" className="block text-sm font-medium text-gray-700 mb-2">
                   Weight
@@ -785,48 +930,6 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
                   placeholder="e.g., 450 lbs"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-              </div>
-
-              <div>
-                <label htmlFor="spec_country" className="block text-sm font-medium text-gray-700 mb-2">
-                  Country of Origin
-                </label>
-                <select
-                  id="spec_country"
-                  name="spec_country"
-                  value={formData.specifications.country || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">Select Country</option>
-                  <option value="Germany">Germany</option>
-                  <option value="Japan">Japan</option>
-                  <option value="Korea">Korea</option>
-                  <option value="United States">United States</option>
-                  <option value="UK">UK</option>
-                  <option value="France">France</option>
-                  <option value="China">China</option>
-                  <option value="Vietnam">Vietnam</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="spec_equipment" className="block text-sm font-medium text-gray-700 mb-2">
-                  Equipment Type
-                </label>
-                <select
-                  id="spec_equipment"
-                  name="spec_equipment"
-                  value={formData.specifications.equipment || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">Select Equipment Type</option>
-                  <option value="Bơm chân không">Bơm chân không</option>
-                  <option value="Phụ tùng bơm">Phụ tùng bơm</option>
-                  <option value="Thiết bị chân không">Thiết bị chân không</option>
-                </select>
               </div>
             </div>
           </div>
@@ -861,34 +964,59 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
             </button>
           </div>
 
+          {/* Applications */}
           <div>
-            <h4 className="text-md font-medium text-gray-900 mb-4">Applications</h4>
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-md font-medium text-gray-900">Applications</h4>
+              <button
+                type="button"
+                onClick={addApplication}
+                className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Add Application
+              </button>
+            </div>
             {formData.applications.map((application, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={application}
-                  onChange={(e) => handleArrayChange('applications', index, e.target.value)}
-                  placeholder="Enter an application"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeArrayItem('applications', index)}
-                  className="px-3 py-2 text-red-600 hover:text-red-800"
-                  disabled={formData.applications.length === 1}
-                >
-                  Remove
-                </button>
+              <div key={index} className="border border-gray-200 rounded-md p-4 mb-3">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="text-sm font-medium text-gray-700">Application {index + 1}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeApplication(index)}
+                    className="text-red-600 hover:text-red-800 text-sm"
+                    disabled={formData.applications.length === 1}
+                  >
+                    Remove
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Application Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={application.name}
+                      onChange={(e) => updateApplication(index, 'name', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter application name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Application URL
+                    </label>
+                    <input
+                      type="url"
+                      value={application.url || ''}
+                      onChange={(e) => updateApplication(index, 'url', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="https://example.com/application"
+                    />
+                  </div>
+                </div>
               </div>
             ))}
-            <button
-              type="button"
-              onClick={() => addArrayItem('applications')}
-              className="text-blue-600 hover:text-blue-800 text-sm"
-            >
-              + Add Application
-            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

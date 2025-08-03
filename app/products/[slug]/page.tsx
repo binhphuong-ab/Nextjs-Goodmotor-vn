@@ -308,11 +308,32 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Technical Specifications */}
-        {(product.specifications?.flowRate || product.specifications?.vacuumLevel || product.specifications?.power || product.specifications?.inletSize || product.specifications?.weight) && (
+        {(product.specifications?.equipment || product.specifications?.country || product.specifications?.power || product.specifications?.flowRate || product.specifications?.vacuumLevel || product.specifications?.inletSize || product.specifications?.weight) && (
           <div className="mt-12 bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Technical Specifications</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="space-y-3">
+                {product.specifications?.equipment && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Equipment Type</dt>
+                    <dd className="text-lg font-semibold text-gray-900">{product.specifications.equipment}</dd>
+                  </div>
+                )}
+                {product.specifications?.country && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Country of Origin</dt>
+                    <dd className="text-lg font-semibold text-gray-900">{product.specifications.country}</dd>
+                  </div>
+                )}
+                {product.specifications?.power && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Power</dt>
+                    <dd className="text-lg font-semibold text-gray-900">{product.specifications.power}</dd>
+                  </div>
+                )}
+              </div>
+              
               <div className="space-y-3">
                 {product.specifications?.flowRate && (
                   <div>
@@ -324,15 +345,6 @@ export default function ProductDetailPage() {
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Vacuum Level</dt>
                     <dd className="text-lg font-semibold text-gray-900">{product.specifications.vacuumLevel}</dd>
-                  </div>
-                )}
-              </div>
-              
-              <div className="space-y-3">
-                {product.specifications?.power && (
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Power</dt>
-                    <dd className="text-lg font-semibold text-gray-900">{product.specifications.power}</dd>
                   </div>
                 )}
                 {product.specifications?.inletSize && (
@@ -363,7 +375,18 @@ export default function ProductDetailPage() {
               {product.applications.map((application, index) => (
                 <div key={index} className="flex items-center">
                   <Star className="w-5 h-5 text-yellow-500 mr-3" />
-                  <span className="text-gray-700">{application}</span>
+                  {application.url ? (
+                    <Link 
+                      href={application.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {application.name}
+                    </Link>
+                  ) : (
+                    <span className="text-gray-700">{application.name}</span>
+                  )}
                 </div>
               ))}
             </div>

@@ -64,21 +64,30 @@ export default function IndustryForm({ industry, onSubmit, onCancel, onShowNotif
       <div className="bg-white rounded-lg max-w-4xl max-h-screen overflow-y-auto w-full">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-xl font-medium text-gray-900">
               {industry ? 'Edit Industry' : 'Add New Industry'}
             </h2>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            
+            {/* Action Buttons in Header */}
+            <div className="flex space-x-4">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="industry-form"
+                className="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                {industry?._id ? 'Update' : 'Create'} Industry
+              </button>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form id="industry-form" onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Info */}
             <div className="space-y-4">
               <div>
@@ -190,22 +199,6 @@ export default function IndustryForm({ industry, onSubmit, onCancel, onShowNotif
               </div>
             </div>
 
-            {/* Form Actions */}
-            <div className="flex justify-end space-x-3 pt-6 border-t">
-              <button
-                type="button"
-                onClick={onCancel}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
-              >
-                {industry?._id ? 'Update' : 'Create'} Industry
-              </button>
-            </div>
           </form>
         </div>
       </div>
