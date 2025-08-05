@@ -9,10 +9,7 @@ interface Customer {
   name: string
   slug: string
   legalName?: string
-  businessType: {
-    _id: string
-    name: string
-  }
+  businessType: string
   industry?: {
     _id: string
     name: string
@@ -20,8 +17,7 @@ interface Customer {
   }[]
   website?: string
   logo?: string
-  customerStatus: string
-  customerTier: string
+  country: string
   completeDate?: string
   description?: string
   projects?: { name: string; url?: string }[]
@@ -32,38 +28,24 @@ interface Customer {
   updatedAt: string
 }
 
-interface BusinessType {
-  _id: string
-  name: string
-}
 
-const statusColors = {
-  'prospect': 'bg-yellow-100 text-yellow-800',
-  'active': 'bg-green-100 text-green-800',
-  'inactive': 'bg-gray-100 text-gray-800',
-  'partner': 'bg-blue-100 text-blue-800',
-  'distributor': 'bg-purple-100 text-purple-800'
-}
 
-const tierBadges = {
-  'standard': 'bg-gray-100 text-gray-800',
-  'preferred': 'bg-blue-100 text-blue-800',
-  'premium': 'bg-purple-100 text-purple-800',
-  'enterprise': 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white'
-}
+
+
+
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([])
-  const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([])
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
   const [filterByType, setFilterByType] = useState<string>('all')
-  const [filterByTier, setFilterByTier] = useState<string>('all')
+  const [filterByCountry, setFilterByCountry] = useState<string>('all')
 
   useEffect(() => {
     fetchCustomers()
-    fetchBusinessTypes()
+
   }, [])
 
   const fetchCustomers = async (retryAttempt = 0) => {
@@ -100,25 +82,7 @@ export default function CustomersPage() {
     }
   }
 
-  const fetchBusinessTypes = async () => {
-    try {
-      console.log('Fetching business types...')
-      const response = await fetch('/api/admin/business-types')
-      
-      if (response.ok) {
-        const businessTypesData = await response.json()
-        setBusinessTypes(businessTypesData)
-        console.log(`Successfully loaded ${businessTypesData.length} business types`)
-      } else {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        console.error('Failed to fetch business types:', errorData.error || response.statusText)
-        // Business types are not critical, so we don't set a global error for this
-      }
-    } catch (error) {
-      console.error('Error fetching business types:', error)
-      // Business types failure is not critical, continue with empty array
-    }
-  }
+
 
   const handleRetry = () => {
     setLoading(true)
@@ -128,12 +92,12 @@ export default function CustomersPage() {
   }
 
   const filteredCustomers = customers.filter(customer => {
-    const typeMatch = filterByType === 'all' || customer.businessType?._id === filterByType
-    const tierMatch = filterByTier === 'all' || customer.customerTier === filterByTier
-    return typeMatch && tierMatch
+    const typeMatch = filterByType === 'all' || customer.businessType === filterByType
+    const countryMatch = filterByCountry === 'all' || customer.country === filterByCountry
+    return typeMatch && countryMatch
   })
 
-  const customerTiers = Array.from(new Set(customers.map(c => c.customerTier)))
+  const countries = Array.from(new Set(customers.map(c => c.country)))
 
   if (loading) {
     return (
@@ -202,14 +166,14 @@ export default function CustomersPage() {
                 <div className="text-primary-200">Active Customers</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary-300">{businessTypes.length}</div>
+                <div className="text-3xl font-bold text-primary-300">5</div>
                 <div className="text-primary-200">Business Types</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary-300">
-                  {customers.filter(c => c.customerTier === 'enterprise' || c.customerTier === 'premium').length}
+                  {countries.length}
                 </div>
-                <div className="text-primary-200">Premium Partners</div>
+                <div className="text-primary-200">Countries</div>
               </div>
             </div>
           </div>
@@ -258,20 +222,20 @@ export default function CustomersPage() {
                     </div>
                   </button>
                   
-                  {businessTypes.map(type => (
+                  {['Machinary service', 'Nhà chế tạo máy', 'Nhà máy Việt Nam', 'Nhà máy nước ngoài', 'Xưởng sản xuất'].map(type => (
                     <button
-                      key={type._id}
-                      onClick={() => setFilterByType(type._id)}
+                      key={type}
+                      onClick={() => setFilterByType(type)}
                       className={`px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
-                        filterByType === type._id
+                        filterByType === type
                           ? 'bg-primary-600 text-white shadow-lg ring-2 ring-primary-200'
                           : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400'
                       }`}
                     >
                       <div className="text-left">
-                        <div className="font-medium">{type.name}</div>
+                        <div className="font-medium">{type}</div>
                         <div className="text-xs opacity-75">
-                          {customers.filter(c => c.businessType?._id === type._id).length} customers
+                          {customers.filter(c => c.businessType === type).length} customers
                         </div>
                       </div>
                     </button>
@@ -279,68 +243,53 @@ export default function CustomersPage() {
                 </div>
               </div>
 
-              {/* Customer Tier Filter */}
+              {/* Country Filter */}
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-yellow-100 rounded-lg">
-                    <svg className="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <svg className="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Customer Tier</h3>
-                    <p className="text-sm text-gray-600">Filter by partnership level</p>
+                    <h3 className="text-lg font-semibold text-gray-900">Country</h3>
+                    <p className="text-sm text-gray-600">Filter by customer location</p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
                   <button
-                    onClick={() => setFilterByTier('all')}
+                    onClick={() => setFilterByCountry('all')}
                     className={`px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
-                      filterByTier === 'all'
+                      filterByCountry === 'all'
                         ? 'bg-secondary-600 text-white shadow-lg ring-2 ring-secondary-200'
                         : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400'
                     }`}
                   >
                     <div className="text-left">
-                      <div className="font-medium">All Tiers</div>
+                      <div className="font-medium">All Countries</div>
                       <div className="text-xs opacity-75">{customers.length} customers</div>
                     </div>
                   </button>
                   
-                  {customerTiers.map(tier => {
-                    const tierStyles = {
-                      'standard': filterByTier === tier 
-                        ? 'bg-gray-600 text-white shadow-lg ring-2 ring-gray-200' 
-                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400',
-                      'preferred': filterByTier === tier 
-                        ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-200' 
-                        : 'bg-white text-blue-700 border border-blue-300 hover:bg-blue-50 hover:border-blue-400',
-                      'premium': filterByTier === tier 
-                        ? 'bg-purple-600 text-white shadow-lg ring-2 ring-purple-200' 
-                        : 'bg-white text-purple-700 border border-purple-300 hover:bg-purple-50 hover:border-purple-400',
-                      'enterprise': filterByTier === tier 
-                        ? 'bg-gradient-to-r from-yellow-500 to-orange-600 text-white shadow-lg ring-2 ring-orange-200' 
-                        : 'bg-gradient-to-r from-yellow-50 to-orange-50 text-orange-700 border border-orange-300 hover:from-yellow-100 hover:to-orange-100 hover:border-orange-400'
-                    }
-                    
-                    return (
-                      <button
-                        key={tier}
-                        onClick={() => setFilterByTier(tier)}
-                        className={`px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          tierStyles[tier as keyof typeof tierStyles]
-                        }`}
-                      >
-                        <div className="text-left">
-                          <div className="font-medium capitalize">{tier}</div>
-                          <div className="text-xs opacity-75">
-                            {customers.filter(c => c.customerTier === tier).length} customers
-                          </div>
+                  {countries.map(country => (
+                    <button
+                      key={country}
+                      onClick={() => setFilterByCountry(country)}
+                      className={`px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                        filterByCountry === country
+                          ? 'bg-green-600 text-white shadow-lg ring-2 ring-green-200'
+                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                      }`}
+                    >
+                      <div className="text-left">
+                        <div className="font-medium">{country}</div>
+                        <div className="text-xs opacity-75">
+                          {customers.filter(c => c.country === country).length} customers
                         </div>
-                      </button>
-                    )
-                  })}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -355,13 +304,7 @@ export default function CustomersPage() {
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                  <span>Active: {customers.filter(c => c.customerStatus === 'active').length}</span>
-                  <span>•</span>
-                  <span>Prospects: {customers.filter(c => c.customerStatus === 'prospect').length}</span>
-                  <span>•</span>
-                  <span>Partners: {customers.filter(c => c.customerStatus === 'partner').length}</span>
-                </div>
+
               </div>
             </div>
           </div>
@@ -422,7 +365,7 @@ export default function CustomersPage() {
                               {customer.name}
                             </h3>
                             <p className="text-sm text-gray-600 font-medium">
-                              {customer.businessType?.name || 'Unknown Business Type'}
+                              {customer.businessType || 'Unknown Business Type'}
                             </p>
                             {customer.legalName && customer.legalName !== customer.name && (
                               <p className="text-xs text-gray-500 mt-1 truncate">
@@ -435,11 +378,8 @@ export default function CustomersPage() {
 
                       {/* Status Badges */}
                       <div className="flex items-center gap-2 mb-4">
-                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${tierBadges[customer.customerTier as keyof typeof tierBadges]}`}>
-                          {customer.customerTier.charAt(0).toUpperCase() + customer.customerTier.slice(1)}
-                        </span>
-                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${statusColors[customer.customerStatus as keyof typeof statusColors]}`}>
-                          {customer.customerStatus.charAt(0).toUpperCase() + customer.customerStatus.slice(1)}
+                        <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                          {customer.country}
                         </span>
                       </div>
 

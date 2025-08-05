@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import connectToDatabase from '@/lib/mongoose'
 import Customer, { ICustomerInput } from '@/models/Customer'
-import BusinessType from '@/models/BusinessType'
 import Industry from '@/models/Industry'
 
 // GET /api/admin/customers - Fetch all customers
@@ -11,7 +10,6 @@ export async function GET() {
     console.log('[API] GET customers: Database connected successfully')
     
     const customers = await Customer.find({})
-      .populate('businessType', 'name')
       .populate('industry', 'name slug')
       .sort({ createdAt: -1 })
     
@@ -54,11 +52,17 @@ export async function POST(request: Request) {
       )
     }
     
-    // Verify businessType exists
-    const businessType = await BusinessType.findById(body.businessType)
-    if (!businessType) {
+    // Validate businessType enum
+    const validBusinessTypes = [
+      'Machinary service',
+      'Nhà chế tạo máy', 
+      'Nhà máy Việt Nam',
+      'Nhà máy nước ngoài',
+      'Xưởng sản xuất'
+    ]
+    if (!validBusinessTypes.includes(body.businessType)) {
       return NextResponse.json(
-        { error: 'Invalid business type ID' },
+        { error: 'Invalid business type' },
         { status: 400 }
       )
     }
@@ -82,7 +86,6 @@ export async function POST(request: Request) {
     
     // Populate references for response
     await customer.populate([
-      { path: 'businessType', select: 'name' },
       { path: 'industry', select: 'name slug' }
     ])
     

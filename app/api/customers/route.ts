@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Customer from '@/models/Customer'
-import BusinessType from '@/models/BusinessType'
+
 import Industry from '@/models/Industry' // Import Industry model to register schema
 import connectToDatabase from '@/lib/mongoose'
 
@@ -24,8 +24,8 @@ export async function GET() {
           industry: 1,
           website: 1,
           logo: 1,
-          customerStatus: 1,
-          customerTier: 1,
+          province: 1,
+          country: 1,
           completeDate: 1,
           description: 1,
           projects: 1,
@@ -35,17 +35,13 @@ export async function GET() {
           createdAt: 1
         }
       )
-      .populate({
-        path: 'businessType',
-        select: 'name',
-        strictPopulate: false
-      })
+
       .populate({
         path: 'industry',
         select: 'name slug',
         strictPopulate: false
       })
-      .sort({ featured: -1, customerTier: -1, createdAt: -1 })
+      .sort({ featured: -1, country: -1, createdAt: -1 })
       
       console.log(`[API] GET customers: Found ${customers.length} customers`)
       
@@ -62,8 +58,8 @@ export async function GET() {
           industry: 1,
           website: 1,
           logo: 1,
-          customerStatus: 1,
-          customerTier: 1,
+          province: 1,
+          country: 1,
           completeDate: 1,
           description: 1,
           projects: 1,
@@ -73,7 +69,7 @@ export async function GET() {
           createdAt: 1
         }
       )
-      .sort({ featured: -1, customerTier: -1, createdAt: -1 })
+      .sort({ featured: -1, country: -1, createdAt: -1 })
       
       console.log(`[API] GET customers: Found ${customers.length} customers (without population)`)
     }

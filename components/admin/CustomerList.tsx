@@ -13,15 +13,7 @@ interface Industry {
   displayOrder?: number
 }
 
-interface BusinessType {
-  _id: string
-  name: string
-  slug: string
-  description?: string
-  category: string
-  featured: boolean
-  displayOrder: number
-}
+
 
 interface CustomerListProps {
   customers: ICustomer[]
@@ -36,24 +28,13 @@ interface NotificationState {
   visible: boolean
 }
 
-const statusColors = {
-  'prospect': 'bg-yellow-100 text-yellow-800',
-  'active': 'bg-green-100 text-green-800',
-  'inactive': 'bg-gray-100 text-gray-800',
-  'partner': 'bg-blue-100 text-blue-800',
-  'distributor': 'bg-purple-100 text-purple-800'
-}
 
-const tierColors = {
-  'standard': 'bg-gray-100 text-gray-800',
-  'preferred': 'bg-blue-100 text-blue-800',
-  'premium': 'bg-purple-100 text-purple-800',
-  'enterprise': 'bg-gold-100 text-gold-800'
-}
+
+
 
 export default function CustomerList({ customers, onEdit, onDelete, onCreate }: CustomerListProps) {
   const [industries, setIndustries] = useState<Industry[]>([])
-  const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([])
+
   const [notification, setNotification] = useState<NotificationState | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
@@ -65,7 +46,7 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
 
   useEffect(() => {
     fetchIndustries()
-    fetchBusinessTypes()
+
   }, [])
 
   const showNotification = (type: 'success' | 'error' | 'info', message: string) => {
@@ -115,21 +96,7 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
     }
   }
 
-  const fetchBusinessTypes = async () => {
-    try {
-      const response = await fetch('/api/admin/business-types')
-      if (response.ok) {
-        const businessTypesData = await response.json()
-        setBusinessTypes(businessTypesData)
-      } else {
-        console.error('Failed to fetch business types')
-        showNotification('error', 'Failed to load business types data')
-      }
-    } catch (error) {
-      console.error('Error fetching business types:', error)
-      showNotification('error', 'Error loading business types data')
-    }
-  }
+
 
   const getIndustryNames = (industryData: any[]) => {
     if (!industryData || !Array.isArray(industryData)) return []
@@ -151,15 +118,8 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
   }
 
   const getBusinessTypeName = (businessType: any) => {
-    // Handle both populated object and ObjectId string
-    if (typeof businessType === 'object' && businessType?.name) {
-      return businessType.name
-    }
-    if (typeof businessType === 'string') {
-      const bt = businessTypes.find(bt => bt._id === businessType)
-      return bt ? bt.name : 'Unknown'
-    }
-    return 'Unknown'
+    // BusinessType is now a simple string enum
+    return businessType || 'Unknown'
   }
 
   if (customers.length === 0) {
@@ -204,7 +164,7 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Tier
+                Country
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Projects & Models
@@ -270,17 +230,14 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
                 </td>
                 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[customer.customerStatus]}`}>
-                    {customer.customerStatus.charAt(0).toUpperCase() + customer.customerStatus.slice(1)}
-                  </span>
                   {customer.featured && (
-                    <div className="text-xs text-blue-600 mt-1 font-medium">Featured</div>
+                    <div className="text-xs text-blue-600 font-medium">Featured</div>
                   )}
                 </td>
                 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${tierColors[customer.customerTier]}`}>
-                    {customer.customerTier.charAt(0).toUpperCase() + customer.customerTier.slice(1)}
+                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                    {customer.country || 'Unknown'}
                   </span>
                 </td>
                 
@@ -334,20 +291,7 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
               Showing {customers.length} customer{customers.length !== 1 ? 's' : ''}
             </div>
             
-            <div className="flex space-x-4 text-xs text-gray-500">
-              <div className="flex items-center space-x-2">
-                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                <span>{customers.filter(c => c.customerStatus === 'active').length}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Prospects</span>
-                <span>{customers.filter(c => c.customerStatus === 'prospect').length}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Partners</span>
-                <span>{customers.filter(c => c.customerStatus === 'partner').length}</span>
-              </div>
-            </div>
+
           </div>
         </div>
       </div>

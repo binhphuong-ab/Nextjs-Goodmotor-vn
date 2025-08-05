@@ -48,10 +48,13 @@ const quillFormats = [
   'code-block'
 ]
 
-interface BusinessType {
-  _id: string
-  name: string
-}
+const businessTypes = [
+  { value: 'Machinary service', label: 'Machinary service' },
+  { value: 'Nhà chế tạo máy', label: 'Nhà chế tạo máy' },
+  { value: 'Nhà máy Việt Nam', label: 'Nhà máy Việt Nam' },
+  { value: 'Nhà máy nước ngoài', label: 'Nhà máy nước ngoài' },
+  { value: 'Xưởng sản xuất', label: 'Xưởng sản xuất' }
+]
 
 interface Industry {
   _id: string
@@ -62,9 +65,8 @@ interface Industry {
 }
 
 // Extended interface for populated customer data from API
-interface PopulatedCustomer extends Omit<ICustomer, 'industry' | 'businessType'> {
+interface PopulatedCustomer extends Omit<ICustomer, 'industry'> {
   industry?: (string | { _id: string; name: string; slug: string })[]
-  businessType: string | { _id: string; name: string }
 }
 
 interface CustomerFormProps {
@@ -74,19 +76,53 @@ interface CustomerFormProps {
   onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
-const customerStatuses = [
-  { value: 'prospect', label: 'Prospect' },
-  { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' },
-  { value: 'partner', label: 'Partner' },
-  { value: 'distributor', label: 'Distributor' }
+const provinces = [
+  { value: 'TP Ho Chi Minh', label: 'TP Hồ Chí Minh' },
+  { value: 'TP Hà Nội', label: 'TP Hà Nội' },
+  { value: 'TP Đà Nẵng', label: 'TP Đà Nẵng' },
+  { value: 'TP Huế', label: 'TP Huế' },
+  { value: 'Quảng Ninh', label: 'Quảng Ninh' },
+  { value: 'Cao Bằng', label: 'Cao Bằng' },
+  { value: 'Lạng Sơn', label: 'Lạng Sơn' },
+  { value: 'Lai Châu', label: 'Lai Châu' },
+  { value: 'Điện Biên', label: 'Điện Biên' },
+  { value: 'Sơn La', label: 'Sơn La' },
+  { value: 'Thanh Hóa', label: 'Thanh Hóa' },
+  { value: 'Nghệ An', label: 'Nghệ An' },
+  { value: 'Hà Tĩnh', label: 'Hà Tĩnh' },
+  { value: 'Tuyên Quang', label: 'Tuyên Quang' },
+  { value: 'Lào Cai', label: 'Lào Cai' },
+  { value: 'Thái Nguyên', label: 'Thái Nguyên' },
+  { value: 'Phú Thọ', label: 'Phú Thọ' },
+  { value: 'Bắc Ninh', label: 'Bắc Ninh' },
+  { value: 'Hưng Yên', label: 'Hưng Yên' },
+  { value: 'TP Hải Phòng', label: 'TP Hải Phòng' },
+  { value: 'Ninh Bình', label: 'Ninh Bình' },
+  { value: 'Quảng Trị', label: 'Quảng Trị' },
+  { value: 'Quảng Ngãi', label: 'Quảng Ngãi' },
+  { value: 'Gia Lai', label: 'Gia Lai' },
+  { value: 'Khánh Hòa', label: 'Khánh Hòa' },
+  { value: 'Lâm Đồng', label: 'Lâm Đồng' },
+  { value: 'Đắk Lắk', label: 'Đắk Lắk' },
+  { value: 'Đồng Nai', label: 'Đồng Nai' },
+  { value: 'Tây Ninh', label: 'Tây Ninh' },
+  { value: 'TP Cần Thơ', label: 'TP Cần Thơ' },
+  { value: 'Vĩnh Long', label: 'Vĩnh Long' },
+  { value: 'Đồng Tháp', label: 'Đồng Tháp' },
+  { value: 'Cà Mau', label: 'Cà Mau' },
+  { value: 'An Giang', label: 'An Giang' }
 ]
 
-const customerTiers = [
-  { value: 'standard', label: 'Standard' },
-  { value: 'preferred', label: 'Preferred' },
-  { value: 'premium', label: 'Premium' },
-  { value: 'enterprise', label: 'Enterprise' }
+const countries = [
+  { value: 'Việt Nam', label: 'Việt Nam' },
+  { value: 'Nhật Bản', label: 'Nhật Bản' },
+  { value: 'Hàn Quốc', label: 'Hàn Quốc' },
+  { value: 'Trung Quốc', label: 'Trung Quốc' },
+  { value: 'Đài Loan', label: 'Đài Loan' },
+  { value: 'Mỹ', label: 'Mỹ' },
+  { value: 'EU', label: 'EU' },
+  { value: 'Thái Lan', label: 'Thái Lan' },
+  { value: 'Other', label: 'Other' }
 ]
 
 
@@ -101,7 +137,8 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
   const [formData, setFormData] = useState<ICustomerInput>({
     name: '',
     slug: '',
-    businessType: '',
+    businessType: businessTypes[0].value, // Default to first business type
+    country: countries[0].value, // Default to Việt Nam
     industry: [], // Optional now
     completeDate: customer ? undefined : new Date(), // Auto-fill with today for new customers
     projects: [],
@@ -111,40 +148,14 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
   })
 
   const [loading, setLoading] = useState(false)
-  const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([])
-  const [loadingBusinessTypes, setLoadingBusinessTypes] = useState(true)
   const [industries, setIndustries] = useState<Industry[]>([])
   const [loadingIndustries, setLoadingIndustries] = useState(true)
 
   useEffect(() => {
-    fetchBusinessTypes()
     fetchIndustries()
   }, [])
 
-  const fetchBusinessTypes = async () => {
-    try {
-      const response = await fetch('/api/admin/business-types')
-      if (response.ok) {
-        const businessTypesData = await response.json()
-        setBusinessTypes(businessTypesData)
-        
-        // Set default business type and complete date if creating new customer
-        if (!customer && businessTypesData.length > 0) {
-          setFormData(prev => ({ 
-            ...prev, 
-            businessType: businessTypesData[0]._id,
-            completeDate: prev.completeDate || new Date() // Ensure complete date is set
-          }))
-        }
-      } else {
-        console.error('Failed to fetch business types')
-      }
-    } catch (error) {
-      console.error('Error fetching business types:', error)
-    } finally {
-      setLoadingBusinessTypes(false)
-    }
-  }
+
 
   const fetchIndustries = async () => {
     try {
@@ -178,14 +189,12 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
         name: customer.name,
         slug: customer.slug,
         legalName: customer.legalName,
-        businessType: typeof customer.businessType === 'object' && customer.businessType._id 
-          ? customer.businessType._id.toString() 
-          : customer.businessType.toString(),
+        businessType: customer.businessType,
         industry: industryIds,
         website: customer.website,
         logo: customer.logo,
-        customerStatus: customer.customerStatus,
-        customerTier: customer.customerTier,
+        province: customer.province,
+        country: customer.country,
         completeDate: customer.completeDate,
         description: customer.description,
         projects: customer.projects || [],
@@ -439,49 +448,41 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Business Type *
                   </label>
-                  {loadingBusinessTypes ? (
-                    <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
-                      Loading business types...
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <select
+                        name="businessType"
+                        value={formData.businessType}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                        size={5}
+                        required
+                      >
+                        {businessTypes.map(type => (
+                          <option 
+                            key={type.value} 
+                            value={type.value}
+                            className="py-2 px-2 hover:bg-blue-50 cursor-pointer"
+                          >
+                            {type.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <div className="relative">
-                        <select
-                          name="businessType"
-                          value={formData.businessType}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
-                          size={5}
-                          required
-                        >
-                          <option value="">Choose a business type...</option>
-                          {businessTypes.map(type => (
-                            <option 
-                              key={type._id} 
-                              value={type._id}
-                              className="py-2 px-2 hover:bg-blue-50 cursor-pointer"
-                            >
-                              {type.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="flex items-start space-x-2 text-xs text-gray-500">
-                        <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <div>
-                          <div>Click to select a business type</div>
-                          {formData.businessType && (
-                            <div className="mt-1 text-blue-600 font-medium">
-                              {businessTypes.find(type => type._id === formData.businessType)?.name} selected
-                            </div>
-                          )}
-                        </div>
+                    <div className="flex items-start space-x-2 text-xs text-gray-500">
+                      <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div>
+                        <div>Click to select a business type</div>
+                        {formData.businessType && (
+                          <div className="mt-1 text-blue-600 font-medium">
+                            {businessTypes.find(type => type.value === formData.businessType)?.label} selected
+                          </div>
+                        )}
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 {/* Industries */}
@@ -580,24 +581,24 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
               </div>
             </div>
 
-            {/* Status & Tier */}
+            {/* Province & Tier */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">Status & Classification</h3>
+              <h3 className="text-lg font-medium text-gray-900">Location & Classification</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Customer Status
+                    Province/City
                   </label>
                   <select
-                    name="customerStatus"
-                    value={formData.customerStatus || 'prospect'}
+                    name="province"
+                    value={formData.province || 'TP Ho Chi Minh'}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {customerStatuses.map(status => (
-                      <option key={status.value} value={status.value}>
-                        {status.label}
+                    {provinces.map(province => (
+                      <option key={province.value} value={province.value}>
+                        {province.label}
                       </option>
                     ))}
                   </select>
@@ -605,17 +606,17 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Customer Tier
+                    Country
                   </label>
                   <select
-                    name="customerTier"
-                    value={formData.customerTier || 'standard'}
+                    name="country"
+                    value={formData.country || 'Việt Nam'}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {customerTiers.map(tier => (
-                      <option key={tier.value} value={tier.value}>
-                        {tier.label}
+                    {countries.map(country => (
+                      <option key={country.value} value={country.value}>
+                        {country.label}
                       </option>
                     ))}
                   </select>

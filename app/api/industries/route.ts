@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Industry from '@/models/Industry'
 import Customer from '@/models/Customer'
-import Application from '@/models/Application'
+
 import connectToDatabase from '@/lib/mongoose'
 
 // GET /api/industries - Fetch all industries
@@ -28,17 +28,18 @@ export async function GET(request: Request) {
     if (includeCustomers) {
       industriesQuery = industriesQuery.populate({
         path: 'customers',
-        select: 'name slug businessType customerStatus',
-        populate: {
-          path: 'businessType',
-          select: 'name'
-        }
+        select: 'name slug businessType province'
       })
     }
     
     // Optionally populate applications
     if (includeApplications) {
-      industriesQuery = industriesQuery.populate('applications', 'name slug category')
+      try {
+        const Application = await import('@/models/Application').then(m => m.default)
+        industriesQuery = industriesQuery.populate('applications', 'name slug category')
+      } catch (error) {
+        console.warn('Application model not available for population')
+      }
     }
     
     const industries = await industriesQuery.sort({ displayOrder: 1, name: 1 })
@@ -62,15 +63,16 @@ export async function GET(request: Request) {
         if (includeCustomers) {
           refetchQuery = refetchQuery.populate({
             path: 'customers',
-            select: 'name slug businessType customerStatus',
-            populate: {
-              path: 'businessType',
-              select: 'name'
-            }
+            select: 'name slug businessType province'
           })
         }
         if (includeApplications) {
-          refetchQuery = refetchQuery.populate('applications', 'name slug category')
+          try {
+            const Application = await import('@/models/Application').then(m => m.default)
+            refetchQuery = refetchQuery.populate('applications', 'name slug category')
+          } catch (error) {
+            console.warn('Application model not available for population in refetch')
+          }
         }
         return NextResponse.json(
           await refetchQuery.sort({ displayOrder: 1, name: 1 })

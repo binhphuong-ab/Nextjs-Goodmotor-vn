@@ -28,7 +28,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     let query: any = { industry: params.id }
     
     if (status) {
-      query.customerStatus = status
+      query.province = status
     }
     
     if (businessType) {

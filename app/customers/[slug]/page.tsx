@@ -14,10 +14,7 @@ interface Customer {
   name: string
   slug: string
   legalName?: string
-  businessType: {
-    _id: string
-    name: string
-  }
+  businessType: string
   industry?: {
     _id: string
     name: string
@@ -25,8 +22,7 @@ interface Customer {
   }[]
   website?: string
   logo?: string
-  customerStatus: string
-  customerTier: string
+  country: string
   completeDate?: string
   description?: string
   projects?: { name: string; url?: string }[]
@@ -39,20 +35,9 @@ interface Customer {
 
 
 
-const statusColors = {
-  'prospect': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  'active': 'bg-green-100 text-green-800 border-green-200',
-  'inactive': 'bg-gray-100 text-gray-800 border-gray-200',
-  'partner': 'bg-blue-100 text-blue-800 border-blue-200',
-  'distributor': 'bg-purple-100 text-purple-800 border-purple-200'
-}
 
-const tierBadges = {
-  'standard': 'bg-gray-100 text-gray-800 border-gray-200',
-  'preferred': 'bg-blue-100 text-blue-800 border-blue-200',
-  'premium': 'bg-purple-100 text-purple-800 border-purple-200',
-  'enterprise': 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-yellow-300'
-}
+
+
 
 
 
@@ -175,14 +160,11 @@ export default function CustomerDetailPage() {
                   <p className="text-lg text-gray-600 mt-1">Legal Name: {customer.legalName}</p>
                 )}
                 <div className="flex items-center gap-4 mt-3">
-                  <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${tierBadges[customer.customerTier as keyof typeof tierBadges]}`}>
-                    {customer.customerTier.charAt(0).toUpperCase() + customer.customerTier.slice(1)} Customer
-                  </span>
-                  <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border ${statusColors[customer.customerStatus as keyof typeof statusColors]}`}>
-                    {customer.customerStatus.charAt(0).toUpperCase() + customer.customerStatus.slice(1)}
+                  <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full border bg-green-100 text-green-800 border-green-200">
+                    {customer.country}
                   </span>
                   <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-800 border border-gray-200">
-                    {customer.businessType.name}
+                    {customer.businessType}
                   </span>
                 </div>
               </div>
@@ -270,23 +252,18 @@ export default function CustomerDetailPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Customer Details</h3>
               
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Status</span>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[customer.customerStatus as keyof typeof statusColors]}`}>
-                    {customer.customerStatus.charAt(0).toUpperCase() + customer.customerStatus.slice(1)}
-                  </span>
-                </div>
+
                 
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Tier</span>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${tierBadges[customer.customerTier as keyof typeof tierBadges]}`}>
-                    {customer.customerTier.charAt(0).toUpperCase() + customer.customerTier.slice(1)}
+                  <span className="text-sm font-medium text-gray-600">Country</span>
+                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                    {customer.country}
                   </span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="text-sm font-medium text-gray-600">Business Type</span>
-                  <span className="text-sm text-gray-900">{customer.businessType.name}</span>
+                  <span className="text-sm text-gray-900">{customer.businessType}</span>
                 </div>
                 
                 {customer.completeDate && (

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Customer from '@/models/Customer'
-import BusinessType from '@/models/BusinessType'
+
 import Industry from '@/models/Industry' // Import Industry model to register schema
 import connectToDatabase from '@/lib/mongoose'
 
@@ -18,11 +18,7 @@ export async function GET(request: Request, { params }: { params: { slug: string
       customer = await Customer.findOne({ 
         slug: params.slug
       })
-      .populate({
-        path: 'businessType',
-        select: 'name',
-        strictPopulate: false
-      })
+
       .populate({
         path: 'industry',
         select: 'name slug',

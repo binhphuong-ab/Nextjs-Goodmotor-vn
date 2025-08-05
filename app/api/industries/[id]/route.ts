@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Industry from '@/models/Industry'
 import Customer from '@/models/Customer'
-import Application from '@/models/Application'
+
 import connectToDatabase from '@/lib/mongoose'
 
 // GET /api/industries/[id] - Fetch individual industry
@@ -21,17 +21,18 @@ export async function GET(request: Request, { params }: { params: { id: string }
     if (includeCustomers) {
       industryQuery = industryQuery.populate({
         path: 'customers',
-        select: 'name slug businessType customerStatus',
-        populate: {
-          path: 'businessType',
-          select: 'name'
-        }
+        select: 'name slug businessType province'
       })
     }
     
     // Optionally populate applications
     if (includeApplications) {
-      industryQuery = industryQuery.populate('applications', 'name slug category')
+      try {
+        const Application = await import('@/models/Application').then(m => m.default)
+        industryQuery = industryQuery.populate('applications', 'name slug category')
+      } catch (error) {
+        console.warn('Application model not available for population')
+      }
     }
     
     const industry = await industryQuery

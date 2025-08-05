@@ -15,11 +15,7 @@ interface Customer {
   _id: string
   name: string
   slug: string
-  businessType?: {
-    _id: string
-    name: string
-  }
-  customerStatus?: 'active' | 'inactive' | 'prospect' | 'former'
+  businessType?: string
 }
 
 interface Industry {
@@ -67,19 +63,7 @@ const categoryColors = {
   'other': 'bg-gray-100 text-gray-800'
 }
 
-const customerStatusColors = {
-  'active': 'bg-green-100 text-green-800',
-  'inactive': 'bg-gray-100 text-gray-800',
-  'prospect': 'bg-blue-100 text-blue-800',
-  'former': 'bg-red-100 text-red-800'
-}
 
-const customerStatusLabels = {
-  'active': 'Active',
-  'inactive': 'Inactive',
-  'prospect': 'Prospect',
-  'former': 'Former'
-}
 
 export default function IndustryList({ industries, onEdit, onDelete, onCreate }: IndustryListProps) {
   const [searchTerm, setSearchTerm] = useState('')
@@ -327,15 +311,10 @@ export default function IndustryList({ industries, onEdit, onDelete, onCreate }:
                                     </div>
                                     {customer.businessType && (
                                       <div className="text-xs text-gray-500 truncate">
-                                        {customer.businessType.name}
+                                        {customer.businessType}
                                       </div>
                                     )}
                                   </div>
-                                  {customer.customerStatus && (
-                                    <span className={`ml-2 inline-flex px-1 py-0.5 text-xs font-medium rounded ${customerStatusColors[customer.customerStatus]}`}>
-                                      {customerStatusLabels[customer.customerStatus]}
-                                    </span>
-                                  )}
                                 </div>
                               ))}
                               {industry.customers.length > 2 && (
