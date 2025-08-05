@@ -2,16 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { ICustomer } from '@/models/Customer'
+import { IIndustry } from '@/models/Industry'
 import Notification from '@/components/Notification'
 import ConfirmDialog from '@/components/ConfirmDialog'
-
-interface Industry {
-  _id: string
-  name: string
-  slug: string
-  category?: string
-  displayOrder?: number
-}
 
 
 
@@ -33,7 +26,7 @@ interface NotificationState {
 
 
 export default function CustomerList({ customers, onEdit, onDelete, onCreate }: CustomerListProps) {
-  const [industries, setIndustries] = useState<Industry[]>([])
+  const [industries, setIndustries] = useState<IIndustry[]>([])
 
   const [notification, setNotification] = useState<NotificationState | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -84,7 +77,7 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
     try {
       const response = await fetch('/api/industries')
       if (response.ok) {
-        const industriesData = await response.json()
+        const industriesData: IIndustry[] = await response.json()
         setIndustries(industriesData)
       } else {
         console.error('Failed to fetch industries')
@@ -98,26 +91,26 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
 
 
 
-  const getIndustryNames = (industryData: any[]) => {
+  const getIndustryNames = (industryData: (string | IIndustry)[] | undefined): string[] => {
     if (!industryData || !Array.isArray(industryData)) return []
     
     return industryData
       .map(item => {
-        // Handle populated objects
-        if (typeof item === 'object' && item?.name) {
+        // Handle populated Industry objects from MongoDB Atlas
+        if (typeof item === 'object' && item !== null && 'name' in item) {
           return item.name
         }
-        // Handle ObjectId strings (fallback)
+        // Handle ObjectId strings (when not populated)
         if (typeof item === 'string') {
           const industry = industries.find(industry => industry._id === item)
           return industry ? industry.name : null
         }
         return null
       })
-      .filter(name => name) as string[]
+      .filter((name): name is string => name !== null)
   }
 
-  const getBusinessTypeName = (businessType: any) => {
+  const getBusinessTypeName = (businessType: ICustomer['businessType'] | undefined): string => {
     // BusinessType is now a simple string enum
     return businessType || 'Unknown'
   }
@@ -159,9 +152,6 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Industries
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Country
@@ -213,25 +203,30 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
                 </td>
                 
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
+                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                     {getBusinessTypeName(customer.businessType)}
-                  </div>
+                  </span>
                 </td>
                 
                 <td className="px-6 py-4 whitespace-nowrap">
                   {customer.industry && customer.industry.length > 0 ? (
-                    <div className="text-sm text-gray-500">
-                      {getIndustryNames(customer.industry).slice(0, 2).join(', ')}
-                      {customer.industry.length > 2 && ` +${customer.industry.length - 2} more`}
+                    <div className="flex flex-wrap gap-1">
+                      {getIndustryNames(customer.industry).slice(0, 2).map((industryName, index) => (
+                        <span 
+                          key={index}
+                          className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800"
+                        >
+                          {industryName}
+                        </span>
+                      ))}
+                      {customer.industry.length > 2 && (
+                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+                          +{customer.industry.length - 2} more
+                        </span>
+                      )}
                     </div>
                   ) : (
                     <div className="text-sm text-gray-400">-</div>
-                  )}
-                </td>
-                
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {customer.featured && (
-                    <div className="text-xs text-blue-600 font-medium">Featured</div>
                   )}
                 </td>
                 

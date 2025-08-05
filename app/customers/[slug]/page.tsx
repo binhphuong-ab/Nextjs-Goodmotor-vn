@@ -8,30 +8,7 @@ import {
   BuildingOfficeIcon, 
   GlobeAltIcon
 } from '@heroicons/react/24/outline'
-
-interface Customer {
-  _id: string
-  name: string
-  slug: string
-  legalName?: string
-  businessType: string
-  industry?: {
-    _id: string
-    name: string
-    slug: string
-  }[]
-  website?: string
-  logo?: string
-  country: string
-  completeDate?: string
-  description?: string
-  projects?: { name: string; url?: string }[]
-  pumpModelsUsed?: { name: string; url?: string }[]
-  applications?: { name: string; url?: string }[]
-  featured: boolean
-  createdAt: string
-  updatedAt: string
-}
+import { ICustomerPopulated } from '@/types/customer'
 
 
 
@@ -43,7 +20,7 @@ interface Customer {
 
 export default function CustomerDetailPage() {
   const { slug } = useParams()
-  const [customer, setCustomer] = useState<Customer | null>(null)
+  const [customer, setCustomer] = useState<ICustomerPopulated | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -163,6 +140,11 @@ export default function CustomerDetailPage() {
                   <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full border bg-green-100 text-green-800 border-green-200">
                     {customer.country}
                   </span>
+                  {customer.province && (
+                    <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full border bg-orange-100 text-orange-800 border-orange-200">
+                      {customer.province}
+                    </span>
+                  )}
                   <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-800 border border-gray-200">
                     {customer.businessType}
                   </span>
@@ -201,7 +183,7 @@ export default function CustomerDetailPage() {
                 <div className="mb-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-3">Industries</h3>
                   <div className="flex flex-wrap gap-2">
-                    {customer.industry.map((industry, index) => (
+                    {customer.industry.map((industry, index: number) => (
                       <span
                         key={index}
                         className="inline-flex px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded-md border border-blue-200"

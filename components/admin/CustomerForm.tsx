@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { generateSlug } from '@/lib/utils'
 import { ICustomer, ICustomerInput } from '@/models/Customer'
+import { BUSINESS_TYPES, PROVINCES, COUNTRIES } from '@/types/customer'
 
 // Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
@@ -48,14 +49,6 @@ const quillFormats = [
   'code-block'
 ]
 
-const businessTypes = [
-  { value: 'Machinary service', label: 'Machinary service' },
-  { value: 'Nhà chế tạo máy', label: 'Nhà chế tạo máy' },
-  { value: 'Nhà máy Việt Nam', label: 'Nhà máy Việt Nam' },
-  { value: 'Nhà máy nước ngoài', label: 'Nhà máy nước ngoài' },
-  { value: 'Xưởng sản xuất', label: 'Xưởng sản xuất' }
-]
-
 interface Industry {
   _id: string
   name: string
@@ -76,42 +69,25 @@ interface CustomerFormProps {
   onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
-const provinces = [
-  { value: 'TP Ho Chi Minh', label: 'TP Hồ Chí Minh' },
-  { value: 'TP Hà Nội', label: 'TP Hà Nội' },
-  { value: 'TP Đà Nẵng', label: 'TP Đà Nẵng' },
-  { value: 'TP Huế', label: 'TP Huế' },
-  { value: 'Quảng Ninh', label: 'Quảng Ninh' },
-  { value: 'Cao Bằng', label: 'Cao Bằng' },
-  { value: 'Lạng Sơn', label: 'Lạng Sơn' },
-  { value: 'Lai Châu', label: 'Lai Châu' },
-  { value: 'Điện Biên', label: 'Điện Biên' },
-  { value: 'Sơn La', label: 'Sơn La' },
-  { value: 'Thanh Hóa', label: 'Thanh Hóa' },
-  { value: 'Nghệ An', label: 'Nghệ An' },
-  { value: 'Hà Tĩnh', label: 'Hà Tĩnh' },
-  { value: 'Tuyên Quang', label: 'Tuyên Quang' },
-  { value: 'Lào Cai', label: 'Lào Cai' },
-  { value: 'Thái Nguyên', label: 'Thái Nguyên' },
-  { value: 'Phú Thọ', label: 'Phú Thọ' },
-  { value: 'Bắc Ninh', label: 'Bắc Ninh' },
-  { value: 'Hưng Yên', label: 'Hưng Yên' },
-  { value: 'TP Hải Phòng', label: 'TP Hải Phòng' },
-  { value: 'Ninh Bình', label: 'Ninh Bình' },
-  { value: 'Quảng Trị', label: 'Quảng Trị' },
-  { value: 'Quảng Ngãi', label: 'Quảng Ngãi' },
-  { value: 'Gia Lai', label: 'Gia Lai' },
-  { value: 'Khánh Hòa', label: 'Khánh Hòa' },
-  { value: 'Lâm Đồng', label: 'Lâm Đồng' },
-  { value: 'Đắk Lắk', label: 'Đắk Lắk' },
-  { value: 'Đồng Nai', label: 'Đồng Nai' },
-  { value: 'Tây Ninh', label: 'Tây Ninh' },
-  { value: 'TP Cần Thơ', label: 'TP Cần Thơ' },
-  { value: 'Vĩnh Long', label: 'Vĩnh Long' },
-  { value: 'Đồng Tháp', label: 'Đồng Tháp' },
-  { value: 'Cà Mau', label: 'Cà Mau' },
-  { value: 'An Giang', label: 'An Giang' }
-]
+interface Industry {
+  _id: string
+  name: string
+  slug: string
+  category?: string
+  displayOrder?: number
+}
+
+// Extended interface for populated customer data from API
+interface PopulatedCustomer extends Omit<ICustomer, 'industry'> {
+  industry?: (string | { _id: string; name: string; slug: string })[]
+}
+
+interface CustomerFormProps {
+  customer?: PopulatedCustomer | null
+  onSave: (customerData: ICustomerInput) => Promise<void>
+  onCancel: () => void
+  onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
+}
 
 const countries = [
   { value: 'Việt Nam', label: 'Việt Nam' },
@@ -137,8 +113,8 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
   const [formData, setFormData] = useState<ICustomerInput>({
     name: '',
     slug: '',
-    businessType: businessTypes[0].value, // Default to first business type
-    country: countries[0].value, // Default to Việt Nam
+    businessType: BUSINESS_TYPES[0].value, // Default to first business type
+    country: COUNTRIES[0].value, // Default to Việt Nam
     industry: [], // Optional now
     completeDate: customer ? undefined : new Date(), // Auto-fill with today for new customers
     projects: [],
@@ -458,7 +434,7 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                         size={5}
                         required
                       >
-                        {businessTypes.map(type => (
+                        {BUSINESS_TYPES.map(type => (
                           <option 
                             key={type.value} 
                             value={type.value}
@@ -477,7 +453,7 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                         <div>Click to select a business type</div>
                         {formData.businessType && (
                           <div className="mt-1 text-blue-600 font-medium">
-                            {businessTypes.find(type => type.value === formData.businessType)?.label} selected
+                            {BUSINESS_TYPES.find(type => type.value === formData.businessType)?.label} selected
                           </div>
                         )}
                       </div>
@@ -596,7 +572,7 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {provinces.map(province => (
+                    {PROVINCES.map(province => (
                       <option key={province.value} value={province.value}>
                         {province.label}
                       </option>
@@ -614,7 +590,7 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {countries.map(country => (
+                    {COUNTRIES.map(country => (
                       <option key={country.value} value={country.value}>
                         {country.label}
                       </option>

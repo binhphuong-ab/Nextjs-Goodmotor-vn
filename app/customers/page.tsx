@@ -3,30 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { BuildingOfficeIcon, GlobeAltIcon } from '@heroicons/react/24/outline'
-
-interface Customer {
-  _id: string
-  name: string
-  slug: string
-  legalName?: string
-  businessType: string
-  industry?: {
-    _id: string
-    name: string
-    slug: string
-  }[]
-  website?: string
-  logo?: string
-  country: string
-  completeDate?: string
-  description?: string
-  projects?: { name: string; url?: string }[]
-  pumpModelsUsed?: { name: string; url?: string }[]
-  applications?: { name: string; url?: string }[]
-  featured: boolean
-  createdAt: string
-  updatedAt: string
-}
+import { ICustomerPopulated } from '@/types/customer'
 
 
 
@@ -35,7 +12,7 @@ interface Customer {
 
 
 export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>([])
+  const [customers, setCustomers] = useState<ICustomerPopulated[]>([])
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -324,7 +301,7 @@ export default function CustomersPage() {
               <button
                 onClick={() => {
                   setFilterByType('all')
-                  setFilterByTier('all')
+                  setFilterByCountry('all')
                 }}
                 className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
@@ -381,6 +358,11 @@ export default function CustomersPage() {
                         <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                           {customer.country}
                         </span>
+                        {customer.province && (
+                          <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
+                            {customer.province}
+                          </span>
+                        )}
                       </div>
 
                       {/* Website Link */}
@@ -412,7 +394,7 @@ export default function CustomersPage() {
                       <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-100">
                         <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Industries</p>
                         <div className="flex flex-wrap gap-2">
-                          {customer.industry.slice(0, 3).map((industry, index) => (
+                          {customer.industry.slice(0, 3).map((industry, index: number) => (
                             <span
                               key={index}
                               className="inline-flex px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-md font-medium"
