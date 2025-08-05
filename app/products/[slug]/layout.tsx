@@ -18,6 +18,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     await connectToDatabase()
     const db = mongoose.connection.db
+    
+    if (!db) {
+      return {
+        title: 'Database Error',
+        description: 'Database connection failed.',
+      }
+    }
+    
     const product = await db.collection('products').findOne({ slug: params.slug })
 
     if (!product) {
@@ -39,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         'industrial pump',
         'good motor',
         ...product.features?.slice(0, 3) || [],
-        ...product.applications?.slice(0, 3).map(app => app.name) || [],
+        ...product.applications?.slice(0, 3).map((app: any) => app.name) || [],
       ].join(', '),
       openGraph: {
         title: product.name,
