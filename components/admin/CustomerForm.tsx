@@ -89,18 +89,6 @@ interface CustomerFormProps {
   onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
-const countries = [
-  { value: 'Việt Nam', label: 'Việt Nam' },
-  { value: 'Nhật Bản', label: 'Nhật Bản' },
-  { value: 'Hàn Quốc', label: 'Hàn Quốc' },
-  { value: 'Trung Quốc', label: 'Trung Quốc' },
-  { value: 'Đài Loan', label: 'Đài Loan' },
-  { value: 'Mỹ', label: 'Mỹ' },
-  { value: 'EU', label: 'EU' },
-  { value: 'Thái Lan', label: 'Thái Lan' },
-  { value: 'Other', label: 'Other' }
-]
-
 
 
 export default function CustomerForm({ customer, onSave, onCancel, onShowNotification }: CustomerFormProps) {
