@@ -103,7 +103,7 @@ export default function AboutPage() {
             </div>
             <div className="relative">
               <Image
-                src="/images/company/industrial-pumps.jpg"
+                src="/images/pages/home/company/industrial-pumps.jpg"
                 alt="Good Motor Manufacturing Facility"
                 width={600}
                 height={400}
@@ -150,7 +150,7 @@ export default function AboutPage() {
             </div>
             <div>
               <Image
-                src="/images/hero/busch-vacuum-pump-2.webp"
+                src="/images/pages/home/hero/busch-vacuum-pump-2.webp"
                 alt="Vacuum Pump Technology"
                 width={500}
                 height={400}

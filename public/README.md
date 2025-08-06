@@ -5,55 +5,19 @@
 ```
 public/
 ├── images/
-│   ├── products/          # Product images
-│   ├── company/           # Company/about page images
-│   ├── hero/              # Homepage hero images
-│   └── logo/              # Logo and branding images
+│   ├── pages/
+│   │   ├── home/          # Homepage images
+│   │   │   ├── hero/      # Hero section images
+│   │   │   ├── company/   # Company info images
+│   │   │   └── services/  # Services images
+│   │   ├── about/         # About page images (empty)
+│   │   └── contact/       # Contact page images (empty)
+│   ├── database/          # Database-related images
+│   │   ├── products/      # Product images (empty)
+│   │   ├── brands/        # Brand images (empty)
+│   │   ├── customers/     # Customer images (empty)
+│   │   ├── projects/      # Project images (empty)
+│   │   └── aplications/   # Application images (empty)
+│   └── ui/                # UI elements (empty)
 └── README.md
 ```
-
-## How to Use Internal Images
-
-### 1. Store Images in Public Folder
-- Place images in `/public/images/[category]/`
-- Images are accessible via `/images/[category]/filename.jpg`
-
-### 2. Reference in Components
-```jsx
-// Using Next.js Image component
-import Image from 'next/image'
-
-<Image
-  src="/images/hero/industrial-pumps.jpg"
-  alt="Industrial Pumps"
-  width={600}
-  height={400}
-  className="rounded-lg"
-/>
-
-// Using regular img tag
-<img 
-  src="/images/products/vacuum-pump.jpg" 
-  alt="Vacuum Pump"
-  className="w-full h-auto"
-/>
-```
-
-### 3. Benefits of Internal Images
-- ✅ Better performance (local loading)
-- ✅ No external dependencies
-- ✅ No CORS issues
-- ✅ Reliable (no broken links)
-- ✅ Better SEO
-- ✅ Easier to manage
-
-### 4. Recommended Image Formats
-- **WebP**: Best compression and quality
-- **JPEG**: For photos
-- **PNG**: For images with transparency
-- **SVG**: For icons and logos
-
-### 5. Image Optimization Tips
-- Optimize images before uploading (use tools like TinyPNG)
-- Use appropriate dimensions
-- Consider responsive images with Next.js Image component 
