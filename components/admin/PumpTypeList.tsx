@@ -57,6 +57,9 @@ export default function PumpTypeList({ pumpTypes, onEdit, onDelete }: PumpTypeLi
                   <h3 className="text-lg font-medium text-gray-900">
                     {pumpType.pumpType}
                   </h3>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                    /{pumpType.slug}
+                  </span>
                   {pumpType.productUsage && pumpType.productUsage.length > 0 && (
                     <span 
                       className="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-green-600 rounded-full"
@@ -66,11 +69,83 @@ export default function PumpTypeList({ pumpTypes, onEdit, onDelete }: PumpTypeLi
                     </span>
                   )}
                 </div>
-                <div className="mt-1">
-                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
-                    slug: {pumpType.slug}
-                  </span>
+                <div className="mt-2 text-sm text-gray-600">
+                  {pumpType.description 
+                    ? (
+                        <div 
+                          className="prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={{ 
+                            __html: pumpType.description.length > 300 
+                              ? pumpType.description.substring(0, 300) + '...' 
+                              : pumpType.description 
+                          }} 
+                        />
+                      )
+                    : <span className="text-gray-400 italic">No description available</span>
+                  }
                 </div>
+
+                {/* Sub Pump Types Section */}
+                {pumpType.subPumpTypes && pumpType.subPumpTypes.length > 0 && (
+                  <div className="mt-3">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <h4 className="text-sm font-medium text-gray-900">Sub Pump Types:</h4>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                        {pumpType.subPumpTypes.length} total
+                      </span>
+                      {pumpType.subPumpTypes.filter(subType => subType.isActive).length > 0 && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          {pumpType.subPumpTypes.filter(subType => subType.isActive).length} active
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {pumpType.subPumpTypes
+                        .sort((a, b) => a.displayOrder - b.displayOrder)
+                        .map((subType, index) => {
+                          const productCount = pumpType.subPumpTypeUsage?.[subType._id || '']?.length || 0
+                          const productNames = pumpType.subPumpTypeUsage?.[subType._id || ''] || []
+                          const tooltip = subType.description 
+                            ? `${subType.description}${productCount > 0 ? `\n\nUsed by ${productCount} product(s): ${productNames.join(', ')}` : ''}`
+                            : productCount > 0 
+                              ? `Used by ${productCount} product(s): ${productNames.join(', ')}`
+                              : subType.name
+                              
+                          return (
+                            <div
+                              key={subType._id || index}
+                              className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
+                                subType.isActive
+                                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                  : 'bg-gray-50 text-gray-500 border border-gray-200'
+                              }`}
+                              title={tooltip}
+                            >
+                              <span>{subType.name}</span>
+                              {productCount > 0 && (
+                                <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-green-600 rounded-full">
+                                  {productCount}
+                                </span>
+                              )}
+                              {!subType.isActive && (
+                                <span className="ml-1 text-gray-400">(inactive)</span>
+                              )}
+                            </div>
+                          )
+                        })}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Show message if no sub pump types */}
+                {(!pumpType.subPumpTypes || pumpType.subPumpTypes.length === 0) && (
+                  <div className="mt-3">
+                    <div className="flex items-center space-x-2">
+                      <h4 className="text-sm font-medium text-gray-900">Sub Pump Types:</h4>
+                      <span className="text-xs text-gray-500 italic">No sub pump types defined</span>
+                    </div>
+                  </div>
+                )}
                 <div className="mt-1 text-xs text-gray-500">
                   Created: {new Date(pumpType.createdAt).toLocaleDateString()}
                   {pumpType.updatedAt !== pumpType.createdAt && (
@@ -120,9 +195,12 @@ export default function PumpTypeList({ pumpTypes, onEdit, onDelete }: PumpTypeLi
       </ul>
       
       <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
-        <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+        <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
           <div>
             <span className="font-medium">Pump Types:</span> {pumpTypes.length}
+          </div>
+          <div>
+            <span className="font-medium">Sub Types:</span> {pumpTypes.reduce((total, pt) => total + (pt.subPumpTypes?.length || 0), 0)}
           </div>
           <div>
             <span className="font-medium">In Use:</span> {pumpTypes.filter(pt => pt.productUsage && pt.productUsage.length > 0).length}
@@ -141,6 +219,56 @@ export default function PumpTypeList({ pumpTypes, onEdit, onDelete }: PumpTypeLi
         onCancel={handleCancelDelete}
         danger={true}
       />
+      
+      <style jsx global>{`
+        /* Prose styling for pump type descriptions */
+        .prose p {
+          margin-bottom: 0.5em;
+          line-height: 1.5;
+          color: #4b5563;
+        }
+        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+          color: #1f2937;
+          margin-top: 0.5em;
+          margin-bottom: 0.25em;
+          font-weight: 600;
+        }
+        .prose h1 { font-size: 1.1rem; }
+        .prose h2 { font-size: 1rem; }
+        .prose h3 { font-size: 0.95rem; }
+        .prose ul, .prose ol {
+          margin-bottom: 0.5em;
+          padding-left: 1.25em;
+        }
+        .prose li {
+          margin-bottom: 0.125em;
+          color: #4b5563;
+        }
+        .prose strong {
+          font-weight: 600;
+          color: #111827;
+        }
+        .prose a {
+          color: #2563eb;
+          text-decoration: underline;
+        }
+        .prose a:hover {
+          color: #1d4ed8;
+        }
+        .prose blockquote {
+          border-left: 3px solid #d1d5db;
+          padding-left: 0.75em;
+          margin: 0.5em 0;
+          font-style: italic;
+          color: #6b7280;
+        }
+        .prose code {
+          background-color: #f3f4f6;
+          padding: 0.125em 0.25em;
+          border-radius: 2px;
+          font-size: 0.85em;
+        }
+      `}</style>
     </div>
   )
 } 

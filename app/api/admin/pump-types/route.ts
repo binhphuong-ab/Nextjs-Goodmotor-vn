@@ -12,34 +12,63 @@ export async function GET() {
     const pumpTypes = await PumpType.find({})
       .sort({ pumpType: 1 })
     
-    // Add product usage data safely
+    // Add product usage data safely (now using stored usage tracking for better performance)
     const pumpTypesWithUsage = await Promise.all(
       pumpTypes.map(async (pumpType) => {
         try {
-          // Query products using this pump type
-          const db = mongoose.connection.db
-          if (!db) {
-            throw new Error('Database not available')
+          // If stored usage data exists, use it; otherwise fall back to real-time calculation
+          let productUsage = pumpType.productUsage || []
+          let subPumpTypeUsage: Record<string, string[]> = {}
+          
+          // Convert Map to object for JSON serialization
+          if (pumpType.subPumpTypeUsage && pumpType.subPumpTypeUsage instanceof Map) {
+            for (const [key, value] of pumpType.subPumpTypeUsage.entries()) {
+              subPumpTypeUsage[key] = value
+            }
+          } else if (pumpType.subPumpTypeUsage) {
+            subPumpTypeUsage = pumpType.subPumpTypeUsage as Record<string, string[]>
           }
           
-          const products = await db.collection('products').find({
-            pumpType: pumpType._id
-          }, { 
-            projection: { name: 1 } 
-          }).toArray()
-          
-          const productUsage = products.map((product: any) => product.name)
+          // If no stored usage data, calculate it (fallback for data migration)
+          if (!productUsage || productUsage.length === 0) {
+            const db = mongoose.connection.db
+            if (db) {
+              const products = await db.collection('products').find({
+                pumpType: pumpType._id
+              }, { 
+                projection: { name: 1, subPumpType: 1 } 
+              }).toArray()
+              
+              productUsage = products.map((product: any) => product.name)
+              
+              // Initialize all sub pump types with empty arrays using their _id
+              if (pumpType.subPumpTypes) {
+                pumpType.subPumpTypes.forEach((subType: any) => {
+                  subPumpTypeUsage[subType._id.toString()] = []
+                })
+              }
+              
+              // Populate usage data for each sub pump type using _id
+              products.forEach((product: any) => {
+                if (product.subPumpType && subPumpTypeUsage[product.subPumpType.toString()]) {
+                  subPumpTypeUsage[product.subPumpType.toString()].push(product.name)
+                }
+              })
+            }
+          }
           
           return {
             ...pumpType.toObject(),
-            productUsage
+            productUsage,
+            subPumpTypeUsage
           }
         } catch (usageError) {
           console.error('Error getting usage for pump type:', pumpType.pumpType, usageError)
           // Return pump type without usage data if there's an error
           return {
             ...pumpType.toObject(),
-            productUsage: []
+            productUsage: [],
+            subPumpTypeUsage: {}
           }
         }
       })
@@ -102,7 +131,10 @@ export async function POST(request: NextRequest) {
     
     const pumpType = new PumpType({
       pumpType: data.pumpType.trim(),
-      slug: data.slug.trim().toLowerCase()
+      slug: data.slug.trim().toLowerCase(),
+      description: data.description?.trim() || undefined,
+      subPumpTypes: data.subPumpTypes || [],
+      productUsage: data.productUsage || []
     })
     
     await pumpType.save()
@@ -175,7 +207,10 @@ export async function PUT(request: NextRequest) {
       id,
       {
         pumpType: data.pumpType.trim(),
-        slug: data.slug.trim().toLowerCase()
+        slug: data.slug.trim().toLowerCase(),
+        description: data.description?.trim() || undefined,
+        subPumpTypes: data.subPumpTypes || [],
+        productUsage: data.productUsage || []
       },
       { new: true, runValidators: true }
     )

@@ -189,15 +189,22 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  {getPumpTypeName(product) ? (
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {getPumpTypeName(product)}
-                    </span>
-                  ) : (
-                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
-                      No pump type
-                    </span>
-                  )}
+                  <div className="flex flex-col space-y-1">
+                    {getPumpTypeName(product) ? (
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {getPumpTypeName(product)}
+                      </span>
+                    ) : (
+                      <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
+                        No pump type
+                      </span>
+                    )}
+                    {(product as any).subPumpTypeName && (
+                      <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-600">
+                        {(product as any).subPumpTypeName}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   {getBrandName(product) ? (

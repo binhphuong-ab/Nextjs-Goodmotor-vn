@@ -91,7 +91,16 @@ const BrandSchema = new Schema<IBrand>({
     required: false,
     trim: true
   },
-  productLines: [ProductLineSchema] // Embedded array of product lines
+  productLines: [ProductLineSchema], // Embedded array of product lines
+  productLineUsage: {
+    type: Map,
+    of: [String],
+    default: new Map()
+  },
+  productUsage: {
+    type: [String],
+    default: []
+  }
 }, {
   timestamps: true
 })

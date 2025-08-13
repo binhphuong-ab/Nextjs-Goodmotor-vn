@@ -8,6 +8,7 @@ export interface IProduct {
   brand?: Types.ObjectId // Optional reference to Brand _id
   productLineId?: string // Optional reference to specific product line within brand
   pumpType?: Types.ObjectId // Optional reference to PumpType _id
+  subPumpType?: Types.ObjectId // Optional reference to specific sub pump type _id
   specifications: {
     flowRate?: string // CFM
     vacuumLevel?: string // torr or mbar
@@ -67,6 +68,17 @@ const ProductSchema = new Schema<IProduct>({
     type: Schema.Types.ObjectId,
     ref: 'PumpType',
     required: false
+  },
+  subPumpType: {
+    type: Schema.Types.ObjectId,
+    required: false,
+    validate: {
+      validator: function(v: Types.ObjectId) {
+        if (!v) return true // subPumpType is optional
+        return Types.ObjectId.isValid(v)
+      },
+      message: 'Please provide a valid sub pump type ID'
+    }
   },
   specifications: {
     flowRate: {
@@ -177,6 +189,7 @@ ProductSchema.index({ price: 1 }, { sparse: true })
 ProductSchema.index({ brand: 1 }, { sparse: true })
 ProductSchema.index({ productLineId: 1 }, { sparse: true })
 ProductSchema.index({ pumpType: 1 }, { sparse: true })
+ProductSchema.index({ subPumpType: 1 }, { sparse: true })
 
 // Input interface for creating/updating products
 export interface IProductInput {
@@ -186,6 +199,7 @@ export interface IProductInput {
   brand?: string // Brand ID as string
   productLineId?: string // Product line ID as string
   pumpType?: string // PumpType ID as string
+  subPumpType?: string // Sub pump type ID as string
   specifications: IProduct['specifications']
   features: string[]
   applications: Array<{

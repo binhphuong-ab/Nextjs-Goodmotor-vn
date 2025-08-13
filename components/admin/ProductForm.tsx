@@ -22,7 +22,9 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
   const [brands, setBrands] = useState<IBrand[]>([])
   const [pumpTypes, setPumpTypes] = useState<IPumpType[]>([])
   const [selectedBrand, setSelectedBrand] = useState<IBrand | null>(null)
+  const [selectedPumpType, setSelectedPumpType] = useState<IPumpType | null>(null)
   const [availableProductLines, setAvailableProductLines] = useState<any[]>([])
+  const [availableSubPumpTypes, setAvailableSubPumpTypes] = useState<any[]>([])
   const isInitializedRef = useRef(false)
   
 
@@ -34,6 +36,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
     brand: '',
     productLineId: '',
     pumpType: '',
+    subPumpType: '',
     specifications: {
       flowRate: '',
       vacuumLevel: '',
@@ -73,6 +76,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
           brand: '',
           productLineId: '',
           pumpType: '',
+          subPumpType: '',
           specifications: {
             flowRate: '',
             vacuumLevel: '',
@@ -109,6 +113,11 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
       ? (product.pumpType as any)._id
       : product.pumpType ? String(product.pumpType) : ''
     
+    // Handle subPumpType - it might be populated object or just ID string  
+    const subPumpTypeId = typeof product.subPumpType === 'object' && product.subPumpType !== null
+      ? (product.subPumpType as any)._id
+      : product.subPumpType ? String(product.subPumpType) : ''
+    
     // Product data processing
     
     setFormData({
@@ -118,6 +127,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
       brand: brandId,
       productLineId: product.productLineId || '',
       pumpType: pumpTypeId,
+      subPumpType: subPumpTypeId,
       specifications: { ...product.specifications },
       features: [...product.features],
       applications: [...product.applications],
@@ -170,6 +180,48 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
         }
       }
   }, [formData.brand, brands, product])
+
+  // Handle pump type selection and populate sub pump types
+  useEffect(() => {
+    if (formData.pumpType && pumpTypes.length > 0) {
+      const pumpType = pumpTypes.find(pt => pt._id === formData.pumpType)
+      if (pumpType) {
+        setSelectedPumpType(pumpType)
+        const activeSubPumpTypes = pumpType.subPumpTypes?.filter(subType => subType.isActive) || []
+        const sortedSubTypes = activeSubPumpTypes.sort((a, b) => a.displayOrder - b.displayOrder)
+        setAvailableSubPumpTypes(sortedSubTypes)
+        
+        // Check if this is the initial load when pump types data becomes available
+        const isInitialPumpTypeLoad = !isInitializedRef.current && product && product.subPumpType
+        
+        if (isInitialPumpTypeLoad) {
+          // Set subPumpType from product data on initial load
+          const subPumpTypeId = typeof product.subPumpType === 'object' && product.subPumpType !== null
+            ? (product.subPumpType as any)._id
+            : product.subPumpType ? String(product.subPumpType) : ''
+          setFormData(prev => ({ ...prev, subPumpType: subPumpTypeId }))
+        } else if (isInitializedRef.current && product) {
+          // This is a user-initiated change - check if pump type actually changed
+          const originalPumpTypeId = product.pumpType 
+            ? (typeof product.pumpType === 'object' && product.pumpType !== null 
+               ? (product.pumpType as any)._id 
+               : String(product.pumpType))
+            : null
+          
+          if (formData.pumpType !== originalPumpTypeId) {
+            setFormData(prev => ({ ...prev, subPumpType: '' }))
+          }
+        }
+      }
+    } else {
+      setSelectedPumpType(null)
+      setAvailableSubPumpTypes([])
+      // Only reset subPumpType if pump types are loaded and no pump type is selected, or if this is a user change
+      if ((pumpTypes.length > 0 && !formData.pumpType) || isInitializedRef.current) {
+        setFormData(prev => ({ ...prev, subPumpType: '' }))
+      }
+    }
+  }, [formData.pumpType, pumpTypes, product])
 
   const fetchBrands = async () => {
     try {
@@ -370,11 +422,22 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Clean form data before submission to handle optional fields properly
+    // Convert empty strings to undefined to avoid validation errors:
+    // - For ObjectId references: empty string would fail ObjectId validation
+    // - For enum fields: empty string would fail enum validation since "" is not a valid enum value
     const cleanedData = {
       ...formData,
       brand: formData.brand && formData.brand.trim() !== '' ? formData.brand : undefined,
       productLineId: formData.productLineId && formData.productLineId.trim() !== '' ? formData.productLineId : undefined,
       pumpType: formData.pumpType && formData.pumpType.trim() !== '' ? formData.pumpType : undefined,
+      specifications: {
+        ...formData.specifications,
+        // Clean optional enum fields - convert empty strings to undefined to avoid enum validation errors
+        equipment: formData.specifications.equipment && formData.specifications.equipment.trim() !== '' ? formData.specifications.equipment : undefined,
+        power: formData.specifications.power && formData.specifications.power.trim() !== '' ? formData.specifications.power : undefined,
+        country: formData.specifications.country && formData.specifications.country.trim() !== '' ? formData.specifications.country : undefined,
+      },
       features: formData.features.filter(feature => feature.trim() !== ''),
       applications: formData.applications.filter(app => app.name.trim() !== ''),
       images: formData.images.filter(img => img.url.trim() !== '').map((img, index) => ({
@@ -506,6 +569,51 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
                 </div>
               </div>
             </div>
+
+            {/* Sub Pump Type Selection */}
+            {formData.pumpType && availableSubPumpTypes.length > 0 && (
+              <div>
+                <label htmlFor="subPumpType" className="block text-sm font-medium text-gray-700 mb-2">
+                  Sub Pump Type (Optional)
+                </label>
+                <div className="space-y-2">
+                  <div className="relative">
+                    <select
+                      id="subPumpType"
+                      name="subPumpType"
+                      value={formData.subPumpType || ''}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                      size={5}
+                    >
+                      <option value="">Select a sub pump type (optional)</option>
+                      {availableSubPumpTypes.map(subPumpType => (
+                        <option 
+                          key={subPumpType._id} 
+                          value={subPumpType._id}
+                          className="py-2 px-2 hover:bg-blue-50 cursor-pointer"
+                        >
+                          {subPumpType.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex items-start space-x-2 text-xs text-gray-500">
+                    <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <div>Choose the specific sub type within the selected pump type</div>
+                      {formData.subPumpType && (
+                        <div className="mt-1 text-blue-600 font-medium">
+                          {availableSubPumpTypes.find(st => st._id === formData.subPumpType)?.name || formData.subPumpType} selected
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div>
               <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-2">

@@ -12,47 +12,53 @@ export async function GET() {
     const brands = await Brand.find({})
       .sort({ name: 1 })
     
-    // Add product line usage data safely
+    // Add product usage data safely (now using stored usage tracking for better performance)
     const brandsWithUsage = await Promise.all(
       brands.map(async (brand) => {
         try {
-          // Query products directly using mongoose
-          const db = mongoose.connection.db
-          if (!db) {
-            throw new Error('Database not available')
+          // If stored usage data exists, use it; otherwise fall back to real-time calculation
+          let productUsage = brand.productUsage || []
+          let productLineUsage: Record<string, string[]> = {}
+          
+          // Convert Map to object for JSON serialization
+          if (brand.productLineUsage && brand.productLineUsage instanceof Map) {
+            for (const [key, value] of brand.productLineUsage.entries()) {
+              productLineUsage[key] = value
+            }
+          } else if (brand.productLineUsage) {
+            productLineUsage = brand.productLineUsage as Record<string, string[]>
           }
           
-          // Get products with product line usage
-          const productsWithLines = await db.collection('products').find({
-            brand: brand._id,
-            productLineId: { $exists: true, $ne: '' }
-          }, { 
-            projection: { productLineId: 1, name: 1 } 
-          }).toArray()
-          
-          // Get all products using this brand
-          const allBrandProducts = await db.collection('products').find({
-            brand: brand._id
-          }, { 
-            projection: { name: 1 } 
-          }).toArray()
-          
-          const lineUsage: Record<string, string[]> = {}
-          productsWithLines.forEach((product: any) => {
-            if (product.productLineId) {
-              if (!lineUsage[product.productLineId]) {
-                lineUsage[product.productLineId] = []
-              }
-              lineUsage[product.productLineId].push(product.name)
+          // If no stored usage data, calculate it (fallback for data migration)
+          if (!productUsage || productUsage.length === 0) {
+            const db = mongoose.connection.db
+            if (db) {
+              const allBrandProducts = await db.collection('products').find({
+                brand: brand._id
+              }, { 
+                projection: { name: 1, productLineId: 1 } 
+              }).toArray()
+              
+              productUsage = allBrandProducts.map((product: any) => product.name)
+              
+              // Calculate product line usage
+              const lineUsage: Record<string, string[]> = {}
+              allBrandProducts.forEach((product: any) => {
+                if (product.productLineId) {
+                  if (!lineUsage[product.productLineId]) {
+                    lineUsage[product.productLineId] = []
+                  }
+                  lineUsage[product.productLineId].push(product.name)
+                }
+              })
+              productLineUsage = lineUsage
             }
-          })
-          
-          const brandUsage = allBrandProducts.map((product: any) => product.name)
+          }
           
           return {
             ...brand.toObject(),
-            productLineUsage: lineUsage,
-            productUsage: brandUsage
+            productLineUsage,
+            productUsage
           }
         } catch (usageError) {
           console.error('Error getting usage for brand:', brand.name, usageError)
