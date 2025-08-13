@@ -8,7 +8,7 @@ interface Industry {
   name: string
   slug: string
   description?: string
-  category?: string
+  category?: 'thuc-pham' | 'nganh-nhua' | 'kim-loai' | 'y-te-duoc' | 'dien-dien-lanh' | 'phong-nghien-cuu' | 'nganh-khac'
   displayOrder?: number
 }
 
@@ -20,13 +20,13 @@ interface IndustryFormProps {
 }
 
 const categoryOptions = [
-  { value: 'manufacturing', label: 'Manufacturing' },
-  { value: 'processing', label: 'Processing' },
-  { value: 'research', label: 'Research' },
-  { value: 'energy', label: 'Energy' },
-  { value: 'healthcare', label: 'Healthcare' },
-  { value: 'technology', label: 'Technology' },
-  { value: 'other', label: 'Other' }
+  { value: 'thuc-pham', label: 'Thực phẩm' },
+  { value: 'nganh-nhua', label: 'Ngành nhựa' },
+  { value: 'kim-loai', label: 'Kim loại' },
+  { value: 'y-te-duoc', label: 'Y tế - Dược' },
+  { value: 'dien-dien-lanh', label: 'Điện - Điện lạnh' },
+  { value: 'phong-nghien-cuu', label: 'Phòng nghiên cứu' },
+  { value: 'nganh-khac', label: 'Ngành khác' }
 ]
 
 
@@ -36,7 +36,7 @@ export default function IndustryForm({ industry, onSubmit, onCancel, onShowNotif
     name: industry?.name || '',
     slug: industry?.slug || '',
     description: industry?.description || '',
-    category: industry?.category || 'other',
+    category: industry?.category || 'nganh-khac',
     displayOrder: industry?.displayOrder || 0
   })
 

@@ -5,7 +5,7 @@ export interface IIndustry {
   name: string
   slug: string
   description?: string
-  category?: 'manufacturing' | 'processing' | 'research' | 'energy' | 'healthcare' | 'technology' | 'other'
+  category?: 'thuc-pham' | 'nganh-nhua' | 'kim-loai' | 'y-te-duoc' | 'dien-dien-lanh' | 'phong-nghien-cuu' | 'nganh-khac'
   
   // Visibility
   displayOrder?: number
@@ -59,8 +59,8 @@ const IndustrySchema = new Schema<IIndustry>({
   },
   category: {
     type: String,
-    enum: ['manufacturing', 'processing', 'research', 'energy', 'healthcare', 'technology', 'other'],
-    default: 'other'
+    enum: ['thuc-pham', 'nganh-nhua', 'kim-loai', 'y-te-duoc', 'dien-dien-lanh', 'phong-nghien-cuu', 'nganh-khac'],
+    default: 'nganh-khac'
   },
   
   // Visibility

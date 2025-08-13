@@ -23,7 +23,7 @@ interface Industry {
   name: string
   slug: string
   description?: string
-  category: string
+  category: 'thuc-pham' | 'nganh-nhua' | 'kim-loai' | 'y-te-duoc' | 'dien-dien-lanh' | 'phong-nghien-cuu' | 'nganh-khac'
   displayOrder?: number
   stats?: {
     customerCount?: number
@@ -44,23 +44,23 @@ interface IndustryListProps {
 }
 
 const categoryLabels = {
-  'manufacturing': 'Manufacturing',
-  'processing': 'Processing',
-  'research': 'Research',
-  'energy': 'Energy',
-  'healthcare': 'Healthcare',
-  'technology': 'Technology',
-  'other': 'Other'
+  'thuc-pham': 'Thực phẩm',
+  'nganh-nhua': 'Ngành nhựa',
+  'kim-loai': 'Kim loại',
+  'y-te-duoc': 'Y tế - Dược',
+  'dien-dien-lanh': 'Điện - Điện lạnh',
+  'phong-nghien-cuu': 'Phòng nghiên cứu',
+  'nganh-khac': 'Ngành khác'
 }
 
 const categoryColors = {
-  'manufacturing': 'bg-blue-100 text-blue-800',
-  'processing': 'bg-green-100 text-green-800',
-  'research': 'bg-purple-100 text-purple-800',
-  'energy': 'bg-yellow-100 text-yellow-800',
-  'healthcare': 'bg-red-100 text-red-800',
-  'technology': 'bg-indigo-100 text-indigo-800',
-  'other': 'bg-gray-100 text-gray-800'
+  'thuc-pham': 'bg-green-100 text-green-800',
+  'nganh-nhua': 'bg-blue-100 text-blue-800',
+  'kim-loai': 'bg-gray-100 text-gray-800',
+  'y-te-duoc': 'bg-red-100 text-red-800',
+  'dien-dien-lanh': 'bg-yellow-100 text-yellow-800',
+  'phong-nghien-cuu': 'bg-purple-100 text-purple-800',
+  'nganh-khac': 'bg-indigo-100 text-indigo-800'
 }
 
 
