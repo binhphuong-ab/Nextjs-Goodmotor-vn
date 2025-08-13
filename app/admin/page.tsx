@@ -20,7 +20,7 @@ import ApplicationList from '@/components/admin/ApplicationList'
 import NotificationContainer from '@/components/NotificationContainer'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { IApplication, IApplicationInput } from '@/models/Application'
-import { Product, ProductInput } from '@/models/Product'
+import { IProduct, IProductInput } from '@/models/Product'
 import { ICustomer, ICustomerInput } from '@/models/Customer'
 import { IIndustry, IIndustryInput } from '@/models/Industry'
 
@@ -67,8 +67,8 @@ interface LoginCredentials {
 }
 
 export default function AdminPage() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [products, setProducts] = useState<IProduct[]>([])
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
@@ -301,7 +301,7 @@ export default function AdminPage() {
     setIsFormOpen(true)
   }
 
-  const handleEditProduct = (product: Product) => {
+  const handleEditProduct = (product: IProduct) => {
     setSelectedProduct(product)
     setIsFormOpen(true)
   }
@@ -332,7 +332,7 @@ export default function AdminPage() {
     }
   }
 
-  const handleSaveProduct = async (productData: ProductInput) => {
+  const handleSaveProduct = async (productData: IProductInput) => {
     try {
       if (selectedProduct) {
         // Update existing product

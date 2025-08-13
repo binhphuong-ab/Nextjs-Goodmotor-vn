@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { generateSlug } from '@/lib/utils'
 import 'react-quill/dist/quill.snow.css'
-import { Product, ProductInput } from '@/models/Product'
+import { IProduct, IProductInput } from '@/models/Product'
 import { IBrand } from '@/models/Brand'
 import { IPumpType } from '@/models/PumpType'
 
@@ -12,13 +12,12 @@ import { IPumpType } from '@/models/PumpType'
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 interface ProductFormProps {
-  product?: Product | null
-  onSave: (productData: ProductInput) => void
+  product?: IProduct | null
+  onSave: (productData: IProductInput) => void
   onCancel: () => void
-  onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
 
-export default function ProductForm({ product, onSave, onCancel, onShowNotification }: ProductFormProps) {
+export default function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
   const [brands, setBrands] = useState<IBrand[]>([])
   const [pumpTypes, setPumpTypes] = useState<IPumpType[]>([])
   const [selectedBrand, setSelectedBrand] = useState<IBrand | null>(null)
@@ -27,9 +26,8 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
   const [availableSubPumpTypes, setAvailableSubPumpTypes] = useState<any[]>([])
   const isInitializedRef = useRef(false)
   
-
-  
-  const [formData, setFormData] = useState<ProductInput>({
+  // Default form data structure
+  const getDefaultFormData = (): IProductInput => ({
     name: '',
     slug: '',
     description: '',
@@ -48,14 +46,11 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
     },
     features: [''],
     applications: [{ name: '', url: '' }],
-    images: [{
-      url: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
-      alt: '',
-      caption: '',
-      isPrimary: true
-    }],
+    images: [],
     price: undefined,
   })
+
+  const [formData, setFormData] = useState<IProductInput>(getDefaultFormData())
 
   useEffect(() => {
     // Fetch brands and pump types on component mount
@@ -69,33 +64,7 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
     if (!product || brands.length === 0) {
       if (!product) {
         // Reset form for new product
-        setFormData({
-          name: '',
-          slug: '',
-          description: '',
-          brand: '',
-          productLineId: '',
-          pumpType: '',
-          subPumpType: '',
-          specifications: {
-            flowRate: '',
-            vacuumLevel: '',
-            power: '',
-            inletSize: '',
-            weight: '',
-            country: '',
-            equipment: '',
-          },
-          features: [''],
-          applications: [{ name: '', url: '' }],
-          images: [{
-            url: 'https://trebles.co.uk/wp-content/uploads/2021/01/Industrial-Pumps.jpg',
-            alt: '',
-            caption: '',
-            isPrimary: true
-          }],
-          price: undefined,
-        })
+        setFormData(getDefaultFormData())
       }
       return
     }
@@ -424,13 +393,17 @@ export default function ProductForm({ product, onSave, onCancel, onShowNotificat
     
     // Clean form data before submission to handle optional fields properly
     // Convert empty strings to undefined to avoid validation errors:
-    // - For ObjectId references: empty string would fail ObjectId validation
-    // - For enum fields: empty string would fail enum validation since "" is not a valid enum value
+    // - For ObjectId references (brand, pumpType, subPumpType): empty string would fail ObjectId validation
+    // - For enum fields (equipment, power, country): empty string would fail enum validation since "" is not a valid enum value
+    // - For string fields (productLineId): empty string is converted to undefined for consistency
     const cleanedData = {
       ...formData,
+      // ObjectId reference fields - must be undefined when empty to avoid ObjectId validation errors
       brand: formData.brand && formData.brand.trim() !== '' ? formData.brand : undefined,
-      productLineId: formData.productLineId && formData.productLineId.trim() !== '' ? formData.productLineId : undefined,
       pumpType: formData.pumpType && formData.pumpType.trim() !== '' ? formData.pumpType : undefined,
+      subPumpType: formData.subPumpType && formData.subPumpType.trim() !== '' ? formData.subPumpType : undefined,
+      // String field - convert empty to undefined for consistency
+      productLineId: formData.productLineId && formData.productLineId.trim() !== '' ? formData.productLineId : undefined,
       specifications: {
         ...formData.specifications,
         // Clean optional enum fields - convert empty strings to undefined to avoid enum validation errors

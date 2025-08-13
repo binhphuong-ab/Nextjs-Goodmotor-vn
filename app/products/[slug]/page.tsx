@@ -5,14 +5,14 @@ import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, ShoppingCart, Phone, Mail, Check, Star } from 'lucide-react'
-import { Product } from '@/models/Product'
+import { IProduct } from '@/models/Product'
 
 
 
 export default function ProductDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const [product, setProduct] = useState<Product | null>(null)
+  const [product, setProduct] = useState<IProduct | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedImage, setSelectedImage] = useState(0)
@@ -58,14 +58,14 @@ export default function ProductDetailPage() {
     router.push(`/contact?product=${encodeURIComponent(product?.name || '')}`)
   }
 
-  const getSelectedImageAlt = (product: Product, index: number) => {
-    if (product.images && Array.isArray(product.images) && product.images[index]) {
-      return product.images[index].alt || `${product.name} - Image ${index + 1}`
+  const getSelectedImageAlt = (product: IProduct, index: number) => {
+    if (product.images && product.images[index] && product.images[index].alt) {
+      return product.images[index].alt
     }
     return product.name
   }
 
-  const getSelectedImageCaption = (product: Product, index: number) => {
+  const getSelectedImageCaption = (product: IProduct, index: number) => {
     if (product.images && Array.isArray(product.images) && product.images[index]) {
       return product.images[index].caption
     }
@@ -121,7 +121,7 @@ export default function ProductDetailPage() {
 
   // Get product images array
   const productImages = product.images && product.images.length > 0
-    ? product.images.map(img => img.url)
+    ? product.images.map((img: any) => img.url)
     : ['/images/placeholder-product.jpg']
 
   return (

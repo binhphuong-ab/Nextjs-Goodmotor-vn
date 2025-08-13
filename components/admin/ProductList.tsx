@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Product } from '@/models/Product'
+import { IProduct } from '@/models/Product'
 import Notification from '@/components/Notification'
 import ConfirmDialog from '@/components/ConfirmDialog'
 
 interface ProductListProps {
-  products: Product[]
-  onEdit: (product: Product) => void
+  products: IProduct[]
+  onEdit: (product: IProduct) => void
   onDelete: (productId: string) => void
 }
 
@@ -22,7 +22,7 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
   const [notification, setNotification] = useState<NotificationState | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
-    product: Product | null
+    product: IProduct | null
   }>({
     isOpen: false,
     product: null
@@ -40,12 +40,12 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
     return `${price.toLocaleString('vi-VN')} VNĐ`
   }
 
-  const handleEdit = (product: Product) => {
+  const handleEdit = (product: IProduct) => {
     onEdit(product)
     showNotification('info', `Editing product: ${product.name}`)
   }
 
-  const handleDelete = (product: Product) => {
+  const handleDelete = (product: IProduct) => {
     setConfirmDialog({
       isOpen: true,
       product
@@ -64,21 +64,21 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
   }
 
   // Safely access nested properties
-  const getPumpTypeName = (product: Product) => {
+  const getPumpTypeName = (product: IProduct) => {
     if (!product.pumpType) return null
     return typeof product.pumpType === 'object' && 'pumpType' in product.pumpType 
       ? (product.pumpType as any).pumpType 
       : 'Pump Type Selected'
   }
 
-  const getBrandName = (product: Product) => {
+  const getBrandName = (product: IProduct) => {
     if (!product.brand) return null
     return typeof product.brand === 'object' && 'name' in product.brand 
       ? (product.brand as any).name 
       : 'Brand Selected'
   }
 
-  const getProductLineName = (product: Product) => {
+  const getProductLineName = (product: IProduct) => {
     if (!product.productLineId || !product.brand) return null
     
     // Check if brand is populated with productLines
@@ -92,10 +92,10 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
     return null
   }
 
-  const getPrimaryImageUrl = (product: Product) => {
+  const getPrimaryImageUrl = (product: IProduct) => {
     if (product.images && product.images.length > 0) {
       // Find primary image first
-      const primaryImage = product.images.find(img => img.isPrimary)
+      const primaryImage = product.images.find((img: any) => img.isPrimary)
       if (primaryImage) return primaryImage.url
       
       // If no primary image, use first image
@@ -105,10 +105,10 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
     return null
   }
 
-  const getPrimaryImageAlt = (product: Product) => {
+  const getPrimaryImageAlt = (product: IProduct) => {
     if (product.images && product.images.length > 0) {
       // Find primary image first
-      const primaryImage = product.images.find(img => img.isPrimary)
+      const primaryImage = product.images.find((img: any) => img.isPrimary)
       if (primaryImage && primaryImage.alt) return primaryImage.alt
       
       // If no primary image or alt, use first image alt or product name

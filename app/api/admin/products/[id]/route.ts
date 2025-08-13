@@ -78,9 +78,27 @@ export async function PUT(
     }
     }
     
+    // Handle undefined values properly - convert to null for explicit removal
+    // Mongoose treats null as "remove field" but undefined as "ignore field"
+    const processedUpdateData = { ...updateData } as any
+    
+    // Convert undefined ObjectId references to null for explicit removal
+    if (updateData.pumpType === undefined) processedUpdateData.pumpType = null
+    if (updateData.subPumpType === undefined) processedUpdateData.subPumpType = null
+    if (updateData.brand === undefined) processedUpdateData.brand = null
+    if (updateData.productLineId === undefined) processedUpdateData.productLineId = null
+    
+    // Handle specifications object
+    if (updateData.specifications) {
+      processedUpdateData.specifications = { ...updateData.specifications }
+      if (updateData.specifications.equipment === undefined) processedUpdateData.specifications.equipment = null
+      if (updateData.specifications.power === undefined) processedUpdateData.specifications.power = null
+      if (updateData.specifications.country === undefined) processedUpdateData.specifications.country = null
+    }
+    
     let product = await Product.findByIdAndUpdate(
       id,
-      { ...updateData, updatedAt: new Date() },
+      { ...processedUpdateData, updatedAt: new Date() },
       { new: true, runValidators: true }
     )
     

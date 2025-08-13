@@ -215,8 +215,4 @@ export interface IProductInput {
   price?: number
 }
 
-// Keep old interfaces for backward compatibility
-export interface Product extends IProduct {}
-export interface ProductInput extends IProductInput {}
-
 export default models.Product || model<IProduct>('Product', ProductSchema) 

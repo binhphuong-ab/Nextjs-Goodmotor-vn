@@ -1,6 +1,6 @@
 # VPS Connection Information
 
-This document contains essential information for connecting to and managing the VPS server for the Good Motor website.
+Essential information for the Good Motor website VPS server.
 
 ## Server Details
 
@@ -9,83 +9,71 @@ This document contains essential information for connecting to and managing the 
 - **Username**: root
 - **Password**: (*W4dd#qao8k%iwlb)%R
 
-## Connection Methods
-
-### Direct SSH Connection
-
-Connect to the VPS directly using SSH with the following command:
+## Quick Connection
 
 ```bash
 ssh -p 24700 root@103.72.96.189
 ```
 
-When prompted, enter the password: `(*W4dd#qao8k%iwlb)%R`
+**Note**: Passwordless SSH is set up, password may not be required.
 
-**Note**: Passwordless SSH connection is already set up, so you may not need to enter the password.
+## Deployment Process
 
-## Deployment
+Application location: `/var/www/good-motor`
 
-The application is deployed at: `/var/www/good-motor`
-
-### Method 1: Manual Deployment (Recommended)
-
-To deploy updates manually:
+### Quick Deploy Steps
 
 ```bash
 # Connect to VPS
 ssh -p 24700 root@103.72.96.189
 
-# Navigate to application directory
+# Navigate to app directory
 cd /var/www/good-motor
 
-# Pull latest changes from GitHub
+# Update code
 git pull origin main
 
-# Install dependencies (if needed)
+# Install/update dependencies
 npm install
 
-# Build the application
+# Build application
 npm run build
 
-# Restart the application
+# Restart application
 pm2 restart good-motor
 ```
 
-### Method 2: Using connect-vps.sh Script
-
-For easier connection, use the provided connection script:
-
-```bash
-./connect-vps.sh
-```
-
-This script will automatically connect you to the VPS, then you can run the deployment commands manually.
-
-## Database Information
-
-We use MongoDB Atlas for the database backend. Connection details:
+## Database
 
 - **Type**: MongoDB Atlas
-- **Connection String**: mongodb+srv://goodmotorvn:L4lfPMzmN5t6VYa8@cluster0.lcv0mgg.mongodb.net/goodmotor?retryWrites=true&w=majority&appName=Cluster0
-- **User**: goodmotorvn
-- **Password**: L4lfPMzmN5t6VYa8
-- **Database Name**: goodmotor
+- **Connection**: mongodb+srv://goodmotorvn:L4lfPMzmN5t6VYa8@cluster0.lcv0mgg.mongodb.net/goodmotor
+- **Database**: goodmotor
 
-This connection is configured in the `.env` file on the VPS and automatically used by the application.
-
-### Database Management
-
-The database is hosted on MongoDB Atlas and is managed automatically. No manual seeding is typically required as the database is already set up and populated.
-
-If you need to run any database operations:
+## PM2 Management
 
 ```bash
-# Connect to VPS and navigate to app directory
-cd /var/www/good-motor
+# Check status
+pm2 status
 
-# Connect to MongoDB Atlas using mongosh (if needed)
-mongosh "mongodb+srv://goodmotorvn:L4lfPMzmN5t6VYa8@cluster0.lcv0mgg.mongodb.net/goodmotor?retryWrites=true&w=majority&appName=Cluster0"
+# View logs (one-time snapshot)
+pm2 logs good-motor --lines 10 --nostream
+
+# View logs (continuous streaming)
+pm2 logs good-motor --lines 10
+
+# Restart application
+pm2 restart good-motor
 ```
+
+**Note**: The `pm2 logs` command without `--nostream` continuously follows the log output and never exits. Using `--nostream` gives you a quick snapshot and exits immediately.
+
+## Server Info
+
+- **OS**: Debian GNU/Linux
+- **RAM**: 2GB
+- **Node**: v18.x
+- **Process Manager**: PM2
+- **Web Server**: Nginx
 
 ## Application Management
 

@@ -3,10 +3,10 @@
 import { useState, useEffect, CSSProperties } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Product } from '@/models/Product'
+import { IProduct } from '@/models/Product'
 
 // Extended interface for populated product
-interface PopulatedProduct extends Omit<Product, 'brand'> {
+interface PopulatedProduct extends Omit<IProduct, 'brand'> {
   brand?: {
     _id: string
     name: string
@@ -32,7 +32,7 @@ export default function ProductsPage() {
   const getPrimaryImageUrl = (product: PopulatedProduct) => {
     if (product.images && product.images.length > 0) {
       // Find primary image first
-      const primaryImage = product.images.find(img => img.isPrimary)
+      const primaryImage = product.images.find((img: any) => img.isPrimary)
       if (primaryImage) return primaryImage.url
       
       // If no primary image, use first image
@@ -45,7 +45,7 @@ export default function ProductsPage() {
   const getPrimaryImageAlt = (product: PopulatedProduct) => {
     if (product.images && product.images.length > 0) {
       // Find primary image first
-      const primaryImage = product.images.find(img => img.isPrimary)
+      const primaryImage = product.images.find((img: any) => img.isPrimary)
       if (primaryImage && primaryImage.alt) return primaryImage.alt
       
       // If no primary image or alt, use first image alt or product name
