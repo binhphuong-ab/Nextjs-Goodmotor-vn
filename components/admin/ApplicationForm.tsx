@@ -58,7 +58,7 @@ const CATEGORIES = [
   { value: 'freeze-drying', label: 'Freeze Drying' },
   { value: 'distillation', label: 'Distillation' },
   { value: 'packaging', label: 'Packaging' },
-  { value: 'coating', label: 'Coating' },
+  { value: 'plastic', label: 'Plastic' },
   { value: 'degassing', label: 'Degassing' },
   { value: 'filtration', label: 'Filtration' },
   { value: 'drying', label: 'Drying' },

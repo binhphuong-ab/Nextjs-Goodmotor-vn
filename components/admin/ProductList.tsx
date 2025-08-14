@@ -135,9 +135,6 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                 Brand
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Product Line
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Country
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -207,26 +204,22 @@ export default function ProductList({ products, onEdit, onDelete }: ProductListP
                   </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
-                  {getBrandName(product) ? (
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                      {getBrandName(product)}
-                    </span>
-                  ) : (
-                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
-                      No brand
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  {getProductLineName(product) ? (
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
-                      {getProductLineName(product)}
-                    </span>
-                  ) : (
-                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
-                      No product line
-                    </span>
-                  )}
+                  <div className="flex flex-col space-y-1">
+                    {getBrandName(product) ? (
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                        {getBrandName(product)}
+                      </span>
+                    ) : (
+                      <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
+                        No brand
+                      </span>
+                    )}
+                    {getProductLineName(product) && (
+                      <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-50 text-green-600">
+                        {getProductLineName(product)}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   {product.specifications?.country ? (

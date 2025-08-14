@@ -5,7 +5,7 @@ export interface IApplication {
   name: string
   slug: string
   description: string
-  category: 'freeze-drying' | 'distillation' | 'packaging' | 'coating' | 'degassing' | 'filtration' | 'drying' | 'metallurgy' | 'electronics' | 'medical' | 'research' | 'other'
+  category: 'freeze-drying' | 'distillation' | 'packaging' | 'plastic' | 'degassing' | 'filtration' | 'drying' | 'metallurgy' | 'electronics' | 'medical' | 'research' | 'other'
   
   // Technical specifications
   vacuumRequirements: {
@@ -99,7 +99,7 @@ const ApplicationSchema = new Schema<IApplication>({
       'freeze-drying',
       'distillation', 
       'packaging',
-      'coating',
+      'plastic',
       'degassing',
       'filtration',
       'drying',
