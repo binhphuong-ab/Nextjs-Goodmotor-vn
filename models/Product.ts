@@ -20,6 +20,11 @@ export interface IProduct {
     status?: string // Hàng mới 100%, Hàng cũ
   }
   features: string[]
+  repairParts: Array<{
+    name: string
+    image?: string
+    url?: string
+  }>
   applications: Array<{
     name: string
     url?: string
@@ -133,6 +138,37 @@ const ProductSchema = new Schema<IProduct>({
     type: String,
     trim: true
   }],
+  repairParts: [{
+    name: {
+      type: String,
+      required: [true, 'Repair part name is required'],
+      trim: true
+    },
+    image: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          if (!v) return true // image is optional
+          // Allow both full URLs (http/https) and relative paths starting with /
+          // Must end with valid image extensions
+          return /^(https?:\/\/.+|\/[\w\-\/\.]+)\.(jpg|jpeg|png|gif|webp|svg)$/i.test(v);
+        },
+        message: 'Please provide a valid image URL or path (relative paths must start with / and end with .jpg, .jpeg, .png, .gif, .webp, or .svg)'
+      }
+    },
+    url: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          if (!v) return true // url is optional
+          return /^https?:\/\/.+/.test(v);
+        },
+        message: 'Please provide a valid URL starting with http:// or https://'
+      }
+    }
+  }],
   applications: [{
     name: {
       type: String,
@@ -213,6 +249,11 @@ export interface IProductInput {
   subPumpType?: string // Sub pump type ID as string
   specifications: IProduct['specifications']
   features: string[]
+  repairParts: Array<{
+    name: string
+    image?: string
+    url?: string
+  }>
   applications: Array<{
     name: string
     url?: string

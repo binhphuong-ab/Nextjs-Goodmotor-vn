@@ -46,6 +46,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
       status: 'Hàng cũ',
     },
     features: [''],
+    repairParts: [{ name: '', image: '', url: '' }],
     applications: [{ name: '', url: '' }],
     images: [],
     price: undefined,
@@ -100,6 +101,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
       subPumpType: subPumpTypeId,
       specifications: { ...product.specifications },
       features: [...product.features],
+      repairParts: [...(product.repairParts || [])],
       applications: [...product.applications],
       images: [...product.images],
       price: product.price || undefined,
@@ -277,6 +279,32 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
     }
   }
 
+  // Repair Parts-specific functions
+  const addRepairPart = () => {
+    setFormData(prev => ({
+      ...prev,
+      repairParts: [...prev.repairParts, { name: '', image: '', url: '' }]
+    }))
+  }
+
+  const removeRepairPart = (index: number) => {
+    if (formData.repairParts.length > 1) {
+      setFormData(prev => ({
+        ...prev,
+        repairParts: prev.repairParts.filter((_, i) => i !== index)
+      }))
+    }
+  }
+
+  const updateRepairPart = (index: number, field: 'name' | 'image' | 'url', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      repairParts: prev.repairParts.map((part, i) => 
+        i === index ? { ...part, [field]: value } : part
+      )
+    }))
+  }
+
   // Application-specific functions
   const addApplication = () => {
     setFormData(prev => ({
@@ -414,6 +442,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
         status: formData.specifications.status && formData.specifications.status.trim() !== '' ? formData.specifications.status : undefined,
       },
       features: formData.features.filter(feature => feature.trim() !== ''),
+      repairParts: formData.repairParts.filter(part => part.name.trim() !== ''),
       applications: formData.applications.filter(app => app.name.trim() !== ''),
       images: formData.images.filter(img => img.url.trim() !== '').map((img, index) => ({
         ...img,
@@ -1081,6 +1110,93 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             >
               + Add Feature
             </button>
+          </div>
+
+          {/* Repair Parts (Phụ tùng) */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="text-md font-medium text-gray-900">Repair Parts (Phụ tùng)</h4>
+              <button
+                type="button"
+                onClick={addRepairPart}
+                className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Add Repair Part
+              </button>
+            </div>
+            {formData.repairParts.map((repairPart, index) => (
+              <div key={index} className="border border-gray-200 rounded-md p-4 mb-3">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="text-sm font-medium text-gray-700">Repair Part {index + 1}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeRepairPart(index)}
+                    className="text-red-600 hover:text-red-800 text-sm"
+                    disabled={formData.repairParts.length === 1}
+                  >
+                    Remove
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Part Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={repairPart.name}
+                      onChange={(e) => updateRepairPart(index, 'name', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter repair part name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Image URL (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={repairPart.image || ''}
+                      onChange={(e) => updateRepairPart(index, 'image', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="/images/repair-parts/part.jpg"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Part URL (Optional)
+                    </label>
+                    <input
+                      type="url"
+                      value={repairPart.url || ''}
+                      onChange={(e) => updateRepairPart(index, 'url', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="https://example.com/repair-part"
+                    />
+                  </div>
+                </div>
+                
+                {/* Image Preview */}
+                {repairPart.image && (
+                  <div className="mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Image Preview:
+                    </label>
+                    <div className="relative w-24 h-24 border border-gray-200 rounded-lg overflow-hidden">
+                      <img
+                        src={repairPart.image}
+                        alt={repairPart.name || 'Repair part image'}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.style.display = 'none'
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
           {/* Applications */}
