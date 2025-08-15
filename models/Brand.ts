@@ -1,11 +1,17 @@
 import { Schema, model, models } from 'mongoose'
 
+export interface IProductLineDocument {
+  name: string
+  url: string
+}
+
 export interface IProductLine {
   _id?: string
   name: string
   description?: string
   isActive: boolean
   displayOrder: number
+  documents?: IProductLineDocument[]
 }
 
 export interface IBrand {
@@ -22,6 +28,23 @@ export interface IBrand {
   createdAt: Date
   updatedAt: Date
 }
+
+const ProductLineDocumentSchema = new Schema<IProductLineDocument>({
+  name: {
+    type: String,
+    required: [true, 'Document name is required'],
+    trim: true,
+    maxlength: [200, 'Document name cannot exceed 200 characters']
+  },
+  url: {
+    type: String,
+    required: [true, 'Document URL is required'],
+    trim: true,
+    maxlength: [500, 'Document URL cannot exceed 500 characters']
+  }
+}, {
+  _id: true // Generate _id for each document for easier tracking
+})
 
 const ProductLineSchema = new Schema<IProductLine>({
   name: {
@@ -42,6 +65,11 @@ const ProductLineSchema = new Schema<IProductLine>({
   displayOrder: {
     type: Number,
     default: 0
+  },
+  documents: {
+    type: [ProductLineDocumentSchema],
+    default: [],
+    required: false
   }
 }, {
   _id: true // Allow MongoDB to generate _id for each product line

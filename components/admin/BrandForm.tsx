@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import 'react-quill/dist/quill.snow.css'
-import { IBrand, IBrandInput, IProductLine } from '@/models/Brand'
+import { IBrand, IBrandInput, IProductLine, IProductLineDocument } from '@/models/Brand'
 import { generateSlug } from '@/lib/utils'
 
 // Dynamically import ReactQuill to avoid SSR issues
@@ -138,7 +138,8 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
       name: '',
       description: '',
       isActive: true,
-      displayOrder: formData.productLines?.length || 0
+      displayOrder: formData.productLines?.length || 0,
+      documents: []
     }
     setFormData(prev => ({
       ...prev,
@@ -174,6 +175,57 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
     }))
   }
 
+  // Document management functions for product lines
+  const addDocument = (productLineIndex: number) => {
+    const newDocument: IProductLineDocument = {
+      name: '',
+      url: ''
+    }
+    
+    console.log('Adding document to product line', productLineIndex, ':', newDocument)
+    
+    setFormData(prev => ({
+      ...prev,
+      productLines: prev.productLines?.map((line, i) => 
+        i === productLineIndex 
+          ? { ...line, documents: [...(line.documents || []), newDocument] }
+          : line
+      ) || []
+    }))
+  }
+
+  const updateDocument = (productLineIndex: number, documentIndex: number, field: keyof IProductLineDocument, value: string) => {
+    console.log('Updating document:', { productLineIndex, documentIndex, field, value })
+    
+    setFormData(prev => ({
+      ...prev,
+      productLines: prev.productLines?.map((line, i) => 
+        i === productLineIndex 
+          ? {
+              ...line,
+              documents: line.documents?.map((doc, j) => 
+                j === documentIndex ? { ...doc, [field]: value } : doc
+              ) || []
+            }
+          : line
+      ) || []
+    }))
+  }
+
+  const removeDocument = (productLineIndex: number, documentIndex: number) => {
+    setFormData(prev => ({
+      ...prev,
+      productLines: prev.productLines?.map((line, i) => 
+        i === productLineIndex 
+          ? {
+              ...line,
+              documents: line.documents?.filter((_, j) => j !== documentIndex) || []
+            }
+          : line
+      ) || []
+    }))
+  }
+
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {}
 
@@ -200,10 +252,30 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
     e.preventDefault()
     
     if (validateForm()) {
-      // Filter out empty product lines
-      const validProductLines = formData.productLines?.filter(line => line.name.trim() !== '') || []
+      // Debug: Log original form data
+      console.log('Original formData.productLines:', formData.productLines)
       
-      onSave({
+      // Filter out empty product lines and clean up documents
+      const validProductLines = formData.productLines?.filter(line => line.name.trim() !== '').map(line => {
+        // Debug: Log each product line before and after document filtering
+        console.log('Product line before filtering:', line.name, 'documents:', line.documents)
+        
+        const filteredDocuments = line.documents?.filter(doc => {
+          const hasName = doc.name.trim() !== ''
+          const hasUrl = doc.url.trim() !== ''
+          console.log('Document filter check:', { name: doc.name, url: doc.url, hasName, hasUrl, willKeep: hasName && hasUrl })
+          return hasName && hasUrl
+        }) || []
+        
+        console.log('Product line after filtering:', line.name, 'documents:', filteredDocuments)
+        
+        return {
+          ...line,
+          documents: filteredDocuments
+        }
+      }) || []
+      
+      const dataToSave = {
         name: formData.name.trim(),
         slug: formData.slug.trim(),
         country: formData.country?.trim() || undefined,
@@ -211,7 +283,13 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
         revenue: formData.revenue?.trim() || undefined,
         description: formData.description?.trim() || undefined,
         productLines: validProductLines
-      })
+      }
+      
+      // Debug: Log final data being sent
+      console.log('Final data being sent to API:', dataToSave)
+      console.log('Final productLines with documents:', JSON.stringify(validProductLines, null, 2))
+      
+      onSave(dataToSave)
     }
   }
 
@@ -392,7 +470,7 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
             </div>
             
             <p className="text-sm text-gray-600 mb-4">
-              Define product lines/groups for this brand. Users will be able to select these when creating products.
+              Define product lines/groups for this brand. Users will be able to select these when creating products. You can also attach relevant documents (catalogs, manuals, etc.) to each product line.
             </p>
 
             {formData.productLines && formData.productLines.length > 0 ? (
@@ -426,6 +504,59 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
+                    </div>
+                    
+                    {/* Documents Section */}
+                    <div className="mb-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Documents (Optional)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => addDocument(index)}
+                          className="text-sm bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 transition-colors"
+                        >
+                          + Add Document
+                        </button>
+                      </div>
+                      
+                      {line.documents && line.documents.length > 0 ? (
+                        <div className="space-y-2">
+                          {line.documents.map((doc, docIndex) => (
+                            <div key={docIndex} className="flex gap-2 items-center bg-white p-2 rounded border">
+                              <div className="flex-1">
+                                <input
+                                  type="text"
+                                  value={doc.name}
+                                  onChange={(e) => updateDocument(index, docIndex, 'name', e.target.value)}
+                                  placeholder="Document name (e.g. Product Catalog, User Manual)"
+                                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <input
+                                  type="text"
+                                  value={doc.url}
+                                  onChange={(e) => updateDocument(index, docIndex, 'url', e.target.value)}
+                                  placeholder="Document URL or path (e.g. /images/catalog.pdf, https://...)"
+                                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeDocument(index, docIndex)}
+                                className="text-red-500 hover:text-red-700 text-sm px-2 py-1"
+                                title="Remove document"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">No documents added</p>
+                      )}
                     </div>
                     
                     <div className="flex items-center justify-between">
