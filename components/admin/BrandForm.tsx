@@ -136,6 +136,7 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
   const addProductLine = () => {
     const newProductLine: Omit<IProductLine, '_id'> = {
       name: '',
+      slug: '',
       description: '',
       isActive: true,
       displayOrder: formData.productLines?.length || 0,
@@ -150,9 +151,17 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
   const updateProductLine = (index: number, field: keyof IProductLine, value: any) => {
     setFormData(prev => ({
       ...prev,
-      productLines: prev.productLines?.map((line, i) => 
-        i === index ? { ...line, [field]: value } : line
-      ) || []
+      productLines: prev.productLines?.map((line, i) => {
+        if (i === index) {
+          const updatedLine = { ...line, [field]: value }
+          // Auto-generate slug when name changes
+          if (field === 'name' && value) {
+            updatedLine.slug = generateSlug(value)
+          }
+          return updatedLine
+        }
+        return line
+      }) || []
     }))
   }
 
@@ -181,9 +190,6 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
       name: '',
       url: ''
     }
-    
-    console.log('Adding document to product line', productLineIndex, ':', newDocument)
-    
     setFormData(prev => ({
       ...prev,
       productLines: prev.productLines?.map((line, i) => 
@@ -195,8 +201,6 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
   }
 
   const updateDocument = (productLineIndex: number, documentIndex: number, field: keyof IProductLineDocument, value: string) => {
-    console.log('Updating document:', { productLineIndex, documentIndex, field, value })
-    
     setFormData(prev => ({
       ...prev,
       productLines: prev.productLines?.map((line, i) => 
@@ -252,30 +256,25 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
     e.preventDefault()
     
     if (validateForm()) {
-      // Debug: Log original form data
-      console.log('Original formData.productLines:', formData.productLines)
-      
       // Filter out empty product lines and clean up documents
-      const validProductLines = formData.productLines?.filter(line => line.name.trim() !== '').map(line => {
-        // Debug: Log each product line before and after document filtering
-        console.log('Product line before filtering:', line.name, 'documents:', line.documents)
-        
-        const filteredDocuments = line.documents?.filter(doc => {
-          const hasName = doc.name.trim() !== ''
-          const hasUrl = doc.url.trim() !== ''
-          console.log('Document filter check:', { name: doc.name, url: doc.url, hasName, hasUrl, willKeep: hasName && hasUrl })
-          return hasName && hasUrl
-        }) || []
-        
-        console.log('Product line after filtering:', line.name, 'documents:', filteredDocuments)
-        
-        return {
-          ...line,
-          documents: filteredDocuments
-        }
-      }) || []
+      const validProductLines = formData.productLines?.filter(line => line.name.trim() !== '' && line.slug.trim() !== '').map(line => ({
+        ...line,
+        // Ensure slug is properly formatted
+        slug: line.slug.trim().toLowerCase(),
+        // Filter out incomplete documents (both name and URL must be provided)
+        documents: line.documents?.filter(doc => doc.name.trim() !== '' && doc.url.trim() !== '') || []
+      })) || []
       
-      const dataToSave = {
+      // Check for duplicate slugs within product lines
+      const slugs = validProductLines.map(line => line.slug)
+      const duplicateSlugs = slugs.filter((slug, index) => slugs.indexOf(slug) !== index)
+      
+      if (duplicateSlugs.length > 0) {
+        onShowNotification?.('error', `Duplicate product line slugs found: ${duplicateSlugs.join(', ')}. Each product line must have a unique slug.`)
+        return
+      }
+      
+      onSave({
         name: formData.name.trim(),
         slug: formData.slug.trim(),
         country: formData.country?.trim() || undefined,
@@ -283,13 +282,7 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
         revenue: formData.revenue?.trim() || undefined,
         description: formData.description?.trim() || undefined,
         productLines: validProductLines
-      }
-      
-      // Debug: Log final data being sent
-      console.log('Final data being sent to API:', dataToSave)
-      console.log('Final productLines with documents:', JSON.stringify(validProductLines, null, 2))
-      
-      onSave(dataToSave)
+      })
     }
   }
 
@@ -494,16 +487,32 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Description (Optional)
+                          URL Slug * <span className="text-xs text-gray-500">(Auto-generated from name)</span>
                         </label>
                         <input
                           type="text"
-                          value={line.description || ''}
-                          onChange={(e) => updateProductLine(index, 'description', e.target.value)}
-                          placeholder="Brief description of this product line"
+                          value={line.slug}
+                          onChange={(e) => updateProductLine(index, 'slug', e.target.value)}
+                          placeholder="e.g. rotary-vane-pumps, screw-pumps"
+                          pattern="[a-z0-9-]+"
+                          title="Only lowercase letters, numbers, and hyphens are allowed"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required
                         />
                       </div>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={line.description || ''}
+                        onChange={(e) => updateProductLine(index, 'description', e.target.value)}
+                        placeholder="Brief description of this product line"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
                     </div>
                     
                     {/* Documents Section */}

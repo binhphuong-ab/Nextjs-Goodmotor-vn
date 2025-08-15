@@ -8,6 +8,7 @@ export interface IProductLineDocument {
 export interface IProductLine {
   _id?: string
   name: string
+  slug: string // URL-friendly identifier (e.g., "rotary-vane-pumps", "screw-pumps")
   description?: string
   isActive: boolean
   displayOrder: number
@@ -43,7 +44,7 @@ const ProductLineDocumentSchema = new Schema<IProductLineDocument>({
     maxlength: [500, 'Document URL cannot exceed 500 characters']
   }
 }, {
-  _id: true // Generate _id for each document for easier tracking
+  _id: false // Don't generate _id for documents
 })
 
 const ProductLineSchema = new Schema<IProductLine>({
@@ -52,6 +53,14 @@ const ProductLineSchema = new Schema<IProductLine>({
     required: [true, 'Product line name is required'],
     trim: true,
     maxlength: [100, 'Product line name cannot exceed 100 characters']
+  },
+  slug: {
+    type: String,
+    required: [true, 'Product line slug is required'],
+    trim: true,
+    lowercase: true,
+    maxlength: [100, 'Slug cannot exceed 100 characters'],
+    match: [/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens']
   },
   description: {
     type: String,
@@ -66,11 +75,7 @@ const ProductLineSchema = new Schema<IProductLine>({
     type: Number,
     default: 0
   },
-  documents: {
-    type: [ProductLineDocumentSchema],
-    default: [],
-    required: false
-  }
+  documents: [ProductLineDocumentSchema]
 }, {
   _id: true // Allow MongoDB to generate _id for each product line
 })
@@ -139,6 +144,7 @@ BrandSchema.index({ country: 1 })
 BrandSchema.index({ yearEstablished: 1 })
 BrandSchema.index({ name: 'text', description: 'text' }) // Text search on name and description
 BrandSchema.index({ 'productLines.name': 1 }) // Index for product line names
+BrandSchema.index({ 'productLines.slug': 1 }) // Index for product line slugs
 
 // Methods to manage product lines
 BrandSchema.methods.addProductLine = function(productLineData: Omit<IProductLine, '_id'>) {
@@ -165,6 +171,32 @@ BrandSchema.methods.getActiveProductLines = function() {
     .filter((line: IProductLine) => line.isActive)
     .sort((a: IProductLine, b: IProductLine) => a.displayOrder - b.displayOrder)
 }
+
+// Method to check if product line slug is unique within this brand
+BrandSchema.methods.isProductLineSlugUnique = function(slug: string, excludeId?: string) {
+  return !this.productLines.some((line: IProductLine) => 
+    line.slug === slug && (!excludeId || line._id?.toString() !== excludeId)
+  )
+}
+
+// Method to find product line by slug
+BrandSchema.methods.getProductLineBySlug = function(slug: string) {
+  return this.productLines.find((line: IProductLine) => line.slug === slug)
+}
+
+// Pre-save hook to validate product line slug uniqueness
+BrandSchema.pre('save', function(next) {
+  if (this.isModified('productLines')) {
+    const slugs = this.productLines.map((line: IProductLine) => line.slug).filter(Boolean)
+    const duplicates = slugs.filter((slug, index) => slugs.indexOf(slug) !== index)
+    
+    if (duplicates.length > 0) {
+      const error = new Error(`Duplicate product line slugs found: ${duplicates.join(', ')}`)
+      return next(error)
+    }
+  }
+  next()
+})
 
 // Product line usage is now handled directly in the API for better reliability
 
