@@ -17,6 +17,7 @@ export interface IProduct {
     weight?: string // lbs or kg
     country?: string // Germany, Japan, Korea, United States, UK, France, China, Vietnam, Other
     equipment?: string // Bơm chân không, Phụ tùng bơm, Thiết bị chân không
+    status?: string // Hàng mới 100%, Hàng cũ
   }
   features: string[]
   applications: Array<{
@@ -117,7 +118,15 @@ const ProductSchema = new Schema<IProduct>({
       type: String,
       required: false,
       trim: true,
-      enum: ['Bơm chân không', 'Phụ tùng bơm', 'Thiết bị chân không']
+      enum: ['Bơm chân không', 'Phụ tùng bơm', 'Thiết bị chân không'],
+      default: 'Bơm chân không'
+    },
+    status: {
+      type: String,
+      required: false,
+      trim: true,
+      enum: ['Hàng mới 100%', 'Hàng cũ'],
+      default: 'Hàng cũ'
     }
   },
   features: [{
@@ -149,9 +158,11 @@ const ProductSchema = new Schema<IProduct>({
       trim: true,
       validate: {
         validator: function(v: string) {
-          return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)$/i.test(v);
+          // Allow both full URLs (http/https) and relative paths starting with /
+          // Must end with valid image extensions
+          return /^(https?:\/\/.+|\/[\w\-\/\.]+)\.(jpg|jpeg|png|gif|webp|svg)$/i.test(v);
         },
-        message: 'Please provide a valid image URL'
+        message: 'Please provide a valid image URL or path (relative paths must start with / and end with .jpg, .jpeg, .png, .gif, .webp, or .svg)'
       }
     },
     alt: {
