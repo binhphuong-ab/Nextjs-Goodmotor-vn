@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import 'react-quill/dist/quill.snow.css'
 import { IBrand, IBrandInput, IProductLine, IProductLineDocument } from '@/models/Brand'
-import { generateSlug } from '@/lib/utils'
+import { generateSlug, validateImageUrl } from '@/lib/utils'
 
 // Dynamically import ReactQuill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
@@ -52,6 +52,7 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
   const [formData, setFormData] = useState<IBrandInput>({
     name: '',
     slug: '',
+    logo: '',
     country: '',
     yearEstablished: undefined,
     revenue: '',
@@ -83,6 +84,7 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
       setFormData({
         name: brand.name,
         slug: brand.slug,
+        logo: brand.logo || '',
         country: brand.country || '',
         yearEstablished: brand.yearEstablished || undefined,
         revenue: brand.revenue || '',
@@ -138,6 +140,7 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
       name: '',
       slug: '',
       description: '',
+      image: '',
       isActive: true,
       displayOrder: formData.productLines?.length || 0,
       documents: []
@@ -163,6 +166,28 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
         return line
       }) || []
     }))
+    
+    // Clear errors when user starts typing
+    if (field === 'image' && errors[`productLine_${index}_image`]) {
+      setErrors(prev => ({
+        ...prev,
+        [`productLine_${index}_image`]: ''
+      }))
+    }
+    
+    // Validate product line image when it changes
+    if (field === 'image' && typeof value === 'string' && value.trim()) {
+      const imageValidation = validateImageUrl(value, { 
+        context: 'Product line image', 
+        allowEmpty: true 
+      })
+      if (!imageValidation.isValid) {
+        setErrors(prev => ({
+          ...prev,
+          [`productLine_${index}_image`]: imageValidation.error || 'Invalid product line image format'
+        }))
+      }
+    }
   }
 
   const removeProductLine = (index: number) => {
@@ -243,9 +268,35 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
       newErrors.slug = 'Slug can only contain lowercase letters, numbers, and hyphens'
     }
 
+    // Logo validation - using centralized validation
+    if (formData.logo && formData.logo.trim()) {
+      const logoValidation = validateImageUrl(formData.logo, { 
+        context: 'Brand logo', 
+        allowEmpty: true 
+      })
+      if (!logoValidation.isValid) {
+        newErrors.logo = logoValidation.error || 'Invalid logo format'
+      }
+    }
+
     // Optional validations - only validate if provided
     if (formData.yearEstablished && (formData.yearEstablished < 1800 || formData.yearEstablished > new Date().getFullYear())) {
       newErrors.yearEstablished = `Year established must be between 1800 and ${new Date().getFullYear()}`
+    }
+
+    // Validate product line images
+    if (formData.productLines && formData.productLines.length > 0) {
+      formData.productLines.forEach((line, index) => {
+        if (line.image && line.image.trim()) {
+          const imageValidation = validateImageUrl(line.image, { 
+            context: 'Product line image', 
+            allowEmpty: true 
+          })
+          if (!imageValidation.isValid) {
+            newErrors[`productLine_${index}_image`] = imageValidation.error || 'Invalid product line image format'
+          }
+        }
+      })
     }
 
     setErrors(newErrors)
@@ -261,6 +312,8 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
         ...line,
         // Ensure slug is properly formatted
         slug: line.slug.trim().toLowerCase(),
+        // Clean up optional image field
+        image: line.image?.trim() || undefined,
         // Filter out incomplete documents (both name and URL must be provided)
         documents: line.documents?.filter(doc => doc.name.trim() !== '' && doc.url.trim() !== '') || []
       })) || []
@@ -277,6 +330,7 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
       onSave({
         name: formData.name.trim(),
         slug: formData.slug.trim(),
+        logo: formData.logo?.trim() || undefined,
         country: formData.country?.trim() || undefined,
         yearEstablished: formData.yearEstablished || undefined,
         revenue: formData.revenue?.trim() || undefined,
@@ -357,6 +411,60 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
             <p className="mt-1 text-xs text-gray-500">
               URL-friendly identifier for this brand. Used in web addresses.
             </p>
+          </div>
+
+          <div>
+            <label htmlFor="logo" className="block text-sm font-medium text-gray-700 mb-1">
+              Brand Logo (Optional)
+            </label>
+            <input
+              type="text"
+              id="logo"
+              name="logo"
+              value={formData.logo}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.logo ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="e.g. /images/brands/busch-logo.png, https://example.com/logo.png"
+            />
+            {errors.logo && (
+              <p className="mt-1 text-sm text-red-600">{errors.logo}</p>
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              Enter a URL or relative path to an image file. Supported formats: jpg, jpeg, png, gif, webp, svg
+            </p>
+            
+            {/* Enhanced Logo Preview */}
+            {formData.logo && formData.logo.trim() && !errors.logo && (
+              <div className="mt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Logo Preview:
+                </label>
+                <div className="border border-gray-200 rounded-md p-3 bg-gray-50">
+                  <img
+                    src={formData.logo}
+                    alt="Brand logo preview"
+                    className="max-w-full h-auto max-h-24 rounded object-contain mx-auto block"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                      const errorDiv = target.nextElementSibling as HTMLElement
+                      if (errorDiv) errorDiv.style.display = 'block'
+                    }}
+                    onLoad={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'block'
+                      const errorDiv = target.nextElementSibling as HTMLElement
+                      if (errorDiv) errorDiv.style.display = 'none'
+                    }}
+                  />
+                  <div className="text-red-500 text-sm mt-2 text-center" style={{ display: 'none' }}>
+                    ⚠️ Unable to load image. Please check the URL or path.
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
@@ -513,6 +621,63 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
                         placeholder="Brief description of this product line"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
+                    </div>
+                    
+                    <div className="mb-3">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Product Line Image (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={line.image || ''}
+                        onChange={(e) => updateProductLine(index, 'image', e.target.value)}
+                        placeholder="e.g. /images/product-lines/rotary-vane.jpg or https://example.com/image.jpg"
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          errors[`productLine_${index}_image`] ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors[`productLine_${index}_image`] && (
+                        <p className="mt-1 text-sm text-red-600">{errors[`productLine_${index}_image`]}</p>
+                      )}
+                      <p className="mt-1 text-xs text-gray-500">
+                        Enter a URL or relative path to an image file. Supported formats: jpg, jpeg, png, gif, webp, svg
+                      </p>
+                      
+                      {/* Enhanced Product Line Image Preview */}
+                      {line.image && line.image.trim() && !errors[`productLine_${index}_image`] && (
+                        <div className="mt-3">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Image Preview:
+                          </label>
+                          <div className="border border-gray-200 rounded-md p-3 bg-gray-50">
+                            <img
+                              src={line.image}
+                              alt={`${line.name} preview`}
+                              className="max-w-full h-auto max-h-32 rounded object-contain mx-auto block"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement
+                                target.style.display = 'none'
+                                const errorDiv = target.nextElementSibling as HTMLElement
+                                if (errorDiv) errorDiv.style.display = 'block'
+                              }}
+                              onLoad={(e) => {
+                                const target = e.target as HTMLImageElement
+                                target.style.display = 'block'
+                                const errorDiv = target.nextElementSibling as HTMLElement
+                                if (errorDiv) errorDiv.style.display = 'none'
+                              }}
+                            />
+                            <div className="text-red-500 text-sm mt-2 text-center" style={{ display: 'none' }}>
+                              ⚠️ Unable to load image. Please check the URL or path.
+                            </div>
+                            {line.name && (
+                              <div className="mt-2 text-sm text-gray-600 text-center italic">
+                                {line.name} Product Line
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     
                     {/* Documents Section */}

@@ -130,6 +130,7 @@ export async function POST(request: NextRequest) {
     const brand = new Brand({
       name: data.name.trim(),
       slug: data.slug.trim().toLowerCase(),
+      logo: data.logo?.trim() || undefined,
       country: data.country?.trim() || undefined,
       yearEstablished: data.yearEstablished || undefined,
       revenue: data.revenue?.trim() || undefined,
@@ -208,6 +209,7 @@ export async function PUT(request: NextRequest) {
       {
         name: data.name.trim(),
         slug: data.slug.trim().toLowerCase(),
+        logo: data.logo?.trim() || undefined,
         country: data.country?.trim() || undefined,
         yearEstablished: data.yearEstablished || undefined,
         revenue: data.revenue?.trim() || undefined,

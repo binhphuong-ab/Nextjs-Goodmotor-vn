@@ -49,6 +49,8 @@ import { Schema, model, models } from 'mongoose'
 export interface ISubPumpType {
   _id?: string
   name: string
+  slug: string
+  image?: string // Optional image URL or relative path
   description?: string
   isActive: boolean
   displayOrder: number
@@ -59,6 +61,7 @@ export interface IPumpType {
   pumpType: string
   slug: string
   description?: string
+  image?: string // Optional image URL or relative path
   subPumpTypes: ISubPumpType[] // Array of sub pump types
   subPumpTypeUsage?: Record<string, string[]> // Map of subPumpType _id -> array of product names
   productUsage?: string[] // Array of product names using this pump type
@@ -72,6 +75,31 @@ const SubPumpTypeSchema = new Schema<ISubPumpType>({
     required: [true, 'Sub pump type name is required'],
     trim: true,
     maxlength: [100, 'Sub pump type name cannot exceed 100 characters']
+  },
+  slug: {
+    type: String,
+    required: [true, 'Sub pump type slug is required'],
+    trim: true,
+    lowercase: true,
+    maxlength: [100, 'Sub pump type slug cannot exceed 100 characters'],
+    match: [/^[a-z0-9-]+$/, 'Sub pump type slug can only contain lowercase letters, numbers, and hyphens']
+  },
+  image: {
+    type: String,
+    required: false,
+    trim: true,
+    maxlength: [500, 'Sub pump type image path cannot exceed 500 characters'],
+    validate: {
+      validator: function(v: string) {
+        if (!v) return true // Image is optional
+        // Allow URLs (http/https) or relative paths
+        const urlPattern = /^https?:\/\/.+/
+        const relativePathPattern = /^[^\/].+\.(jpg|jpeg|png|gif|webp|svg)$/i
+        const absolutePathPattern = /^\/[^\/].+\.(jpg|jpeg|png|gif|webp|svg)$/i
+        return urlPattern.test(v) || relativePathPattern.test(v) || absolutePathPattern.test(v)
+      },
+      message: 'Sub pump type image must be a valid URL or relative path to an image file (jpg, jpeg, png, gif, webp, svg)'
+    }
   },
   description: {
     type: String,
@@ -112,6 +140,23 @@ const PumpTypeSchema = new Schema<IPumpType>({
     required: false,
     trim: true
   },
+  image: {
+    type: String,
+    required: false,
+    trim: true,
+    maxlength: [500, 'Image path cannot exceed 500 characters'],
+    validate: {
+      validator: function(v: string) {
+        if (!v) return true // Image is optional
+        // Allow URLs (http/https) or relative paths
+        const urlPattern = /^https?:\/\/.+/
+        const relativePathPattern = /^[^\/].+\.(jpg|jpeg|png|gif|webp|svg)$/i
+        const absolutePathPattern = /^\/[^\/].+\.(jpg|jpeg|png|gif|webp|svg)$/i
+        return urlPattern.test(v) || relativePathPattern.test(v) || absolutePathPattern.test(v)
+      },
+      message: 'Image must be a valid URL or relative path to an image file (jpg, jpeg, png, gif, webp, svg)'
+    }
+  },
   subPumpTypes: [SubPumpTypeSchema], // Embedded array of sub pump types
   subPumpTypeUsage: {
     type: Map,
@@ -130,6 +175,21 @@ const PumpTypeSchema = new Schema<IPumpType>({
 // Note: pumpType and slug indexes automatically created by unique: true
 PumpTypeSchema.index({ pumpType: 'text', description: 'text' }) // Text search on pump type and description
 PumpTypeSchema.index({ 'subPumpTypes.name': 1 }) // Index for sub pump type names
+PumpTypeSchema.index({ 'subPumpTypes.slug': 1 }) // Index for sub pump type slugs
+
+// Validation to ensure sub pump type slugs are unique within each pump type
+PumpTypeSchema.pre('save', function(next) {
+  if (this.subPumpTypes && this.subPumpTypes.length > 0) {
+    const slugs = this.subPumpTypes.map((subType: ISubPumpType) => subType.slug).filter(Boolean)
+    const uniqueSlugs = new Set(slugs)
+    
+    if (slugs.length !== uniqueSlugs.size) {
+      const error = new Error('Sub pump type slugs must be unique within the same pump type')
+      return next(error)
+    }
+  }
+  next()
+})
 
 // Methods to manage sub pump types
 PumpTypeSchema.methods.addSubPumpType = function(subPumpTypeData: Omit<ISubPumpType, '_id'>) {
@@ -162,6 +222,7 @@ export interface IPumpTypeInput {
   pumpType: string
   slug: string
   description?: string
+  image?: string
   subPumpTypes?: Omit<ISubPumpType, '_id'>[]
   subPumpTypeUsage?: Record<string, string[]>
   productUsage?: string[]

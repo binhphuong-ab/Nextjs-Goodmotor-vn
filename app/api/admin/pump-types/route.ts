@@ -133,6 +133,7 @@ export async function POST(request: NextRequest) {
       pumpType: data.pumpType.trim(),
       slug: data.slug.trim().toLowerCase(),
       description: data.description?.trim() || undefined,
+      image: data.image?.trim() || undefined,
       subPumpTypes: data.subPumpTypes || [],
       productUsage: data.productUsage || []
     })
@@ -209,6 +210,7 @@ export async function PUT(request: NextRequest) {
         pumpType: data.pumpType.trim(),
         slug: data.slug.trim().toLowerCase(),
         description: data.description?.trim() || undefined,
+        image: data.image?.trim() || undefined,
         subPumpTypes: data.subPumpTypes || [],
         productUsage: data.productUsage || []
       },

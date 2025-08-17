@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
-import { generateSlug } from '@/lib/utils'
+import { generateSlug, validateImageUrl } from '@/lib/utils'
 import 'react-quill/dist/quill.snow.css'
 import { IProduct, IProductInput } from '@/models/Product'
 import { IBrand } from '@/models/Brand'
@@ -53,6 +53,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
   })
 
   const [formData, setFormData] = useState<IProductInput>(getDefaultFormData())
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
     // Fetch brands and pump types on component mount
@@ -256,6 +257,15 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
     }
   }
 
+  // Image validation function - now using centralized validation
+  const validateImageUrlLocal = (url: string): string | null => {
+    const result = validateImageUrl(url, { 
+      context: 'Image', 
+      allowEmpty: true 
+    })
+    return result.isValid ? null : result.error || 'Invalid image format'
+  }
+
   const handleArrayChange = (arrayName: 'features', index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -350,6 +360,25 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
         images: newImages
       }
     })
+    
+    // Clear errors when user starts typing
+    if (field === 'url' && errors[`image_${index}_url`]) {
+      setErrors(prev => ({
+        ...prev,
+        [`image_${index}_url`]: ''
+      }))
+    }
+    
+    // Validate image URL when it changes
+    if (field === 'url' && typeof value === 'string') {
+      const validationError = validateImageUrlLocal(value)
+      if (validationError) {
+        setErrors(prev => ({
+          ...prev,
+          [`image_${index}_url`]: validationError
+        }))
+      }
+    }
   }
 
   const addImage = () => {
@@ -373,6 +402,22 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
           ...prev,
           images: newImages
         }
+      })
+      
+      // Clear errors for removed image and shift remaining errors
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[`image_${index}_url`]
+        
+        // Shift error indices for remaining images
+        for (let i = index + 1; i < formData.images.length; i++) {
+          if (newErrors[`image_${i}_url`]) {
+            newErrors[`image_${i-1}_url`] = newErrors[`image_${i}_url`]
+            delete newErrors[`image_${i}_url`]
+          }
+        }
+        
+        return newErrors
       })
     }
   }
@@ -417,8 +462,30 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
     'code-block'
   ]
 
+  const validateForm = (): boolean => {
+    const newErrors: { [key: string]: string } = {}
+
+    // Validate images
+    formData.images.forEach((image, index) => {
+      if (image.url && image.url.trim()) {
+        const validationError = validateImageUrlLocal(image.url)
+        if (validationError) {
+          newErrors[`image_${index}_url`] = validationError
+        }
+      }
+    })
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      return
+    }
     
     // Clean form data before submission to handle optional fields properly
     // Convert empty strings to undefined to avoid validation errors:
@@ -1295,9 +1362,17 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
                           value={image.url}
                           onChange={(e) => handleImageChange(index, 'url', e.target.value)}
                           required
-                          placeholder="/images/database/products/image.jpg or https://example.com/image.jpg"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="e.g. /images/products/product.jpg or https://example.com/image.jpg"
+                          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            errors[`image_${index}_url`] ? 'border-red-500' : 'border-gray-300'
+                          }`}
                         />
+                        {errors[`image_${index}_url`] && (
+                          <p className="mt-1 text-sm text-red-600">{errors[`image_${index}_url`]}</p>
+                        )}
+                        <p className="mt-1 text-xs text-gray-500">
+                          Enter a URL or relative path to an image file. Supported formats: jpg, jpeg, png, gif, webp, svg
+                        </p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1350,22 +1425,45 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
                       )}
                     </div>
 
-                    {/* Image Preview */}
-                    {image.url && (
+                    {/* Enhanced Image Preview */}
+                    {image.url && image.url.trim() && !errors[`image_${index}_url`] && (
                       <div className="mt-4">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Preview:
+                          Image Preview:
                         </label>
-                        <div className="relative w-32 h-32 border border-gray-200 rounded-lg overflow-hidden">
+                        <div className="border border-gray-200 rounded-md p-3 bg-gray-50">
                           <img
                             src={image.url}
-                            alt={image.alt || 'Product image'}
-                            className="w-full h-full object-cover"
+                            alt={image.alt || 'Product image preview'}
+                            className="max-w-full h-auto max-h-48 rounded object-contain mx-auto block"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement
                               target.style.display = 'none'
+                              const errorDiv = target.nextElementSibling as HTMLElement
+                              if (errorDiv) errorDiv.style.display = 'block'
+                            }}
+                            onLoad={(e) => {
+                              const target = e.target as HTMLImageElement
+                              target.style.display = 'block'
+                              const errorDiv = target.nextElementSibling as HTMLElement
+                              if (errorDiv) errorDiv.style.display = 'none'
                             }}
                           />
+                          <div className="text-red-500 text-sm mt-2 text-center" style={{ display: 'none' }}>
+                            ⚠️ Unable to load image. Please check the URL or path.
+                          </div>
+                          {image.caption && (
+                            <div className="mt-2 text-sm text-gray-600 text-center italic">
+                              {image.caption}
+                            </div>
+                          )}
+                          {image.isPrimary && (
+                            <div className="mt-2 text-center">
+                              <span className="inline-block px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-full">
+                                Primary Image
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}

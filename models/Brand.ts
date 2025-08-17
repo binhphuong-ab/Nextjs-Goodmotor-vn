@@ -10,6 +10,7 @@ export interface IProductLine {
   name: string
   slug: string // URL-friendly identifier (e.g., "rotary-vane-pumps", "screw-pumps")
   description?: string
+  image?: string // URL or relative path to product line image (e.g., "/images/product-lines/rotary-vane.jpg", "https://...")
   isActive: boolean
   displayOrder: number
   documents?: IProductLineDocument[]
@@ -19,6 +20,7 @@ export interface IBrand {
   _id: string
   name: string
   slug: string // URL-friendly identifier (e.g., "busch-vacuum", "edwards-pumps")
+  logo?: string // URL or relative path to brand logo (e.g., "/images/brands/busch-logo.png", "https://...")
   country?: string
   yearEstablished?: number
   revenue?: string // Optional since not all brands may disclose revenue
@@ -67,6 +69,12 @@ const ProductLineSchema = new Schema<IProductLine>({
     trim: true,
     maxlength: [500, 'Product line description cannot exceed 500 characters']
   },
+  image: {
+    type: String,
+    required: false,
+    trim: true,
+    maxlength: [500, 'Product line image URL cannot exceed 500 characters']
+  },
   isActive: {
     type: Boolean,
     default: true
@@ -95,6 +103,12 @@ const BrandSchema = new Schema<IBrand>({
     lowercase: true,
     maxlength: [100, 'Slug cannot exceed 100 characters'],
     match: [/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens']
+  },
+  logo: {
+    type: String,
+    required: false,
+    trim: true,
+    maxlength: [500, 'Logo URL cannot exceed 500 characters']
   },
   country: {
     type: String,
@@ -204,6 +218,7 @@ BrandSchema.pre('save', function(next) {
 export interface IBrandInput {
   name: string
   slug: string
+  logo?: string
   country?: string
   yearEstablished?: number
   revenue?: string

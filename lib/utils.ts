@@ -46,6 +46,133 @@ export function formatValidationErrors(errors: string[] | Record<string, string>
 }
 
 /**
+ * Validate image URL or path
+ * Supports both absolute URLs and relative/absolute paths
+ * Used across all admin forms for consistent image validation
+ * 
+ * @param imagePath - The image path or URL to validate
+ * @param options - Optional configuration
+ * @returns Validation result with error message if invalid
+ */
+export function validateImageUrl(
+  imagePath: string, 
+  options: { 
+    context?: string; 
+    allowEmpty?: boolean;
+    supportedFormats?: string[];
+  } = {}
+): { isValid: boolean; error?: string } {
+  const { 
+    context = 'Image', 
+    allowEmpty = true,
+    supportedFormats = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']
+  } = options
+  
+  // Handle empty/undefined values
+  if (!imagePath || !imagePath.trim()) {
+    return allowEmpty 
+      ? { isValid: true } 
+      : { isValid: false, error: `${context} is required` }
+  }
+  
+  const imageValue = imagePath.trim()
+  
+  // Create format pattern based on supported formats
+  const formatsPattern = supportedFormats.join('|')
+  
+  // Validation patterns
+  const urlPattern = /^https?:\/\/.+/
+  const relativePathPattern = new RegExp(`^[^\\/].+\\.(${formatsPattern})$`, 'i')
+  const absolutePathPattern = new RegExp(`^\\/[^\\/].+\\.(${formatsPattern})$`, 'i')
+  
+  // Check if matches any valid pattern
+  if (urlPattern.test(imageValue) || 
+      relativePathPattern.test(imageValue) || 
+      absolutePathPattern.test(imageValue)) {
+    return { isValid: true }
+  }
+  
+  return {
+    isValid: false,
+    error: `${context} must be a valid URL or path to an image file (${supportedFormats.join(', ')})`
+  }
+}
+
+/**
+ * Legacy function - maintained for backward compatibility
+ * @deprecated Use validateImageUrl instead
+ */
+export function validateImagePath(imagePath: string, context: string = 'Image'): { isValid: boolean; normalizedPath: string; error?: string } {
+  const result = validateImageUrl(imagePath, { context, allowEmpty: true })
+  return {
+    isValid: result.isValid,
+    normalizedPath: imagePath?.trim() || '',
+    error: result.error
+  }
+}
+
+/**
+ * Get full image URL for display
+ * Handles both absolute URLs and relative paths
+ * 
+ * @param imagePath - The image path (can be URL or relative path)
+ * @param baseUrl - Base URL for relative paths (optional, defaults to current origin)
+ * @returns Full URL for the image
+ */
+export function getImageUrl(imagePath: string, baseUrl?: string): string {
+  if (!imagePath) return ''
+  
+  // If it's already a full URL, return as-is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath
+  }
+  
+  // For relative paths, prepend base URL or current origin
+  const base = baseUrl || (typeof window !== 'undefined' ? window.location.origin : '')
+  
+  // Ensure proper path formatting
+  const normalizedPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`
+  
+  return `${base}${normalizedPath}`
+}
+
+/**
+ * Image validation constants used across the application
+ */
+export const IMAGE_VALIDATION = {
+  SUPPORTED_FORMATS: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
+  PATTERNS: {
+    URL: /^https?:\/\/.+/,
+    RELATIVE_PATH: /^[^\/].+\.(jpg|jpeg|png|gif|webp|svg)$/i,
+    ABSOLUTE_PATH: /^\/[^\/].+\.(jpg|jpeg|png|gif|webp|svg)$/i
+  },
+  MESSAGES: {
+    INVALID_FORMAT: (context: string, formats: string[]) => 
+      `${context} must be a valid URL or path to an image file (${formats.join(', ')})`,
+    REQUIRED: (context: string) => `${context} is required`,
+    LOAD_ERROR: '⚠️ Unable to load image. Please check the URL or path.'
+  }
+} as const
+
+/**
+ * Create image validation function with custom context
+ * Useful for creating reusable validators for specific form fields
+ * 
+ * @param context - Context for error messages (e.g., 'Pump type image', 'Product image')
+ * @param options - Validation options
+ * @returns Validation function that takes image URL and returns error message or null
+ */
+export function createImageValidator(
+  context: string, 
+  options: { allowEmpty?: boolean; supportedFormats?: string[] } = {}
+) {
+  return (imageUrl: string): string | null => {
+    const result = validateImageUrl(imageUrl, { context, ...options })
+    return result.isValid ? null : result.error || `Invalid ${context.toLowerCase()}`
+  }
+}
+
+/**
  * Common form props interface that all admin forms should extend
  */
 export interface BaseFormProps {
