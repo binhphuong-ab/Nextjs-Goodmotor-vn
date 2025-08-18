@@ -6,11 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "seed:business-types": "npx tsx scripts/seed-business-types.ts",
-    "seed:simple-business-types": "npx tsx scripts/seed-simple-business-types.ts",
-    "migrate:customer-business-types": "npx tsx scripts/migrate-customer-business-types.ts",
-    "update:business-type-relations": "npx tsx scripts/update-business-type-relations.ts"
+    "lint": "next lint"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
