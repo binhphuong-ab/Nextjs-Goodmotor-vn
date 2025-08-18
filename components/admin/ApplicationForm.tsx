@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, memo, useRef } from 'react'
 import { Eye, Edit, CheckCircle } from 'lucide-react'
-import { generateSlug } from '@/lib/utils'
+import { generateSlug, validateUrl, validateImageUrl, getImageUrl } from '@/lib/utils'
 import type { IApplication, IApplicationInput } from '@/models/Application'
 import dynamic from 'next/dynamic'
 
@@ -215,17 +215,24 @@ const TextArrayItem = memo(({
 TextArrayItem.displayName = 'TextArrayItem'
 
 // Name and URL input component for Products and Projects
-const NameUrlArrayInput = ({ label, value, onChange, placeholder }: {
+const NameUrlArrayInput = ({ label, value, onChange, placeholder, errors, onValidateUrl }: {
   label: string
   value: Array<{name: string, url?: string}>
   onChange: (newArray: Array<{name: string, url?: string}>) => void
   placeholder: string
+  errors?: { [key: string]: string }
+  onValidateUrl?: (type: string, index: number, url: string) => void
 }) => {
   const handleItemChange = useCallback((index: number, field: 'name' | 'url', content: string) => {
     const newArray = [...value]
     newArray[index] = { ...newArray[index], [field]: content }
     onChange(newArray)
-  }, [value, onChange])
+    
+    // Validate URL when it changes
+    if (field === 'url' && content.trim() && onValidateUrl) {
+      onValidateUrl(label.toLowerCase(), index, content)
+    }
+  }, [value, onChange, label, onValidateUrl])
 
   const handleItemRemove = useCallback((index: number) => {
     onChange(value.filter((_, i) => i !== index))
@@ -259,12 +266,20 @@ const NameUrlArrayInput = ({ label, value, onChange, placeholder }: {
                   URL (Optional)
                 </label>
                 <input
-                  type="url"
+                  type="text"
                   value={item.url || ''}
                   onChange={(e) => handleItemChange(index, 'url', e.target.value)}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="/industries/industry-slug or https://example.com/page"
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors?.[`${label.toLowerCase()}_${index}_url`] ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 />
+                {errors?.[`${label.toLowerCase()}_${index}_url`] && (
+                  <p className="mt-1 text-sm text-red-600">{errors[`${label.toLowerCase()}_${index}_url`]}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  Enter a relative path (e.g., /products/pump-name) or full URL
+                </p>
               </div>
             </div>
             {value.length > 1 && (
@@ -351,6 +366,7 @@ interface ApplicationFormProps {
 export default function ApplicationForm({ application, onSave, onCancel, onShowNotification }: ApplicationFormProps) {
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
   const [industries, setIndustries] = useState<Array<{ _id: string, name: string, slug: string }>>([])
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   
   const [formData, setFormData] = useState<IApplicationInput>({
     name: '',
@@ -379,6 +395,52 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
     featured: false,
     displayOrder: 0
   })
+
+  // URL validation function
+  const validateUrlLocal = (errorKey: string, url: string, context: string = 'URL'): void => {
+    const result = validateUrl(url, { 
+      context, 
+      allowEmpty: true 
+    })
+    
+    if (result.isValid) {
+      // Clear error if valid
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[errorKey]
+        return newErrors
+      })
+    } else {
+      // Set error if invalid
+      setErrors(prev => ({
+        ...prev,
+        [errorKey]: result.error || `Invalid ${context.toLowerCase()}`
+      }))
+    }
+  }
+
+  // Image validation function
+  const validateImageLocal = (errorKey: string, imageUrl: string, context: string = 'Image'): void => {
+    const result = validateImageUrl(imageUrl, { 
+      context, 
+      allowEmpty: true 
+    })
+    
+    if (result.isValid) {
+      // Clear error if valid
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[errorKey]
+        return newErrors
+      })
+    } else {
+      // Set error if invalid
+      setErrors(prev => ({
+        ...prev,
+        [errorKey]: result.error || `Invalid ${context.toLowerCase()}`
+      }))
+    }
+  }
 
   // Fetch industries
   useEffect(() => {
@@ -832,6 +894,10 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
                       value={formData.products || []}
                       onChange={(newArray) => updateArrayField('products', newArray)}
                       placeholder="e.g., Vacuum Pump Model XYZ"
+                      errors={errors}
+                      onValidateUrl={(type, index, url) => {
+                        validateUrlLocal(`${type}_${index}_url`, url, 'URL')
+                      }}
                     />
 
                     <NameUrlArrayInput
@@ -839,6 +905,10 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
                       value={formData.projects || []}
                       onChange={(newArray) => updateArrayField('projects', newArray)}
                       placeholder="e.g., Industrial Freeze Drying System"
+                      errors={errors}
+                      onValidateUrl={(type, index, url) => {
+                        validateUrlLocal(`${type}_${index}_url`, url, 'URL')
+                      }}
                     />
 
                     <SimpleTextArrayInput
@@ -877,16 +947,36 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
                                   Image URL *
                                 </label>
                                 <input
-                                  type="url"
+                                  type="text"
                                   value={image.url}
                                   onChange={(e) => {
                                     const newImages = [...(formData.images || [])]
                                     newImages[index] = { ...image, url: e.target.value }
                                     updateArrayField('images', newImages)
+                                    
+                                    // Validate image URL
+                                    if (e.target.value.trim()) {
+                                      validateImageLocal(`image_${index}_url`, e.target.value, 'Application Image')
+                                    } else {
+                                      // Clear error when field is empty
+                                      setErrors(prev => {
+                                        const newErrors = { ...prev }
+                                        delete newErrors[`image_${index}_url`]
+                                        return newErrors
+                                      })
+                                    }
                                   }}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  placeholder="https://example.com/image.jpg"
+                                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                    errors[`image_${index}_url`] ? 'border-red-500' : 'border-gray-300'
+                                  }`}
+                                  placeholder="/images/application.jpg or https://example.com/image.jpg"
                                 />
+                                {errors[`image_${index}_url`] && (
+                                  <p className="mt-1 text-sm text-red-600">{errors[`image_${index}_url`]}</p>
+                                )}
+                                <p className="mt-1 text-xs text-gray-500">
+                                  Enter a relative path (e.g., /images/application.jpg) or full URL
+                                </p>
                               </div>
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -921,6 +1011,52 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
                                 placeholder="Optional caption text"
                               />
                             </div>
+
+                            {/* Enhanced Image Preview */}
+                            {image.url && image.url.trim() && !errors[`image_${index}_url`] && (
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Image Preview:
+                                </label>
+                                <div className="border border-gray-200 rounded-md p-3 bg-gray-50">
+                                  <div className="relative w-32 h-32 mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white">
+                                    <img
+                                      src={getImageUrl(image.url)}
+                                      alt={image.alt || 'Application image preview'}
+                                      className="w-full h-full object-contain"
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement
+                                        target.style.display = 'none'
+                                        const errorDiv = target.nextElementSibling as HTMLElement
+                                        if (errorDiv) errorDiv.style.display = 'flex'
+                                      }}
+                                      onLoad={(e) => {
+                                        const target = e.target as HTMLImageElement
+                                        target.style.display = 'block'
+                                        const errorDiv = target.nextElementSibling as HTMLElement
+                                        if (errorDiv) errorDiv.style.display = 'none'
+                                      }}
+                                    />
+                                    <div 
+                                      className="absolute inset-0 flex items-center justify-center bg-gray-100 text-red-500 text-sm text-center p-2" 
+                                      style={{ display: 'none' }}
+                                    >
+                                      <div>
+                                        <svg className="w-8 h-8 mx-auto mb-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        </svg>
+                                        ⚠️ Unable to load image. Please check the URL or path.
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="mt-2 text-center">
+                                    <p className="text-xs text-gray-600 truncate" title={getImageUrl(image.url)}>
+                                      {getImageUrl(image.url)}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                             <div className="flex items-center justify-between">
                               <label className="flex items-center">
                                 <input
@@ -1005,16 +1141,36 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
                                   Document URL *
                                 </label>
                                 <input
-                                  type="url"
+                                  type="text"
                                   value={document.url}
                                   onChange={(e) => {
                                     const newDocuments = [...(formData.downloadDocuments || [])]
                                     newDocuments[index] = { ...document, url: e.target.value }
                                     updateArrayField('downloadDocuments', newDocuments)
+                                    
+                                    // Validate URL
+                                    if (e.target.value.trim()) {
+                                      validateUrlLocal(`download_${index}_url`, e.target.value, 'Document URL')
+                                    } else {
+                                      // Clear error when field is empty
+                                      setErrors(prev => {
+                                        const newErrors = { ...prev }
+                                        delete newErrors[`download_${index}_url`]
+                                        return newErrors
+                                      })
+                                    }
                                   }}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  placeholder="https://docs.google.com/document/d/..."
+                                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                    errors[`download_${index}_url`] ? 'border-red-500' : 'border-gray-300'
+                                  }`}
+                                  placeholder="/documents/manual.pdf or https://docs.google.com/document/d/..."
                                 />
+                                {errors[`download_${index}_url`] && (
+                                  <p className="mt-1 text-sm text-red-600">{errors[`download_${index}_url`]}</p>
+                                )}
+                                <p className="mt-1 text-xs text-gray-500">
+                                  Enter a relative path (e.g., /documents/manual.pdf) or full URL
+                                </p>
                               </div>
                             </div>
                             <div className="mb-4">
@@ -1022,17 +1178,84 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
                                 Thumbnail/Cover Image URL
                               </label>
                               <input
-                                type="url"
+                                type="text"
                                 value={document.imageUrl || ''}
                                 onChange={(e) => {
                                   const newDocuments = [...(formData.downloadDocuments || [])]
                                   newDocuments[index] = { ...document, imageUrl: e.target.value }
                                   updateArrayField('downloadDocuments', newDocuments)
+                                  
+                                  // Validate image URL
+                                  if (e.target.value.trim()) {
+                                    validateImageLocal(`download_${index}_image`, e.target.value, 'Thumbnail Image')
+                                  } else {
+                                    // Clear error when field is empty
+                                    setErrors(prev => {
+                                      const newErrors = { ...prev }
+                                      delete newErrors[`download_${index}_image`]
+                                      return newErrors
+                                    })
+                                  }
                                 }}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="https://example.com/thumbnail.jpg"
+                                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                  errors[`download_${index}_image`] ? 'border-red-500' : 'border-gray-300'
+                                }`}
+                                placeholder="/images/thumbnail.jpg or https://example.com/thumbnail.jpg"
                               />
+                              {errors[`download_${index}_image`] && (
+                                <p className="mt-1 text-sm text-red-600">{errors[`download_${index}_image`]}</p>
+                              )}
+                              <p className="mt-1 text-xs text-gray-500">
+                                Enter a relative path (e.g., /images/thumbnail.jpg) or full URL
+                              </p>
                             </div>
+
+                            {/* Enhanced Thumbnail Preview */}
+                            {document.imageUrl && document.imageUrl.trim() && !errors[`download_${index}_image`] && (
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Thumbnail Preview:
+                                </label>
+                                <div className="border border-gray-200 rounded-md p-3 bg-gray-50">
+                                  <div className="relative w-32 h-32 mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white">
+                                    <img
+                                      src={getImageUrl(document.imageUrl)}
+                                      alt={document.title || 'Document thumbnail preview'}
+                                      className="w-full h-full object-contain"
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement
+                                        target.style.display = 'none'
+                                        const errorDiv = target.nextElementSibling as HTMLElement
+                                        if (errorDiv) errorDiv.style.display = 'flex'
+                                      }}
+                                      onLoad={(e) => {
+                                        const target = e.target as HTMLImageElement
+                                        target.style.display = 'block'
+                                        const errorDiv = target.nextElementSibling as HTMLElement
+                                        if (errorDiv) errorDiv.style.display = 'none'
+                                      }}
+                                    />
+                                    <div 
+                                      className="absolute inset-0 flex items-center justify-center bg-gray-100 text-red-500 text-sm text-center p-2" 
+                                      style={{ display: 'none' }}
+                                    >
+                                      <div>
+                                        <svg className="w-8 h-8 mx-auto mb-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        </svg>
+                                        ⚠️ Unable to load image. Please check the URL or path.
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="mt-2 text-center">
+                                    <p className="text-xs text-gray-600 truncate" title={getImageUrl(document.imageUrl)}>
+                                      {getImageUrl(document.imageUrl)}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
                             <div className="mb-4">
                               <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Description
