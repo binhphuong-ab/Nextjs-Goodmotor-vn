@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Calendar, MapPin, Building, Star } from 'lucide-react'
+import { getImageUrl } from '@/lib/utils'
 import Notification from '../Notification'
 import ConfirmDialog from '../ConfirmDialog'
 
@@ -23,7 +24,12 @@ interface Project {
     name: string
     url: string
   }>
-  images: string[]
+  images: Array<{
+    url: string
+    alt?: string
+    caption?: string
+    isPrimary?: boolean
+  }>
   specifications: {
     flowRate?: string
     vacuumLevel?: string
@@ -138,8 +144,8 @@ export default function ProjectList({ projects, onEdit, onDelete }: ProjectListP
                     {project.images && project.images.length > 0 ? (
                       <Image
                         className="h-12 w-12 rounded-lg object-cover"
-                        src={project.images[0]}
-                        alt={project.title}
+                        src={getImageUrl(project.images[0].url)}
+                        alt={project.images[0].alt || project.title}
                         width={48}
                         height={48}
                       />

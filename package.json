@@ -10,7 +10,8 @@
     "seed:business-types": "npx tsx scripts/seed-business-types.ts",
     "seed:simple-business-types": "npx tsx scripts/seed-simple-business-types.ts",
     "migrate:customer-business-types": "npx tsx scripts/migrate-customer-business-types.ts",
-    "update:business-type-relations": "npx tsx scripts/update-business-type-relations.ts"
+    "update:business-type-relations": "npx tsx scripts/update-business-type-relations.ts",
+    "migrate:project-images": "npx tsx scripts/migrate-project-images.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

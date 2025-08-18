@@ -17,7 +17,12 @@ export interface IProject {
     name: string
     url: string
   }>
-  images: string[]
+  images: Array<{
+    url: string
+    alt?: string
+    caption?: string
+    isPrimary?: boolean
+  }>
   specifications: {
     flowRate?: string
     vacuumLevel?: string
@@ -121,12 +126,31 @@ const ProjectSchema = new Schema<IProject>({
     }
   }],
   images: [{
-    type: String,
-    validate: {
-      validator: function(v: string) {
-        return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(v);
-      },
-      message: 'Please provide a valid image URL'
+    url: {
+      type: String,
+      required: [true, 'Image URL is required'],
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          // Allow both absolute URLs and relative paths
+          return /^(https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$|\/.*\.(jpg|jpeg|png|gif|webp)$)/i.test(v);
+        },
+        message: 'Please provide a valid image URL or path'
+      }
+    },
+    alt: {
+      type: String,
+      trim: true,
+      maxlength: [200, 'Alt text cannot exceed 200 characters']
+    },
+    caption: {
+      type: String,
+      trim: true,
+      maxlength: [500, 'Caption cannot exceed 500 characters']
+    },
+    isPrimary: {
+      type: Boolean,
+      default: false
     }
   }],
   specifications: {

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Eye, Edit, CheckCircle, AlertCircle } from 'lucide-react'
-import { generateSlug, getTodayDate } from '@/lib/utils'
+import { generateSlug, getTodayDate, validateImageUrl, getImageUrl } from '@/lib/utils'
 import 'react-quill/dist/quill.snow.css'
 
 // Dynamically import ReactQuill to avoid SSR issues
@@ -26,7 +26,12 @@ interface Project {
     name: string
     url: string
   }>
-  images: string[]
+  images: Array<{
+    url: string
+    alt?: string
+    caption?: string
+    isPrimary?: boolean
+  }>
   specifications: {
     flowRate?: string
     vacuumLevel?: string
@@ -55,6 +60,7 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
   const [showValidation, setShowValidation] = useState(false)
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   
 
   
@@ -68,7 +74,7 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
     projectType: 'new-installation',
     pumpModels: [{ name: '', url: '' }],
     applications: [{ name: '', url: '' }],
-    images: [''],
+    images: [{ url: '', alt: '', caption: '', isPrimary: true }],
     specifications: {
       flowRate: '',
       vacuumLevel: '',
@@ -101,7 +107,13 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
         projectType: project.projectType,
         pumpModels: [...project.pumpModels],
         applications: [...project.applications],
-        images: [...project.images],
+        images: project.images.map((img, index) => {
+          // Handle both old string format and new object format
+          if (typeof img === 'string') {
+            return { url: img, alt: '', caption: '', isPrimary: index === 0 }
+          }
+          return { ...img }
+        }),
         specifications: { ...project.specifications },
         challenges: project.challenges,
         solutions: project.solutions,
@@ -153,21 +165,121 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
     }))
   }
 
-  const handleArrayChange = (arrayName: 'pumpModels' | 'applications' | 'images', index: number, value: string | { name: string; url: string }) => {
+  // Image validation function
+  const validateImageUrlLocal = (url: string): string | null => {
+    const result = validateImageUrl(url, { 
+      context: 'Image', 
+      allowEmpty: true 
+    })
+    return result.isValid ? null : result.error || 'Invalid image format'
+  }
+
+  // Image array management functions
+  const handleImageChange = (index: number, field: 'url' | 'alt' | 'caption' | 'isPrimary', value: string | boolean) => {
+    setFormData(prev => {
+      const newImages = [...prev.images]
+      
+      if (field === 'isPrimary' && value === true) {
+        // If setting this as primary, unset all others
+        newImages.forEach((img, i) => {
+          img.isPrimary = i === index
+        })
+      } else {
+        newImages[index] = { ...newImages[index], [field]: value }
+      }
+      
+      return {
+        ...prev,
+        images: newImages
+      }
+    })
+    
+    // Clear errors when user starts typing
+    if (field === 'url' && errors[`image_${index}_url`]) {
+      setErrors(prev => ({
+        ...prev,
+        [`image_${index}_url`]: ''
+      }))
+    }
+    
+    // Validate image URL when it changes
+    if (field === 'url' && typeof value === 'string') {
+      const validationError = validateImageUrlLocal(value)
+      if (validationError) {
+        setErrors(prev => ({
+          ...prev,
+          [`image_${index}_url`]: validationError
+        }))
+      }
+    }
+  }
+
+  const addImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, { url: '', alt: '', caption: '', isPrimary: false }]
+    }))
+  }
+
+  const removeImage = (index: number) => {
+    if (formData.images.length > 1) {
+      setFormData(prev => {
+        const newImages = prev.images.filter((_, i) => i !== index)
+        
+        // If we removed the primary image, make the first one primary
+        if (prev.images[index].isPrimary && newImages.length > 0) {
+          newImages[0].isPrimary = true
+        }
+        
+        return {
+          ...prev,
+          images: newImages
+        }
+      })
+      
+      // Clear errors for removed image and shift remaining errors
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[`image_${index}_url`]
+        
+        // Shift error indices for remaining images
+        for (let i = index + 1; i < formData.images.length; i++) {
+          if (newErrors[`image_${i}_url`]) {
+            newErrors[`image_${i-1}_url`] = newErrors[`image_${i}_url`]
+            delete newErrors[`image_${i}_url`]
+          }
+        }
+        
+        return newErrors
+      })
+    }
+  }
+
+  const handlePrimaryImageChange = (index: number, isPrimary: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.map((img, i) => ({
+        ...img,
+        isPrimary: i === index ? isPrimary : false // Only one image can be primary
+      }))
+    }))
+  }
+
+  const handleArrayChange = (arrayName: 'pumpModels' | 'applications', index: number, value: string | { name: string; url: string }) => {
     setFormData(prev => ({
       ...prev,
       [arrayName]: prev[arrayName].map((item, i) => i === index ? value : item),
     }))
   }
 
-  const addArrayItem = (arrayName: 'pumpModels' | 'applications' | 'images') => {
+  const addArrayItem = (arrayName: 'pumpModels' | 'applications') => {
     setFormData(prev => ({
       ...prev,
-      [arrayName]: [...prev[arrayName], arrayName === 'images' ? '' : { name: '', url: '' }],
+      [arrayName]: [...prev[arrayName], { name: '', url: '' }],
     }))
   }
 
-  const removeArrayItem = (arrayName: 'pumpModels' | 'applications' | 'images', index: number) => {
+  const removeArrayItem = (arrayName: 'pumpModels' | 'applications', index: number) => {
     if (formData[arrayName].length > 1) {
       setFormData(prev => ({
         ...prev,
@@ -204,6 +316,18 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
       errors.results = 'Results description is required'
     }
     
+    // Validate images
+    const newImageErrors: { [key: string]: string } = {}
+    formData.images.forEach((image, index) => {
+      if (image.url && image.url.trim()) {
+        const validationError = validateImageUrlLocal(image.url)
+        if (validationError) {
+          newImageErrors[`image_${index}_url`] = validationError
+        }
+      }
+    })
+    setErrors(newImageErrors)
+    
     return errors
   }
 
@@ -224,13 +348,19 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
     setValidationErrors({})
     setShowValidation(false)
     
+    // Ensure at least one image is primary if images exist
+    const filteredImages = formData.images.filter(img => img.url.trim() !== '')
+    if (filteredImages.length > 0 && !filteredImages.some(img => img.isPrimary)) {
+      filteredImages[0].isPrimary = true
+    }
+    
     const cleanedData = {
       ...formData,
       // Convert completionDate string to Date object for the API
       completionDate: new Date(formData.completionDate).toISOString(),
       pumpModels: formData.pumpModels.filter(model => model.name.trim() !== ''),
       applications: formData.applications.filter(app => app.name.trim() !== ''),
-      images: formData.images.filter(img => img.trim() !== ''),
+      images: filteredImages,
     }
     
     onSave(cleanedData)
@@ -731,33 +861,134 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
                 {/* Images */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Images (URLs)
+                    Project Images
                   </label>
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     {formData.images.map((image, index) => (
-                      <div key={index} className="flex items-center space-x-2">
-                        <input
-                          type="url"
-                          value={image}
-                          onChange={(e) => handleArrayChange('images', index, e.target.value)}
-                          placeholder="https://example.com/image.jpg"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        {formData.images.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeArrayItem('images', index)}
-                            className="px-3 py-2 text-red-600 border border-red-300 rounded-md hover:bg-red-50"
-                          >
-                            Remove
-                          </button>
-                        )}
+                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <div className="space-y-3">
+                          {/* Image URL */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Image URL
+                            </label>
+                            <input
+                              type="url"
+                              value={image.url}
+                              onChange={(e) => handleImageChange(index, 'url', e.target.value)}
+                              placeholder="https://example.com/image.jpg or /images/project.jpg"
+                              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                showValidation && validationErrors[`images.${index}.url`] 
+                                  ? 'border-red-300' 
+                                  : 'border-gray-300'
+                              }`}
+                            />
+                            {showValidation && validationErrors[`images.${index}.url`] && (
+                              <p className="mt-1 text-sm text-red-600">
+                                {validationErrors[`images.${index}.url`]}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Alt Text */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Alt Text
+                            </label>
+                            <input
+                              type="text"
+                              value={image.alt || ''}
+                              onChange={(e) => handleImageChange(index, 'alt', e.target.value)}
+                              placeholder="Description of the image for accessibility"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
+
+                          {/* Caption */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Caption
+                            </label>
+                            <input
+                              type="text"
+                              value={image.caption || ''}
+                              onChange={(e) => handleImageChange(index, 'caption', e.target.value)}
+                              placeholder="Optional caption displayed with the image"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
+
+                          {/* Primary Image Checkbox */}
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id={`primary-image-${index}`}
+                              checked={image.isPrimary || false}
+                              onChange={(e) => handlePrimaryImageChange(index, e.target.checked)}
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <label htmlFor={`primary-image-${index}`} className="text-sm text-gray-700">
+                              Primary image (displayed first)
+                            </label>
+                          </div>
+
+                          {/* Image Preview */}
+                          {image.url && (
+                            <div className="mt-3">
+                              <label className="block text-xs font-medium text-gray-600 mb-2">
+                                Preview
+                              </label>
+                              <div className="relative w-32 h-24 border border-gray-200 rounded-md overflow-hidden bg-gray-50">
+                                <img
+                                  src={getImageUrl(image.url)}
+                                  alt={image.alt || 'Project image preview'}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement
+                                    target.style.display = 'none'
+                                    const errorDiv = target.nextElementSibling as HTMLElement
+                                    if (errorDiv) errorDiv.style.display = 'flex'
+                                  }}
+                                  onLoad={(e) => {
+                                    const target = e.target as HTMLImageElement
+                                    target.style.display = 'block'
+                                    const errorDiv = target.nextElementSibling as HTMLElement
+                                    if (errorDiv) errorDiv.style.display = 'none'
+                                  }}
+                                />
+                                <div 
+                                  className="absolute inset-0 flex items-center justify-center bg-gray-100 text-red-500 text-xs text-center p-2" 
+                                  style={{ display: 'none' }}
+                                >
+                                  <div>
+                                    <svg className="w-6 h-6 mx-auto mb-1 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                    </svg>
+                                    ⚠️ Unable to load image. Please check the URL or path.
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Remove Image Button */}
+                          {formData.images.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="inline-flex items-center px-3 py-1 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50"
+                            >
+                              Remove Image
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))}
+                    
                     <button
                       type="button"
-                      onClick={() => addArrayItem('images')}
-                      className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                      onClick={addImage}
+                      className="inline-flex items-center px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
                     >
                       Add Image
                     </button>
@@ -848,11 +1079,11 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
               <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                   {/* Project Preview Header */}
-                  {formData.images?.[0] && (
+                  {formData.images?.[0]?.url && (
                     <div className="relative h-64 bg-gray-200">
                       <img
-                        src={formData.images[0]}
-                        alt={formData.title}
+                        src={getImageUrl(formData.images[0].url)}
+                        alt={formData.images[0].alt || formData.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none'
