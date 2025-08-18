@@ -163,9 +163,10 @@ const ProductSchema = new Schema<IProduct>({
       validate: {
         validator: function(v: string) {
           if (!v) return true // url is optional
-          return /^https?:\/\/.+/.test(v);
+          // Allow both full URLs (http/https) and relative/absolute paths
+          return /^(https?:\/\/.+|\/[\w\-\/\.]+|[\w\-\/\.]+)$/.test(v);
         },
-        message: 'Please provide a valid URL starting with http:// or https://'
+        message: 'Please provide a valid URL (http://... or https://...) or path (relative or absolute)'
       }
     }
   }],
@@ -181,9 +182,10 @@ const ProductSchema = new Schema<IProduct>({
       validate: {
         validator: function(v: string) {
           if (!v) return true // url is optional
-          return /^https?:\/\/.+/.test(v);
+          // Allow both full URLs (http/https) and relative/absolute paths
+          return /^(https?:\/\/.+|\/[\w\-\/\.]+|[\w\-\/\.]+)$/.test(v);
         },
-        message: 'Please provide a valid URL starting with http:// or https://'
+        message: 'Please provide a valid URL (http://... or https://...) or path (relative or absolute)'
       }
     }
   }],

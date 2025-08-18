@@ -99,6 +99,68 @@ export function validateImageUrl(
 }
 
 /**
+ * Validate URL or path (for links, not just images)
+ * Supports both absolute URLs and relative/absolute paths
+ * Used for Part URLs, Application URLs, etc.
+ * 
+ * @param urlPath - The URL or path to validate
+ * @param options - Optional configuration
+ * @returns Validation result with error message if invalid
+ */
+export function validateUrl(
+  urlPath: string, 
+  options: { 
+    context?: string; 
+    allowEmpty?: boolean;
+    requireProtocol?: boolean;
+  } = {}
+): { isValid: boolean; error?: string } {
+  const { 
+    context = 'URL', 
+    allowEmpty = true,
+    requireProtocol = false
+  } = options
+  
+  // Handle empty/undefined values
+  if (!urlPath || !urlPath.trim()) {
+    return allowEmpty 
+      ? { isValid: true } 
+      : { isValid: false, error: `${context} is required` }
+  }
+  
+  const urlValue = urlPath.trim()
+  
+  // If protocol is required, only allow full URLs
+  if (requireProtocol) {
+    const urlPattern = /^https?:\/\/.+/
+    if (urlPattern.test(urlValue)) {
+      return { isValid: true }
+    }
+    return {
+      isValid: false,
+      error: `${context} must be a complete URL starting with http:// or https://`
+    }
+  }
+  
+  // Allow both URLs and paths
+  const urlPattern = /^https?:\/\/.+/ // Full URLs
+  const relativePathPattern = /^[^\/].+/ // Relative paths (no leading slash)
+  const absolutePathPattern = /^\/[^\/].+/ // Absolute paths (with leading slash)
+  
+  // Check if matches any valid pattern
+  if (urlPattern.test(urlValue) || 
+      relativePathPattern.test(urlValue) || 
+      absolutePathPattern.test(urlValue)) {
+    return { isValid: true }
+  }
+  
+  return {
+    isValid: false,
+    error: `${context} must be a valid URL or path`
+  }
+}
+
+/**
  * Legacy function - maintained for backward compatibility
  * @deprecated Use validateImageUrl instead
  */

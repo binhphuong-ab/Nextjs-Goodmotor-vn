@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
-import { generateSlug, validateImageUrl } from '@/lib/utils'
+import { generateSlug, validateImageUrl, validateUrl } from '@/lib/utils'
 import 'react-quill/dist/quill.snow.css'
 import { IProduct, IProductInput } from '@/models/Product'
 import { IBrand } from '@/models/Brand'
@@ -266,6 +266,15 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
     return result.isValid ? null : result.error || 'Invalid image format'
   }
 
+  // URL validation function for Part URLs, Application URLs etc.
+  const validateUrlLocal = (url: string, context: string = 'URL'): string | null => {
+    const result = validateUrl(url, { 
+      context, 
+      allowEmpty: true 
+    })
+    return result.isValid ? null : result.error || `Invalid ${context.toLowerCase()}`
+  }
+
   const handleArrayChange = (arrayName: 'features', index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -313,6 +322,52 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
         i === index ? { ...part, [field]: value } : part
       )
     }))
+    
+    // Validate URLs when they change
+    if (field === 'url' && value.trim()) {
+      const validationError = validateUrlLocal(value, 'Part URL')
+      if (validationError) {
+        setErrors(prev => ({
+          ...prev,
+          [`repairPart_${index}_url`]: validationError
+        }))
+      } else {
+        // Clear error if validation passes
+        setErrors(prev => {
+          const newErrors = { ...prev }
+          delete newErrors[`repairPart_${index}_url`]
+          return newErrors
+        })
+      }
+    }
+    
+    // Validate image URLs when they change
+    if (field === 'image' && value.trim()) {
+      const validationError = validateImageUrlLocal(value)
+      if (validationError) {
+        setErrors(prev => ({
+          ...prev,
+          [`repairPart_${index}_image`]: validationError
+        }))
+      } else {
+        // Clear error if validation passes
+        setErrors(prev => {
+          const newErrors = { ...prev }
+          delete newErrors[`repairPart_${index}_image`]
+          return newErrors
+        })
+      }
+    }
+    
+    // Clear error when user starts typing (for any field)
+    const errorKey = `repairPart_${index}_${field}`
+    if (errors[errorKey]) {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[errorKey]
+        return newErrors
+      })
+    }
   }
 
   // Application-specific functions
@@ -339,6 +394,34 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
         i === index ? { ...app, [field]: value } : app
       )
     }))
+    
+    // Validate URLs when they change
+    if (field === 'url' && value.trim()) {
+      const validationError = validateUrlLocal(value, 'Application URL')
+      if (validationError) {
+        setErrors(prev => ({
+          ...prev,
+          [`application_${index}_url`]: validationError
+        }))
+      } else {
+        // Clear error if validation passes
+        setErrors(prev => {
+          const newErrors = { ...prev }
+          delete newErrors[`application_${index}_url`]
+          return newErrors
+        })
+      }
+    }
+    
+    // Clear error when user starts typing (for any field)
+    const errorKey = `application_${index}_${field}`
+    if (errors[errorKey]) {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[errorKey]
+        return newErrors
+      })
+    }
   }
 
   // Image array management functions
@@ -471,6 +554,36 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
         const validationError = validateImageUrlLocal(image.url)
         if (validationError) {
           newErrors[`image_${index}_url`] = validationError
+        }
+      }
+    })
+
+    // Validate repair part images
+    formData.repairParts.forEach((repairPart, index) => {
+      if (repairPart.image && repairPart.image.trim()) {
+        const validationError = validateImageUrlLocal(repairPart.image)
+        if (validationError) {
+          newErrors[`repairPart_${index}_image`] = validationError
+        }
+      }
+    })
+
+    // Validate repair part URLs
+    formData.repairParts.forEach((repairPart, index) => {
+      if (repairPart.url && repairPart.url.trim()) {
+        const validationError = validateUrlLocal(repairPart.url, 'Part URL')
+        if (validationError) {
+          newErrors[`repairPart_${index}_url`] = validationError
+        }
+      }
+    })
+
+    // Validate application URLs
+    formData.applications.forEach((application, index) => {
+      if (application.url && application.url.trim()) {
+        const validationError = validateUrlLocal(application.url, 'Application URL')
+        if (validationError) {
+          newErrors[`application_${index}_url`] = validationError
         }
       }
     })
@@ -1225,40 +1338,82 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
                       type="text"
                       value={repairPart.image || ''}
                       onChange={(e) => updateRepairPart(index, 'image', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="/images/repair-parts/part.jpg"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        errors[`repairPart_${index}_image`] ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="/images/repair-parts/part.jpg or https://example.com/image.jpg"
                     />
+                    {errors[`repairPart_${index}_image`] && (
+                      <p className="mt-1 text-sm text-red-600">{errors[`repairPart_${index}_image`]}</p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      Enter a URL or relative path to an image file. Supported formats: jpg, jpeg, png, gif, webp, svg
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Part URL (Optional)
                     </label>
                     <input
-                      type="url"
+                      type="text"
                       value={repairPart.url || ''}
                       onChange={(e) => updateRepairPart(index, 'url', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="https://example.com/repair-part"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        errors[`repairPart_${index}_url`] ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="/products/part-slug or https://example.com/repair-part"
                     />
+                    {errors[`repairPart_${index}_url`] && (
+                      <p className="mt-1 text-sm text-red-600">{errors[`repairPart_${index}_url`]}</p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      Enter a relative path (e.g., /products/part-name) or full URL (e.g., https://example.com/part)
+                    </p>
                   </div>
                 </div>
                 
-                {/* Image Preview */}
-                {repairPart.image && (
-                  <div className="mt-3">
+                {/* Enhanced Image Preview */}
+                {repairPart.image && repairPart.image.trim() && !errors[`repairPart_${index}_image`] && (
+                  <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Image Preview:
                     </label>
-                    <div className="relative w-24 h-24 border border-gray-200 rounded-lg overflow-hidden">
-                      <img
-                        src={repairPart.image}
-                        alt={repairPart.name || 'Repair part image'}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
-                          target.style.display = 'none'
-                        }}
-                      />
+                    <div className="border border-gray-200 rounded-md p-3 bg-gray-50">
+                      <div className="relative w-32 h-32 mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white">
+                        <img
+                          src={repairPart.image}
+                          alt={repairPart.name || 'Repair part image'}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement
+                            target.style.display = 'none'
+                            const errorDiv = target.nextElementSibling as HTMLElement
+                            if (errorDiv) errorDiv.style.display = 'flex'
+                          }}
+                          onLoad={(e) => {
+                            const target = e.target as HTMLImageElement
+                            target.style.display = 'block'
+                            const errorDiv = target.nextElementSibling as HTMLElement
+                            if (errorDiv) errorDiv.style.display = 'none'
+                          }}
+                        />
+                        <div 
+                          className="absolute inset-0 flex items-center justify-center bg-gray-100 text-red-500 text-sm text-center p-2" 
+                          style={{ display: 'none' }}
+                        >
+                          <div>
+                            <svg className="w-8 h-8 mx-auto mb-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            ⚠️ Unable to load image. Please check the URL or path.
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-2 text-center">
+                        <p className="text-xs text-gray-600 truncate" title={repairPart.image}>
+                          {repairPart.image}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1306,15 +1461,23 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Application URL
+                      Application URL (Optional)
                     </label>
                     <input
-                      type="url"
+                      type="text"
                       value={application.url || ''}
                       onChange={(e) => updateApplication(index, 'url', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="https://example.com/application"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        errors[`application_${index}_url`] ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="/industries/industry-slug or https://example.com/application"
                     />
+                    {errors[`application_${index}_url`] && (
+                      <p className="mt-1 text-sm text-red-600">{errors[`application_${index}_url`]}</p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      Enter a relative path (e.g., /industries/food-processing) or full URL
+                    </p>
                   </div>
                 </div>
               </div>
