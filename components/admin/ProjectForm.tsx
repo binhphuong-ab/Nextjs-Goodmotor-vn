@@ -702,6 +702,143 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
                   </div>
                 </div>
 
+                {/* Images */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Project Images
+                  </label>
+                  <div className="space-y-4">
+                    {formData.images.map((image, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <div className="space-y-3">
+                          {/* Image URL */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Image URL
+                            </label>
+                            <input
+                              type="url"
+                              value={image.url}
+                              onChange={(e) => handleImageChange(index, 'url', e.target.value)}
+                              placeholder="https://example.com/image.jpg or /images/project.jpg"
+                              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                showValidation && validationErrors[`images.${index}.url`] 
+                                  ? 'border-red-300' 
+                                  : 'border-gray-300'
+                              }`}
+                            />
+                            {showValidation && validationErrors[`images.${index}.url`] && (
+                              <p className="mt-1 text-sm text-red-600">
+                                {validationErrors[`images.${index}.url`]}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Alt Text */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Alt Text
+                            </label>
+                            <input
+                              type="text"
+                              value={image.alt || ''}
+                              onChange={(e) => handleImageChange(index, 'alt', e.target.value)}
+                              placeholder="Description of the image for accessibility"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
+
+                          {/* Caption */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Caption
+                            </label>
+                            <input
+                              type="text"
+                              value={image.caption || ''}
+                              onChange={(e) => handleImageChange(index, 'caption', e.target.value)}
+                              placeholder="Optional caption displayed with the image"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          </div>
+
+                          {/* Primary Image Checkbox */}
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id={`primary-image-${index}`}
+                              checked={image.isPrimary || false}
+                              onChange={(e) => handlePrimaryImageChange(index, e.target.checked)}
+                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <label htmlFor={`primary-image-${index}`} className="text-sm text-gray-700">
+                              Primary image (displayed first)
+                            </label>
+                          </div>
+
+                          {/* Image Preview */}
+                          {image.url && (
+                            <div className="mt-3">
+                              <label className="block text-xs font-medium text-gray-600 mb-2">
+                                Preview
+                              </label>
+                              <div className="relative w-32 h-24 border border-gray-200 rounded-md overflow-hidden bg-gray-50">
+                                <img
+                                  src={getImageUrl(image.url)}
+                                  alt={image.alt || 'Project image preview'}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement
+                                    target.style.display = 'none'
+                                    const errorDiv = target.nextElementSibling as HTMLElement
+                                    if (errorDiv) errorDiv.style.display = 'flex'
+                                  }}
+                                  onLoad={(e) => {
+                                    const target = e.target as HTMLImageElement
+                                    target.style.display = 'block'
+                                    const errorDiv = target.nextElementSibling as HTMLElement
+                                    if (errorDiv) errorDiv.style.display = 'none'
+                                  }}
+                                />
+                                <div 
+                                  className="absolute inset-0 flex items-center justify-center bg-gray-100 text-red-500 text-xs text-center p-2" 
+                                  style={{ display: 'none' }}
+                                >
+                                  <div>
+                                    <svg className="w-6 h-6 mx-auto mb-1 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                    </svg>
+                                    ⚠️ Unable to load image. Please check the URL or path.
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Remove Image Button */}
+                          {formData.images.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="inline-flex items-center px-3 py-1 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50"
+                            >
+                              Remove Image
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    
+                    <button
+                      type="button"
+                      onClick={addImage}
+                      className="inline-flex items-center px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                    >
+                      Add Image
+                    </button>
+                  </div>
+                </div>
+
                 {/* Specifications */}
                 <div>
                   <h4 className="text-lg font-medium text-gray-900 mb-4">Technical Specifications</h4>
@@ -854,143 +991,6 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
                       className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
                     >
                       Add Application
-                    </button>
-                  </div>
-                </div>
-
-                {/* Images */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Images
-                  </label>
-                  <div className="space-y-4">
-                    {formData.images.map((image, index) => (
-                      <div key={index} className="border border-gray-200 rounded-lg p-4">
-                        <div className="space-y-3">
-                          {/* Image URL */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Image URL
-                            </label>
-                            <input
-                              type="url"
-                              value={image.url}
-                              onChange={(e) => handleImageChange(index, 'url', e.target.value)}
-                              placeholder="https://example.com/image.jpg or /images/project.jpg"
-                              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                showValidation && validationErrors[`images.${index}.url`] 
-                                  ? 'border-red-300' 
-                                  : 'border-gray-300'
-                              }`}
-                            />
-                            {showValidation && validationErrors[`images.${index}.url`] && (
-                              <p className="mt-1 text-sm text-red-600">
-                                {validationErrors[`images.${index}.url`]}
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Alt Text */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Alt Text
-                            </label>
-                            <input
-                              type="text"
-                              value={image.alt || ''}
-                              onChange={(e) => handleImageChange(index, 'alt', e.target.value)}
-                              placeholder="Description of the image for accessibility"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-
-                          {/* Caption */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Caption
-                            </label>
-                            <input
-                              type="text"
-                              value={image.caption || ''}
-                              onChange={(e) => handleImageChange(index, 'caption', e.target.value)}
-                              placeholder="Optional caption displayed with the image"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                          </div>
-
-                          {/* Primary Image Checkbox */}
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              id={`primary-image-${index}`}
-                              checked={image.isPrimary || false}
-                              onChange={(e) => handlePrimaryImageChange(index, e.target.checked)}
-                              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                            />
-                            <label htmlFor={`primary-image-${index}`} className="text-sm text-gray-700">
-                              Primary image (displayed first)
-                            </label>
-                          </div>
-
-                          {/* Image Preview */}
-                          {image.url && (
-                            <div className="mt-3">
-                              <label className="block text-xs font-medium text-gray-600 mb-2">
-                                Preview
-                              </label>
-                              <div className="relative w-32 h-24 border border-gray-200 rounded-md overflow-hidden bg-gray-50">
-                                <img
-                                  src={getImageUrl(image.url)}
-                                  alt={image.alt || 'Project image preview'}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement
-                                    target.style.display = 'none'
-                                    const errorDiv = target.nextElementSibling as HTMLElement
-                                    if (errorDiv) errorDiv.style.display = 'flex'
-                                  }}
-                                  onLoad={(e) => {
-                                    const target = e.target as HTMLImageElement
-                                    target.style.display = 'block'
-                                    const errorDiv = target.nextElementSibling as HTMLElement
-                                    if (errorDiv) errorDiv.style.display = 'none'
-                                  }}
-                                />
-                                <div 
-                                  className="absolute inset-0 flex items-center justify-center bg-gray-100 text-red-500 text-xs text-center p-2" 
-                                  style={{ display: 'none' }}
-                                >
-                                  <div>
-                                    <svg className="w-6 h-6 mx-auto mb-1 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                                    </svg>
-                                    ⚠️ Unable to load image. Please check the URL or path.
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Remove Image Button */}
-                          {formData.images.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="inline-flex items-center px-3 py-1 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50"
-                            >
-                              Remove Image
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                    
-                    <button
-                      type="button"
-                      onClick={addImage}
-                      className="inline-flex items-center px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
-                    >
-                      Add Image
                     </button>
                   </div>
                 </div>

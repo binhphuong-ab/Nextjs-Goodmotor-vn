@@ -738,6 +738,184 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
                   </div>
                 </div>
 
+                {/* Images Section */}
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                    🖼️ Images
+                  </h3>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Application Images
+                      </label>
+                      <div className="space-y-4">
+                        {formData.images?.map((image, index) => (
+                          <div key={index} className="border border-gray-300 rounded-md p-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Image URL *
+                                </label>
+                                <input
+                                  type="text"
+                                  value={image.url}
+                                  onChange={(e) => {
+                                    const newImages = [...(formData.images || [])]
+                                    newImages[index] = { ...image, url: e.target.value }
+                                    updateArrayField('images', newImages)
+                                    
+                                    // Validate image URL
+                                    if (e.target.value.trim()) {
+                                      validateImageLocal(`image_${index}_url`, e.target.value, 'Application Image')
+                                    } else {
+                                      // Clear error when field is empty
+                                      setErrors(prev => {
+                                        const newErrors = { ...prev }
+                                        delete newErrors[`image_${index}_url`]
+                                        return newErrors
+                                      })
+                                    }
+                                  }}
+                                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                    errors[`image_${index}_url`] ? 'border-red-500' : 'border-gray-300'
+                                  }`}
+                                  placeholder="/images/application.jpg or https://example.com/image.jpg"
+                                />
+                                {errors[`image_${index}_url`] && (
+                                  <p className="mt-1 text-sm text-red-600">{errors[`image_${index}_url`]}</p>
+                                )}
+                                <p className="mt-1 text-xs text-gray-500">
+                                  Enter a relative path (e.g., /images/application.jpg) or full URL
+                                </p>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Alt Text
+                                </label>
+                                <input
+                                  type="text"
+                                  value={image.alt || ''}
+                                  onChange={(e) => {
+                                    const newImages = [...(formData.images || [])]
+                                    newImages[index] = { ...image, alt: e.target.value }
+                                    updateArrayField('images', newImages)
+                                  }}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder="Image description for accessibility"
+                                />
+                              </div>
+                            </div>
+                            <div className="mb-4">
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Caption
+                              </label>
+                              <input
+                                type="text"
+                                value={image.caption || ''}
+                                onChange={(e) => {
+                                  const newImages = [...(formData.images || [])]
+                                  newImages[index] = { ...image, caption: e.target.value }
+                                  updateArrayField('images', newImages)
+                                }}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Optional caption text"
+                              />
+                            </div>
+
+                            {/* Enhanced Image Preview */}
+                            {image.url && image.url.trim() && !errors[`image_${index}_url`] && (
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  Image Preview:
+                                </label>
+                                <div className="border border-gray-200 rounded-md p-3 bg-gray-50">
+                                  <div className="relative w-32 h-32 mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white">
+                                    <img
+                                      src={getImageUrl(image.url)}
+                                      alt={image.alt || 'Application image preview'}
+                                      className="w-full h-full object-contain"
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement
+                                        target.style.display = 'none'
+                                        const errorDiv = target.nextElementSibling as HTMLElement
+                                        if (errorDiv) errorDiv.style.display = 'flex'
+                                      }}
+                                      onLoad={(e) => {
+                                        const target = e.target as HTMLImageElement
+                                        target.style.display = 'block'
+                                        const errorDiv = target.nextElementSibling as HTMLElement
+                                        if (errorDiv) errorDiv.style.display = 'none'
+                                      }}
+                                    />
+                                    <div 
+                                      className="absolute inset-0 flex items-center justify-center bg-gray-100 text-red-500 text-sm text-center p-2" 
+                                      style={{ display: 'none' }}
+                                    >
+                                      <div>
+                                        <svg className="w-8 h-8 mx-auto mb-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        </svg>
+                                        ⚠️ Unable to load image. Please check the URL or path.
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="mt-2 text-center">
+                                    <p className="text-xs text-gray-600 truncate" title={getImageUrl(image.url)}>
+                                      {getImageUrl(image.url)}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between">
+                              <label className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={image.isPrimary || false}
+                                  onChange={(e) => {
+                                    const newImages = [...(formData.images || [])]
+                                    if (e.target.checked) {
+                                      newImages.forEach((img, i) => {
+                                        img.isPrimary = i === index
+                                      })
+                                    } else {
+                                      newImages[index] = { ...image, isPrimary: false }
+                                    }
+                                    updateArrayField('images', newImages)
+                                  }}
+                                  className="mr-2"
+                                />
+                                <span className="text-sm text-gray-700">Primary Image</span>
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newImages = formData.images?.filter((_, i) => i !== index) || []
+                                  updateArrayField('images', newImages)
+                                }}
+                                className="px-3 py-2 text-red-600 border border-red-300 rounded-md hover:bg-red-50 text-sm"
+                              >
+                                Remove Image
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newImages = [...(formData.images || []), { url: '', alt: '', caption: '', isPrimary: false }]
+                            updateArrayField('images', newImages)
+                          }}
+                          className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                        >
+                          Add Image
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Technical Specifications Section */}
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
@@ -924,184 +1102,6 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
                       onChange={(newArray: string[]) => updateArrayField('challenges', newArray)}
                       placeholder="e.g., high initial cost, maintenance requirements..."
                     />
-                  </div>
-                </div>
-
-                {/* Images Section */}
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-                    🖼️ Images
-                  </h3>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Application Images
-                      </label>
-                      <div className="space-y-4">
-                        {formData.images?.map((image, index) => (
-                          <div key={index} className="border border-gray-300 rounded-md p-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  Image URL *
-                                </label>
-                                <input
-                                  type="text"
-                                  value={image.url}
-                                  onChange={(e) => {
-                                    const newImages = [...(formData.images || [])]
-                                    newImages[index] = { ...image, url: e.target.value }
-                                    updateArrayField('images', newImages)
-                                    
-                                    // Validate image URL
-                                    if (e.target.value.trim()) {
-                                      validateImageLocal(`image_${index}_url`, e.target.value, 'Application Image')
-                                    } else {
-                                      // Clear error when field is empty
-                                      setErrors(prev => {
-                                        const newErrors = { ...prev }
-                                        delete newErrors[`image_${index}_url`]
-                                        return newErrors
-                                      })
-                                    }
-                                  }}
-                                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                    errors[`image_${index}_url`] ? 'border-red-500' : 'border-gray-300'
-                                  }`}
-                                  placeholder="/images/application.jpg or https://example.com/image.jpg"
-                                />
-                                {errors[`image_${index}_url`] && (
-                                  <p className="mt-1 text-sm text-red-600">{errors[`image_${index}_url`]}</p>
-                                )}
-                                <p className="mt-1 text-xs text-gray-500">
-                                  Enter a relative path (e.g., /images/application.jpg) or full URL
-                                </p>
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                  Alt Text
-                                </label>
-                                <input
-                                  type="text"
-                                  value={image.alt || ''}
-                                  onChange={(e) => {
-                                    const newImages = [...(formData.images || [])]
-                                    newImages[index] = { ...image, alt: e.target.value }
-                                    updateArrayField('images', newImages)
-                                  }}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  placeholder="Image description for accessibility"
-                                />
-                              </div>
-                            </div>
-                            <div className="mb-4">
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Caption
-                              </label>
-                              <input
-                                type="text"
-                                value={image.caption || ''}
-                                onChange={(e) => {
-                                  const newImages = [...(formData.images || [])]
-                                  newImages[index] = { ...image, caption: e.target.value }
-                                  updateArrayField('images', newImages)
-                                }}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Optional caption text"
-                              />
-                            </div>
-
-                            {/* Enhanced Image Preview */}
-                            {image.url && image.url.trim() && !errors[`image_${index}_url`] && (
-                              <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  Image Preview:
-                                </label>
-                                <div className="border border-gray-200 rounded-md p-3 bg-gray-50">
-                                  <div className="relative w-32 h-32 mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white">
-                                    <img
-                                      src={getImageUrl(image.url)}
-                                      alt={image.alt || 'Application image preview'}
-                                      className="w-full h-full object-contain"
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement
-                                        target.style.display = 'none'
-                                        const errorDiv = target.nextElementSibling as HTMLElement
-                                        if (errorDiv) errorDiv.style.display = 'flex'
-                                      }}
-                                      onLoad={(e) => {
-                                        const target = e.target as HTMLImageElement
-                                        target.style.display = 'block'
-                                        const errorDiv = target.nextElementSibling as HTMLElement
-                                        if (errorDiv) errorDiv.style.display = 'none'
-                                      }}
-                                    />
-                                    <div 
-                                      className="absolute inset-0 flex items-center justify-center bg-gray-100 text-red-500 text-sm text-center p-2" 
-                                      style={{ display: 'none' }}
-                                    >
-                                      <div>
-                                        <svg className="w-8 h-8 mx-auto mb-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                                        </svg>
-                                        ⚠️ Unable to load image. Please check the URL or path.
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div className="mt-2 text-center">
-                                    <p className="text-xs text-gray-600 truncate" title={getImageUrl(image.url)}>
-                                      {getImageUrl(image.url)}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            <div className="flex items-center justify-between">
-                              <label className="flex items-center">
-                                <input
-                                  type="checkbox"
-                                  checked={image.isPrimary || false}
-                                  onChange={(e) => {
-                                    const newImages = [...(formData.images || [])]
-                                    if (e.target.checked) {
-                                      newImages.forEach((img, i) => {
-                                        img.isPrimary = i === index
-                                      })
-                                    } else {
-                                      newImages[index] = { ...image, isPrimary: false }
-                                    }
-                                    updateArrayField('images', newImages)
-                                  }}
-                                  className="mr-2"
-                                />
-                                <span className="text-sm text-gray-700">Primary Image</span>
-                              </label>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const newImages = formData.images?.filter((_, i) => i !== index) || []
-                                  updateArrayField('images', newImages)
-                                }}
-                                className="px-3 py-2 text-red-600 border border-red-300 rounded-md hover:bg-red-50 text-sm"
-                              >
-                                Remove Image
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newImages = [...(formData.images || []), { url: '', alt: '', caption: '', isPrimary: false }]
-                            updateArrayField('images', newImages)
-                          }}
-                          className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
-                        >
-                          Add Image
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
