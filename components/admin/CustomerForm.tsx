@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { generateSlug } from '@/lib/utils'
+import { generateSlug, validateImageUrl, validateUrl } from '@/lib/utils'
 import { ICustomer, ICustomerInput } from '@/models/Customer'
 import { BUSINESS_TYPES, PROVINCES, COUNTRIES } from '@/types/customer'
 
@@ -108,10 +108,12 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
     projects: [],
     pumpModelsUsed: [],
     applications: [],
+    images: [{ url: '', alt: '', caption: '', isPrimary: true }], // Default empty image
     featured: false
   })
 
   const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [industries, setIndustries] = useState<Industry[]>([])
   const [loadingIndustries, setLoadingIndustries] = useState(true)
 
@@ -164,6 +166,7 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
         projects: customer.projects || [],
         pumpModelsUsed: customer.pumpModelsUsed || [],
         applications: customer.applications || [],
+        images: customer.images && customer.images.length > 0 ? customer.images : [{ url: '', alt: '', caption: '', isPrimary: true }],
         featured: customer.featured
       })
     }
@@ -277,20 +280,121 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
     }))
   }
 
-  const validateForm = () => {
-    const errors = []
+  // Image validation function - using centralized validation from utils
+  const validateImageUrlLocal = (url: string): string | null => {
+    const result = validateImageUrl(url, { 
+      context: 'Image', 
+      allowEmpty: true 
+    })
+    return result.isValid ? null : result.error || 'Invalid image format'
+  }
+
+  // Image array management functions
+  const handleImageChange = (index: number, field: 'url' | 'alt' | 'caption' | 'isPrimary', value: string | boolean) => {
+    setFormData(prev => {
+      const newImages = [...(prev.images || [])]
+      
+      if (field === 'isPrimary' && value === true) {
+        // If setting this as primary, unset all others
+        newImages.forEach((img, i) => {
+          img.isPrimary = i === index
+        })
+      } else {
+        newImages[index] = { ...newImages[index], [field]: value }
+      }
+      
+      return {
+        ...prev,
+        images: newImages
+      }
+    })
     
-    // Basic validation
-    if (!formData.name) errors.push('Company Name is required')
-    if (!formData.slug) errors.push('Slug is required')
-    if (!formData.businessType) errors.push('Business Type is required')
-    
-    // Logo validation
-    if (formData.logo && !(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)$/i.test(formData.logo))) {
-      errors.push('Logo URL must be a valid HTTP/HTTPS URL ending with an image extension')
+    // Clear errors when user starts typing
+    if (field === 'url' && errors[`image_${index}_url`]) {
+      setErrors(prev => ({
+        ...prev,
+        [`image_${index}_url`]: ''
+      }))
     }
     
-    return errors
+    // Validate image URL when it changes
+    if (field === 'url' && typeof value === 'string') {
+      const validationError = validateImageUrlLocal(value)
+      if (validationError) {
+        setErrors(prev => ({
+          ...prev,
+          [`image_${index}_url`]: validationError
+        }))
+      }
+    }
+  }
+
+  const addImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      images: [...(prev.images || []), { url: '', alt: '', caption: '', isPrimary: false }]
+    }))
+  }
+
+  const removeImage = (index: number) => {
+    if ((formData.images?.length || 0) > 1) {
+      setFormData(prev => {
+        const newImages = (prev.images || []).filter((_, i) => i !== index)
+        
+        // If we removed the primary image, make the first one primary
+        if (prev.images && prev.images[index].isPrimary && newImages.length > 0) {
+          newImages[0].isPrimary = true
+        }
+        
+        return {
+          ...prev,
+          images: newImages
+        }
+      })
+      
+      // Clear errors for removed image
+      if (errors[`image_${index}_url`]) {
+        setErrors(prev => {
+          const newErrors = { ...prev }
+          delete newErrors[`image_${index}_url`]
+          return newErrors
+        })
+      }
+    }
+  }
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {}
+    const basicErrors = []
+    
+    // Basic validation
+    if (!formData.name) basicErrors.push('Company Name is required')
+    if (!formData.slug) basicErrors.push('Slug is required')
+    if (!formData.businessType) basicErrors.push('Business Type is required')
+    
+    // Logo validation using the enhanced validation
+    if (formData.logo) {
+      const logoValidation = validateImageUrl(formData.logo, { 
+        context: 'Logo', 
+        allowEmpty: true 
+      })
+      if (!logoValidation.isValid && logoValidation.error) {
+        basicErrors.push(logoValidation.error)
+      }
+    }
+    
+    // Validate images
+    formData.images?.forEach((image, index) => {
+      if (image.url && image.url.trim()) {
+        const validationError = validateImageUrlLocal(image.url)
+        if (validationError) {
+          newErrors[`image_${index}_url`] = validationError
+        }
+      }
+    })
+
+    setErrors(newErrors)
+    return basicErrors.length === 0 && Object.keys(newErrors).length === 0 ? [] : basicErrors
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -524,25 +628,173 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                     value={formData.logo || ''}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://example.com/logo.png"
+                    placeholder="/images/customers/logo.png or https://example.com/logo.png"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Supported formats: JPG, PNG, GIF, WebP, SVG
+                    Enter a URL or relative path. Supported formats: JPG, PNG, GIF, WebP, SVG
                   </p>
-                  {formData.logo && /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)$/i.test(formData.logo) && (
+                  {formData.logo && (
                     <div className="mt-2">
                       <img
                         src={formData.logo}
                         alt="Company Logo Preview"
                         className="h-16 w-auto border border-gray-200 rounded"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none'
+                          const target = e.target as HTMLImageElement
+                          target.style.display = 'none'
+                          const errorDiv = target.nextElementSibling as HTMLElement
+                          if (errorDiv) errorDiv.style.display = 'block'
+                        }}
+                        onLoad={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.style.display = 'block'
+                          const errorDiv = target.nextElementSibling as HTMLElement
+                          if (errorDiv) errorDiv.style.display = 'none'
                         }}
                       />
+                      <div className="text-red-500 text-sm mt-1" style={{ display: 'none' }}>
+                        ⚠️ Unable to load logo. Please check the URL or path.
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Company Images Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900">Company Images</h3>
+              <div className="space-y-4">
+                {(formData.images || []).map((image, index) => (
+                  <div key={index} className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Image URL *
+                        </label>
+                        <input
+                          type="text"
+                          value={image.url}
+                          onChange={(e) => handleImageChange(index, 'url', e.target.value)}
+                          placeholder="/images/customers/company.jpg or https://example.com/image.jpg"
+                          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            errors[`image_${index}_url`] ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {errors[`image_${index}_url`] && (
+                          <p className="mt-1 text-sm text-red-600">{errors[`image_${index}_url`]}</p>
+                        )}
+                        <p className="mt-1 text-xs text-gray-500">
+                          Enter a URL or relative path to an image file. Supported formats: jpg, jpeg, png, gif, webp, svg
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Alt Text
+                        </label>
+                        <input
+                          type="text"
+                          value={image.alt || ''}
+                          onChange={(e) => handleImageChange(index, 'alt', e.target.value)}
+                          placeholder="Descriptive text for accessibility"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Caption (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={image.caption || ''}
+                        onChange={(e) => handleImageChange(index, 'caption', e.target.value)}
+                        placeholder="Image caption or description"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={image.isPrimary || false}
+                          onChange={(e) => handleImageChange(index, 'isPrimary', e.target.checked)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">
+                          Primary Image {image.isPrimary && <span className="text-blue-600 font-medium">(Default)</span>}
+                        </span>
+                      </label>
+                      
+                      {(formData.images?.length || 0) > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="px-3 py-1 text-red-600 border border-red-300 rounded-md hover:bg-red-50 text-sm"
+                        >
+                          Remove Image
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Enhanced Image Preview */}
+                    {image.url && image.url.trim() && !errors[`image_${index}_url`] && (
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Image Preview:
+                        </label>
+                        <div className="border border-gray-200 rounded-md p-3 bg-gray-50">
+                          <img
+                            src={image.url}
+                            alt={image.alt || 'Company image preview'}
+                            className="max-w-full h-auto max-h-48 rounded object-contain mx-auto block"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement
+                              target.style.display = 'none'
+                              const errorDiv = target.nextElementSibling as HTMLElement
+                              if (errorDiv) errorDiv.style.display = 'block'
+                            }}
+                            onLoad={(e) => {
+                              const target = e.target as HTMLImageElement
+                              target.style.display = 'block'
+                              const errorDiv = target.nextElementSibling as HTMLElement
+                              if (errorDiv) errorDiv.style.display = 'none'
+                            }}
+                          />
+                          <div className="text-red-500 text-sm mt-2 text-center" style={{ display: 'none' }}>
+                            ⚠️ Unable to load image. Please check the URL or path.
+                          </div>
+                          {image.caption && (
+                            <div className="mt-2 text-sm text-gray-600 text-center italic">
+                              {image.caption}
+                            </div>
+                          )}
+                          {image.isPrimary && (
+                            <div className="mt-2 text-center">
+                              <span className="inline-block px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-full">
+                                Primary Image
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                <button
+                  type="button"
+                  onClick={addImage}
+                  className="w-full py-3 px-4 border border-dashed border-gray-300 rounded-lg text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                >
+                  + Add Another Image
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Add multiple company images. The primary image will be used as the main display image.
+              </p>
             </div>
 
             {/* Province & Tier */}

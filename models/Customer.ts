@@ -10,6 +10,14 @@ export interface ICustomer {
   website?: string
   logo?: string
   
+  // Enhanced company images similar to Product model
+  images: Array<{
+    url: string
+    alt?: string
+    caption?: string
+    isPrimary?: boolean
+  }>
+  
   // Customer Relationship
   province?: 'TP Ho Chi Minh' | 'TP Hà Nội' | 'TP Đà Nẵng' | 'TP Huế' | 'Quảng Ninh' | 'Cao Bằng' | 'Lạng Sơn' | 'Lai Châu' | 'Điện Biên' | 'Sơn La' | 'Thanh Hóa' | 'Nghệ An' | 'Hà Tĩnh' | 'Tuyên Quang' | 'Lào Cai' | 'Thái Nguyên' | 'Phú Thọ' | 'Bắc Ninh' | 'Hưng Yên' | 'TP Hải Phòng' | 'Ninh Bình' | 'Quảng Trị' | 'Quảng Ngãi' | 'Gia Lai' | 'Khánh Hòa' | 'Lâm Đồng' | 'Đắk Lắk' | 'Đồng Nai' | 'Tây Ninh' | 'TP Cần Thơ' | 'Vĩnh Long' | 'Đồng Tháp' | 'Cà Mau' | 'An Giang'
   country: 'Việt Nam' | 'Nhật Bản' | 'Hàn Quốc' | 'Trung Quốc' | 'Đài Loan' | 'Mỹ' | 'EU' | 'Thái Lan' | 'Other'
@@ -81,11 +89,42 @@ const CustomerSchema = new Schema<ICustomer>({
     validate: {
       validator: function(v: string) {
         if (!v) return true; // Optional field
-        return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)$/i.test(v);
+        // Allow both full URLs (http/https) and relative paths starting with /
+        // Must end with valid image extensions
+        return /^(https?:\/\/.+|\/[\w\-\/\.]+)\.(jpg|jpeg|png|gif|webp|svg)$/i.test(v);
       },
-      message: 'Please provide a valid logo image URL'
+      message: 'Please provide a valid logo image URL or path (relative paths must start with / and end with .jpg, .jpeg, .png, .gif, .webp, or .svg)'
     }
   },
+  
+  // Enhanced company images similar to Product model
+  images: [{
+    url: {
+      type: String,
+      required: [true, 'Image URL is required'],
+      trim: true,
+      validate: {
+        validator: function(v: string) {
+          // Allow both full URLs (http/https) and relative paths starting with /
+          // Must end with valid image extensions
+          return /^(https?:\/\/.+|\/[\w\-\/\.]+)\.(jpg|jpeg|png|gif|webp|svg)$/i.test(v);
+        },
+        message: 'Please provide a valid image URL or path (relative paths must start with / and end with .jpg, .jpeg, .png, .gif, .webp, or .svg)'
+      }
+    },
+    alt: {
+      type: String,
+      trim: true
+    },
+    caption: {
+      type: String,
+      trim: true
+    },
+    isPrimary: {
+      type: Boolean,
+      default: false
+    }
+  }],
   
   // Customer Relationship
   province: {
@@ -261,7 +300,13 @@ export interface ICustomerInput {
   projects?: { name: string; url?: string }[]
   pumpModelsUsed?: { name: string; url?: string }[]
   applications?: { name: string; url?: string }[]
+  images?: Array<{
+    url: string
+    alt?: string
+    caption?: string
+    isPrimary?: boolean
+  }>
   featured?: boolean
 }
 
-export default models.Customer || model<ICustomer>('Customer', CustomerSchema) 
+export default models.Customer || model<ICustomer>('Customer', CustomerSchema)
