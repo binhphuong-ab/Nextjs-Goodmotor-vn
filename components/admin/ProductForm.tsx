@@ -55,6 +55,29 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
   const [formData, setFormData] = useState<IProductInput>(getDefaultFormData())
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
+  // Price formatting functions
+  const formatPrice = (price: number) => {
+    return price.toLocaleString('vi-VN')
+  }
+
+  const formatPriceForDisplay = (price: number) => {
+    return `${price.toLocaleString('vi-VN')} VNĐ`
+  }
+
+  const parsePriceFromFormatted = (formattedPrice: string): number | undefined => {
+    if (!formattedPrice || formattedPrice.trim() === '') return undefined
+    
+    // Remove all non-digit characters (dots, spaces, commas, etc.)
+    const cleaned = formattedPrice.replace(/[^\d]/g, '')
+    
+    // If no digits found, return undefined
+    if (cleaned === '') return undefined
+    
+    const parsed = parseInt(cleaned, 10)
+    
+    return isNaN(parsed) ? undefined : parsed
+  }
+
   useEffect(() => {
     // Fetch brands and pump types on component mount
     fetchBrands()
@@ -235,6 +258,13 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
           ...prev.specifications,
           [specField]: value,
         },
+      }))
+    } else if (name === 'price') {
+      // Handle formatted price input
+      const parsedPrice = parsePriceFromFormatted(value)
+      setFormData(prev => ({
+        ...prev,
+        [name]: parsedPrice,
       }))
     } else if (type === 'number') {
       setFormData(prev => ({
@@ -1491,14 +1521,12 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
               </label>
               <div className="relative">
                 <input
-                  type="number"
+                  type="text"
                   id="price"
                   name="price"
-                  value={formData.price || ''}
+                  value={formData.price ? formatPrice(formData.price) : ''}
                   onChange={handleInputChange}
-                  min="0"
-                  step="1000"
-                  placeholder="e.g., 360000 (leave empty for contact pricing)"
+                  placeholder="e.g., 24.000.000 (leave empty for contact pricing)"
                   className="w-full px-3 py-2 pr-12 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -1506,7 +1534,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
                 </div>
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Enter price in VNĐ (Vietnamese Dong). Leave empty to show "Contact for pricing"
+                Enter price in VNĐ (Vietnamese Dong) with automatic formatting (e.g., 24.000.000). Leave empty to show "Contact for pricing"
               </p>
             </div>
 

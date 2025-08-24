@@ -6,17 +6,39 @@ import connectToDatabase from '@/lib/mongoose'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const category = searchParams.get('category')
+    const brand = searchParams.get('brand')
+    const pumpType = searchParams.get('pumpType')
     
     await connectToDatabase()
     
-    const filter: any = category ? { category } : {}
+    // Build filter object based on available query parameters
+    const filter: any = {}
+    if (brand) filter.brand = brand
+    if (pumpType) filter.pumpType = pumpType
+    
     const products = await Product.find(filter)
       .populate('brand', 'name country productLines')
-      .populate('pumpType', 'pumpType')
+      .populate('pumpType', 'pumpType subPumpTypes')
       .sort({ name: 1 })
     
-    return NextResponse.json(products)
+    // Manually populate subPumpType names (same as admin API)
+    const enrichedProducts = products.map((product: any) => {
+      const productObj = product.toObject()
+      
+      // If product has a subPumpType ID and populated pumpType, find the sub pump type name
+      if (productObj.subPumpType && productObj.pumpType && productObj.pumpType.subPumpTypes) {
+        const subPumpType = productObj.pumpType.subPumpTypes.find(
+          (st: any) => st._id.toString() === productObj.subPumpType.toString()
+        )
+        if (subPumpType) {
+          productObj.subPumpTypeName = subPumpType.name
+        }
+      }
+      
+      return productObj
+    })
+    
+    return NextResponse.json(enrichedProducts)
   } catch (error) {
     console.error('Error fetching products:', error)
     return NextResponse.json(

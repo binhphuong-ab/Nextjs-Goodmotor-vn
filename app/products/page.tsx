@@ -149,7 +149,7 @@ export default function ProductsPage() {
                 alt={getPrimaryImageAlt(product)}
                 width={400}
                 height={250}
-                className="w-full h-48 object-cover"
+                className="w-full h-60 object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement
                   target.src = '/images/placeholder-product.jpg'
