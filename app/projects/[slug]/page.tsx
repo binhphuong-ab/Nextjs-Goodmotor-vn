@@ -17,6 +17,7 @@ import {
   Award,
   Settings
 } from 'lucide-react'
+import { ProjectDescriptionDisplay } from '@/components/MarkdownDisplay'
 
 // TypeScript interface matching the Project model
 interface Project {
@@ -249,10 +250,7 @@ export default function ProjectDetailPage() {
             {/* Project Description */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Project Overview</h2>
-              <div 
-                className="prose prose-blue max-w-none text-gray-600"
-                dangerouslySetInnerHTML={{ __html: project.description }}
-              />
+              <ProjectDescriptionDisplay content={project.description} />
             </div>
 
             {/* Challenges, Solutions, Results */}
@@ -263,10 +261,7 @@ export default function ProjectDetailPage() {
                   <Target className="w-6 h-6 text-red-500" />
                   <h2 className="text-2xl font-bold text-gray-900">Challenges</h2>
                 </div>
-                <div 
-                  className="prose prose-blue max-w-none text-gray-600"
-                  dangerouslySetInnerHTML={{ __html: project.challenges }}
-                />
+                <ProjectDescriptionDisplay content={project.challenges} />
               </div>
 
               {/* Solutions */}
@@ -275,10 +270,7 @@ export default function ProjectDetailPage() {
                   <Lightbulb className="w-6 h-6 text-yellow-500" />
                   <h2 className="text-2xl font-bold text-gray-900">Solutions</h2>
                 </div>
-                <div 
-                  className="prose prose-blue max-w-none text-gray-600"
-                  dangerouslySetInnerHTML={{ __html: project.solutions }}
-                />
+                <ProjectDescriptionDisplay content={project.solutions} />
               </div>
 
               {/* Results */}
@@ -287,10 +279,7 @@ export default function ProjectDetailPage() {
                   <Award className="w-6 h-6 text-green-500" />
                   <h2 className="text-2xl font-bold text-gray-900">Results Achieved</h2>
                 </div>
-                <div 
-                  className="prose prose-blue max-w-none text-gray-600"
-                  dangerouslySetInnerHTML={{ __html: project.results }}
-                />
+                <ProjectDescriptionDisplay content={project.results} />
               </div>
             </div>
           </div>

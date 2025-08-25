@@ -1,15 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import dynamic from 'next/dynamic'
 import { generateSlug, validateImageUrl, validateUrl } from '@/lib/utils'
-import 'react-quill/dist/quill.snow.css'
 import { IProduct, IProductInput } from '@/models/Product'
 import { IBrand } from '@/models/Brand'
 import { IPumpType } from '@/models/PumpType'
-
-// Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
+import MarkdownEditor, { MarkdownEditorPresets } from '@/components/MarkdownEditor'
 
 interface ProductFormProps {
   product?: IProduct | null
@@ -535,45 +531,12 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
     }
   }
 
-  const handleDescriptionChange = (value: string) => {
+  const handleDescriptionChange = (value: string | undefined) => {
     setFormData(prev => ({
       ...prev,
-      description: value,
+      description: value || '',
     }))
   }
-
-  // Quill editor configuration with comprehensive features
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      [{ 'font': [] }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'indent': '-1'}, { 'indent': '+1' }],
-      [{ 'direction': 'rtl' }],
-      [{ 'align': [] }],
-      ['link', 'image', 'video'],
-      ['code-block'],
-      ['clean']
-    ],
-    clipboard: {
-      // toggle to add extra line breaks when pasting HTML:
-      matchVisual: false,
-    }
-  }
-
-  const formats = [
-    'header', 'font', 'size',
-    'bold', 'italic', 'underline', 'strike', 'blockquote',
-    'color', 'background',
-    'script',
-    'list', 'bullet', 'indent',
-    'direction', 'align',
-    'link', 'image', 'video',
-    'code-block'
-  ]
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {}
@@ -929,133 +892,11 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description (Rich Text Editor)
-            </label>
-            <div className="quill-editor-wrapper">
-              <ReactQuill
-                value={formData.description}
-                onChange={handleDescriptionChange}
-                modules={modules}
-                formats={formats}
-                theme="snow"
-                placeholder="Enter product description with rich formatting..."
-              />
-            </div>
-            
-            {/* Live Preview Section */}
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Live Preview:
-              </label>
-              <div className="border border-gray-200 rounded-md p-4 bg-gray-50 min-h-[120px]">
-                {formData.description ? (
-                  <div 
-                    className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: formData.description }}
-                  />
-                ) : (
-                  <p className="text-gray-400 italic">Preview will appear here as you type...</p>
-                )}
-              </div>
-            </div>
-                         <style jsx global>{`
-               .quill-editor-wrapper .ql-editor {
-                 min-height: 250px;
-                 font-size: 14px;
-                 line-height: 1.6;
-               }
-               .quill-editor-wrapper .ql-toolbar {
-                 border-top: 1px solid #d1d5db;
-                 border-left: 1px solid #d1d5db;
-                 border-right: 1px solid #d1d5db;
-                 border-bottom: none;
-                 background-color: #f9fafb;
-               }
-               .quill-editor-wrapper .ql-container {
-                 border-bottom: 1px solid #d1d5db;
-                 border-left: 1px solid #d1d5db;
-                 border-right: 1px solid #d1d5db;
-                 border-top: none;
-                 background-color: white;
-               }
-               .quill-editor-wrapper .ql-toolbar.ql-snow {
-                 border-radius: 6px 6px 0 0;
-               }
-               .quill-editor-wrapper .ql-container.ql-snow {
-                 border-radius: 0 0 6px 6px;
-               }
-               .quill-editor-wrapper .ql-editor.ql-blank::before {
-                 font-style: italic;
-                 color: #9ca3af;
-               }
-               /* Color picker styles */
-               .quill-editor-wrapper .ql-color-picker .ql-picker-options {
-                 max-width: 200px;
-                 width: 200px;
-               }
-               /* Image resize styles */
-               .quill-editor-wrapper .ql-editor img {
-                 max-width: 100%;
-                 height: auto;
-               }
-               
-               /* Preview section styles */
-               .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-                 color: #1f2937;
-                 margin-top: 1em;
-                 margin-bottom: 0.5em;
-                 font-weight: 600;
-               }
-               .prose h1 { font-size: 1.5rem; }
-               .prose h2 { font-size: 1.3rem; }
-               .prose h3 { font-size: 1.1rem; }
-               .prose p {
-                 margin-bottom: 1em;
-                 line-height: 1.6;
-                 color: #374151;
-               }
-               .prose ul, .prose ol {
-                 margin-bottom: 1em;
-                 padding-left: 1.5em;
-               }
-               .prose li {
-                 margin-bottom: 0.25em;
-                 color: #374151;
-               }
-               .prose strong {
-                 font-weight: 600;
-                 color: #111827;
-               }
-               .prose a {
-                 color: #2563eb;
-                 text-decoration: underline;
-               }
-               .prose a:hover {
-                 color: #1d4ed8;
-               }
-               .prose blockquote {
-                 border-left: 4px solid #d1d5db;
-                 padding-left: 1em;
-                 margin: 1em 0;
-                 font-style: italic;
-                 color: #6b7280;
-               }
-               .prose code {
-                 background-color: #f3f4f6;
-                 padding: 0.2em 0.4em;
-                 border-radius: 3px;
-                 font-size: 0.9em;
-               }
-               .prose img {
-                 max-width: 100%;
-                 height: auto;
-                 border-radius: 4px;
-                 margin: 1em 0;
-               }
-             `}</style>
-          </div>
+          <MarkdownEditor
+            value={formData.description || ''}
+            onChange={handleDescriptionChange}
+            {...MarkdownEditorPresets.productDescription}
+          />
 
           <div>
             <h4 className="text-md font-medium text-gray-900 mb-4">Specifications (Optional)</h4>

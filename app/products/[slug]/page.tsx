@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, ShoppingCart, Phone, Mail, Check, Star } from 'lucide-react'
 import { IProduct } from '@/models/Product'
+import { ProductDescriptionDisplay } from '@/components/MarkdownDisplay'
 
 
 
@@ -255,10 +256,7 @@ export default function ProductDetailPage() {
             {product.description && (
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">Description</h3>
-                <div 
-                  className="text-gray-700 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: product.description }}
-                />
+                <ProductDescriptionDisplay content={product.description} />
               </div>
             )}
 

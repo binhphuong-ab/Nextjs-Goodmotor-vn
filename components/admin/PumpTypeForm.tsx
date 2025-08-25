@@ -1,30 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
-import 'react-quill/dist/quill.snow.css'
 import { IPumpType, IPumpTypeInput, ISubPumpType } from '@/models/PumpType'
 import { generateSlug, validateImageUrl } from '@/lib/utils'
+import MarkdownEditor, { MarkdownEditorPresets } from '@/components/MarkdownEditor'
+import { ProductDescriptionDisplay } from '@/components/MarkdownDisplay'
 
-// Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
-// Quill editor configuration
-const modules = {
-  toolbar: [
-    [{ 'header': [1, 2, 3, false] }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'align': [] }],
-    ['link'],
-    ['clean']
-  ]
-}
-
-const formats = [
-  'header', 'bold', 'italic', 'underline', 'strike', 'blockquote',
-  'list', 'bullet', 'align', 'link'
-]
 
 interface PumpTypeFormProps {
   pumpType?: IPumpType | null
@@ -372,19 +354,32 @@ export default function PumpTypeForm({ pumpType, onSave, onCancel, onShowNotific
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description (Optional) - Rich Text Editor
-            </label>
-            <div className="quill-editor-wrapper">
-              <ReactQuill
-                value={formData.description || ''}
-                onChange={handleDescriptionChange}
-                modules={modules}
-                formats={formats}
-                theme="snow"
-                placeholder="Describe this pump type, its applications, and characteristics..."
-              />
-            </div>
+            <MarkdownEditor
+              value={formData.description || ''}
+              onChange={handleDescriptionChange}
+              {...MarkdownEditorPresets.technicalDocs}
+              label="Description (Optional) - Markdown Editor"
+              placeholder={`Describe this pump type, its applications, and characteristics...
+
+## Overview
+Brief description of the pump type and its primary function.
+
+**Key Applications:**
+- Application 1
+- Application 2
+
+## Technical Characteristics
+- Operating pressure range: XX mbar
+- Flow rate capacity: XX m³/h
+- Power consumption: XX kW
+
+## Typical Use Cases
+Description of common applications and industries where this pump type is used.
+
+**Advantages:**
+- Advantage 1
+- Advantage 2`}
+            />
             
             {/* Live Preview Section */}
             <div className="mt-4">
@@ -393,10 +388,7 @@ export default function PumpTypeForm({ pumpType, onSave, onCancel, onShowNotific
               </label>
               <div className="border border-gray-200 rounded-md p-4 bg-gray-50 min-h-[100px]">
                 {formData.description ? (
-                  <div 
-                    className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: formData.description }}
-                  />
+                  <ProductDescriptionDisplay content={formData.description} />
                 ) : (
                   <p className="text-gray-400 italic">Preview will appear here as you type...</p>
                 )}
@@ -661,36 +653,7 @@ export default function PumpTypeForm({ pumpType, onSave, onCancel, onShowNotific
         </form>
         
         <style jsx global>{`
-          .quill-editor-wrapper .ql-editor {
-            min-height: 120px;
-            font-size: 14px;
-            line-height: 1.6;
-          }
-          .quill-editor-wrapper .ql-toolbar {
-            border-top: 1px solid #d1d5db;
-            border-left: 1px solid #d1d5db;
-            border-right: 1px solid #d1d5db;
-            border-bottom: none;
-            background-color: #f9fafb;
-          }
-          .quill-editor-wrapper .ql-container {
-            border-bottom: 1px solid #d1d5db;
-            border-left: 1px solid #d1d5db;
-            border-right: 1px solid #d1d5db;
-            border-top: none;
-            background-color: white;
-          }
-          .quill-editor-wrapper .ql-toolbar.ql-snow {
-            border-radius: 6px 6px 0 0;
-          }
-          .quill-editor-wrapper .ql-container.ql-snow {
-            border-radius: 0 0 6px 6px;
-          }
-          .quill-editor-wrapper .ql-editor.ql-blank::before {
-            font-style: italic;
-            color: #9ca3af;
-          }
-          
+
           /* Preview prose styling */
           .prose p {
             margin-bottom: 1em;

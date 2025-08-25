@@ -4,55 +4,10 @@ import { useState, useEffect, useCallback, memo, useRef } from 'react'
 import { Eye, Edit, CheckCircle } from 'lucide-react'
 import { generateSlug, validateUrl, validateImageUrl, getImageUrl } from '@/lib/utils'
 import type { IApplication, IApplicationInput } from '@/models/Application'
-import dynamic from 'next/dynamic'
+import MarkdownEditor, { MarkdownEditorPresets } from '@/components/MarkdownEditor'
+import { ProductDescriptionDisplay } from '@/components/MarkdownDisplay'
 
-// Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { 
-  ssr: false,
-  loading: () => <div className="w-full min-h-32 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 animate-pulse"></div>
-})
 
-// Import ReactQuill styles
-import 'react-quill/dist/quill.snow.css'
-
-// ReactQuill configuration for main description only
-const QUILL_MODULES = {
-  toolbar: [
-    [{ 'font': [] }],
-    [{ 'size': ['small', false, 'large', 'huge'] }],
-    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ 'color': [] }, { 'background': [] }],
-    [{ 'script': 'sub'}, { 'script': 'super' }],
-    [{ 'align': [] }],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'indent': '-1'}, { 'indent': '+1' }],
-    ['blockquote', 'code-block'],
-    ['link', 'image', 'video'],
-    [{ 'direction': 'rtl' }],
-    ['clean']
-  ],
-  clipboard: {
-    matchVisual: false,
-  },
-  history: {
-    delay: 1000,
-    maxStack: 50,
-    userOnly: true
-  }
-}
-
-const QUILL_FORMATS = [
-  'font', 'size',
-  'header',
-  'bold', 'italic', 'underline', 'strike',
-  'color', 'background',
-  'script',
-  'align',
-  'list', 'bullet', 'indent',
-  'blockquote', 'code-block',
-  'link', 'image', 'video',
-  'direction'
-]
 
 const CATEGORIES = [
   { value: 'freeze-drying', label: 'Freeze Drying' },
@@ -69,25 +24,7 @@ const CATEGORIES = [
   { value: 'other', label: 'Other' }
 ]
 
-// Rich text editor component - only for main description
-const RichTextEditor = ({ value, onChange, placeholder, className = "" }: {
-  value: string
-  onChange: (value: string) => void
-  placeholder: string
-  className?: string
-}) => (
-  <div className={`quill-wrapper ${className}`}>
-    <ReactQuill
-      theme="snow"
-      value={value || ''}
-      onChange={onChange}
-      placeholder={placeholder}
-      modules={QUILL_MODULES}
-      formats={QUILL_FORMATS}
-      style={{ backgroundColor: 'white' }}
-    />
-  </div>
-)
+
 
 // Simple text editor using textarea with stable reference
 const SimpleTextEditor = memo(({ value, onChange, placeholder, className = "" }: {
@@ -687,13 +624,32 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Application Description *
-                      </label>
-                      <RichTextEditor
+                      <MarkdownEditor
                         value={formData.description}
-                        onChange={(value) => updateField('description', value)}
-                        placeholder="Enter detailed application description..."
+                        onChange={(value) => updateField('description', value || '')}
+                        {...MarkdownEditorPresets.technicalDocs}
+                        label="Application Description *"
+                        placeholder={`Enter detailed application description...
+
+## Overview
+Brief description of the application and its purpose.
+
+**Key Features:**
+- Feature 1
+- Feature 2
+
+## Process Requirements
+Specific requirements for vacuum conditions and processing.
+
+**Technical Specifications:**
+- Pressure: $P = 10^{-3}$ mbar
+- Temperature: $T = -80°C$ to $150°C$
+
+## Benefits
+- Improved product quality
+- Reduced processing time
+- Energy efficiency`}
+                        required={true}
                       />
                     </div>
 
@@ -1338,10 +1294,13 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
                     </span>
                   </div>
 
-                  <div 
-                    className="text-gray-600 prose prose-sm max-w-none mb-6"
-                    dangerouslySetInnerHTML={{ __html: formData.description || '<p>Application description will appear here...</p>' }}
-                  />
+                  <div className="text-gray-600 mb-6">
+                    {formData.description ? (
+                      <ProductDescriptionDisplay content={formData.description} />
+                    ) : (
+                      <p className="text-gray-400 italic">Application description will appear here...</p>
+                    )}
+                  </div>
 
                   {/* Benefits */}
                   {formData.benefits?.filter(b => b.trim()).length > 0 && (
@@ -1431,46 +1390,7 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
           )}
         </div>
 
-        <style jsx global>{`
-          .quill-wrapper .ql-editor {
-            min-height: 150px;
-            font-size: 14px;
-            line-height: 1.6;
-            font-family: inherit;
-          }
-          .quill-wrapper .ql-toolbar {
-            background-color: #f9fafb;
-            padding: 8px;
-          }
-          .quill-wrapper .ql-toolbar .ql-formats {
-            margin-right: 15px;
-          }
-          .quill-wrapper .ql-toolbar .ql-formats:last-child {
-            margin-right: 0;
-          }
-          .quill-wrapper .ql-container {
-            font-family: inherit;
-          }
-          .quill-wrapper .ql-editor.ql-blank::before {
-            color: #9ca3af;
-            font-style: normal;
-          }
-          .quill-wrapper .ql-snow .ql-tooltip {
-            background-color: white;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-          }
-          .quill-wrapper .ql-snow .ql-picker-options {
-            background-color: white;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-          }
-          .quill-wrapper .ql-snow .ql-picker-item:hover {
-            background-color: #f3f4f6;
-          }
-        `}</style>
+
       </div>
     </div>
   )

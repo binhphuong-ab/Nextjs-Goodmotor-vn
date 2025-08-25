@@ -178,13 +178,6 @@ export default function ProductsPage() {
                   </div>
                 )}
                 
-                {product.description && (
-                  <div 
-                    className="text-gray-600 mb-4"
-                    dangerouslySetInnerHTML={{ __html: product.description }}
-                  />
-                )}
-                
                 {/* Specifications */}
                 {(product.specifications?.equipment || product.specifications?.country || product.specifications?.power || product.specifications?.flowRate || product.specifications?.vacuumLevel) && (
                   <div className="mb-4">

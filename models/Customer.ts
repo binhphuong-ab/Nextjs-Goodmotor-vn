@@ -188,7 +188,7 @@ const CustomerSchema = new Schema<ICustomer>({
     type: Date
   },
   
-  // Description - Rich HTML content from ReactQuill
+  // Description - Markdown content from MarkdownEditor
   description: {
     type: String,
     required: false,

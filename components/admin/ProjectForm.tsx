@@ -1,13 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
 import { Eye, Edit, CheckCircle, AlertCircle } from 'lucide-react'
 import { generateSlug, getTodayDate, validateImageUrl, getImageUrl } from '@/lib/utils'
-import 'react-quill/dist/quill.snow.css'
-
-// Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
+import MarkdownEditor, { MarkdownEditorPresets } from '@/components/MarkdownEditor'
+import { ProductDescriptionDisplay } from '@/components/MarkdownDisplay'
 
 interface Project {
   _id?: string
@@ -391,37 +388,7 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
     { value: 'planned', label: 'Planned' }
   ]
 
-  // Quill editor configuration
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      [{ 'font': [] }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'indent': '-1'}, { 'indent': '+1' }],
-      [{ 'direction': 'rtl' }],
-      [{ 'align': [] }],
-      ['link', 'image', 'video'],
-      ['code-block'],
-      ['clean']
-    ],
-    clipboard: {
-      matchVisual: false,
-    }
-  }
 
-  const formats = [
-    'header', 'font', 'size',
-    'bold', 'italic', 'underline', 'strike', 'blockquote',
-    'color', 'background',
-    'script',
-    'list', 'bullet', 'indent',
-    'direction', 'align',
-    'link', 'image', 'video',
-    'code-block'
-  ]
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -684,22 +651,32 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Description *
-                  </label>
-                  <div className="quill-editor-wrapper">
-                    <ReactQuill
-                      value={formData.description}
-                      onChange={(value) => handleRichTextChange('description', value)}
-                      modules={modules}
-                      formats={formats}
-                      theme="snow"
-                      placeholder="Enter detailed project description..."
-                    />
-                    {showValidation && validationErrors.description && (
-                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.description}</p>
-                    )}
-                  </div>
+                  <MarkdownEditor
+                    value={formData.description}
+                    onChange={(value) => handleRichTextChange('description', value || '')}
+                    {...MarkdownEditorPresets.projectDescription}
+                    label="Project Description *"
+                    placeholder={`Enter detailed project description...
+
+## Project Overview
+Brief description of the project scope and objectives.
+
+**Client Requirements:**
+- Requirement 1
+- Requirement 2
+
+## Technical Approach
+Description of the technical solution and methodology.
+
+**Key Components:**
+- Component 1: Description
+- Component 2: Description
+
+## Implementation Timeline
+Project phases and milestones.`}
+                    required={true}
+                    error={showValidation && validationErrors.description ? validationErrors.description : undefined}
+                  />
                 </div>
 
                 {/* Images */}
@@ -997,62 +974,82 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
 
                 {/* Challenges */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Challenges
-                  </label>
-                  <div className="quill-editor-wrapper">
-                    <ReactQuill
-                      value={formData.challenges}
-                      onChange={(value) => handleRichTextChange('challenges', value)}
-                      modules={modules}
-                      formats={formats}
-                      theme="snow"
-                      placeholder="Describe the main challenges faced in this project..."
-                    />
-                    {showValidation && validationErrors.challenges && (
-                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.challenges}</p>
-                    )}
-                  </div>
+                  <MarkdownEditor
+                    value={formData.challenges}
+                    onChange={(value) => handleRichTextChange('challenges', value || '')}
+                    {...MarkdownEditorPresets.simpleContent}
+                    label="Project Challenges"
+                    placeholder={`Describe the main challenges faced in this project...
+
+## Technical Challenges
+- Challenge 1: Description
+- Challenge 2: Description
+
+## Environmental Constraints
+- Constraint 1
+- Constraint 2
+
+## Budget/Timeline Limitations
+Description of any budget or timeline constraints encountered.`}
+                    error={showValidation && validationErrors.challenges ? validationErrors.challenges : undefined}
+                  />
                 </div>
 
                 {/* Solutions */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Solutions Provided
-                  </label>
-                  <div className="quill-editor-wrapper">
-                    <ReactQuill
-                      value={formData.solutions}
-                      onChange={(value) => handleRichTextChange('solutions', value)}
-                      modules={modules}
-                      formats={formats}
-                      theme="snow"
-                      placeholder="Explain the solutions and approaches used..."
-                    />
-                    {showValidation && validationErrors.solutions && (
-                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.solutions}</p>
-                    )}
-                  </div>
+                  <MarkdownEditor
+                    value={formData.solutions}
+                    onChange={(value) => handleRichTextChange('solutions', value || '')}
+                    {...MarkdownEditorPresets.simpleContent}
+                    label="Solutions Provided"
+                    placeholder={`Explain the solutions and approaches used...
+
+## Technical Solutions
+- Solution 1: Detailed description
+- Solution 2: Detailed description
+
+## Equipment Selection
+- Primary equipment: Model and specifications
+- Supporting equipment: Details
+
+## Implementation Strategy
+Step-by-step approach taken to address the challenges.
+
+**Key Innovations:**
+- Innovation 1
+- Innovation 2`}
+                    error={showValidation && validationErrors.solutions ? validationErrors.solutions : undefined}
+                  />
                 </div>
 
                 {/* Results */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Results Achieved
-                  </label>
-                  <div className="quill-editor-wrapper">
-                    <ReactQuill
-                      value={formData.results}
-                      onChange={(value) => handleRichTextChange('results', value)}
-                      modules={modules}
-                      formats={formats}
-                      theme="snow"
-                      placeholder="Detail the outcomes and achievements..."
-                    />
-                    {showValidation && validationErrors.results && (
-                      <p className="text-red-500 text-xs mt-1"><AlertCircle className="w-4 h-4 inline-block mr-1" /> {validationErrors.results}</p>
-                    )}
-                  </div>
+                  <MarkdownEditor
+                    value={formData.results}
+                    onChange={(value) => handleRichTextChange('results', value || '')}
+                    {...MarkdownEditorPresets.simpleContent}
+                    label="Results Achieved"
+                    placeholder={`Detail the outcomes and achievements...
+
+## Performance Improvements
+- Metric 1: Before vs After results
+- Metric 2: Quantified improvements
+
+## Cost Savings
+- Direct savings: Amount and description
+- Indirect benefits: Long-term advantages
+
+## Client Satisfaction
+Description of client feedback and satisfaction levels.
+
+**Key Achievements:**
+- Achievement 1: Specific results
+- Achievement 2: Measurable outcomes
+
+## Lessons Learned
+Important insights gained from the project implementation.`}
+                    error={showValidation && validationErrors.results ? validationErrors.results : undefined}
+                  />
                 </div>
 
                 {/* Featured checkbox */}
@@ -1121,10 +1118,11 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
                     {/* Description */}
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-3">Project Description</h3>
-                      <div 
-                        className="text-gray-600 prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: formData.description || '<p>Project description will appear here...</p>' }}
-                      />
+                      {formData.description ? (
+                        <ProductDescriptionDisplay content={formData.description} />
+                      ) : (
+                        <p className="text-gray-400 italic">Project description will appear here...</p>
+                      )}
                     </div>
 
                     {/* Specifications */}
@@ -1184,10 +1182,7 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
                     {formData.challenges && (
                       <div className="mb-6">
                         <h4 className="font-semibold text-gray-800 mb-3">Challenges:</h4>
-                        <div 
-                          className="text-gray-600 prose prose-sm max-w-none"
-                          dangerouslySetInnerHTML={{ __html: formData.challenges }}
-                        />
+                        <ProductDescriptionDisplay content={formData.challenges} />
                       </div>
                     )}
 
@@ -1195,10 +1190,7 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
                     {formData.solutions && (
                       <div className="mb-6">
                         <h4 className="font-semibold text-gray-800 mb-3">Solutions:</h4>
-                        <div 
-                          className="text-gray-600 prose prose-sm max-w-none"
-                          dangerouslySetInnerHTML={{ __html: formData.solutions }}
-                        />
+                        <ProductDescriptionDisplay content={formData.solutions} />
                       </div>
                     )}
 
@@ -1209,10 +1201,7 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
                           <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                           <div>
                             <h4 className="font-semibold text-gray-800 mb-2">Results Achieved:</h4>
-                            <div 
-                              className="text-gray-600 prose prose-sm max-w-none"
-                              dangerouslySetInnerHTML={{ __html: formData.results }}
-                            />
+                            <ProductDescriptionDisplay content={formData.results} />
                           </div>
                         </div>
                       </div>
@@ -1227,32 +1216,7 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
 
 
         <style jsx global>{`
-          .quill-editor-wrapper .ql-editor {
-            min-height: 150px;
-            font-size: 14px;
-            line-height: 1.6;
-          }
-          .quill-editor-wrapper .ql-toolbar {
-            border-top: 1px solid #d1d5db;
-            border-left: 1px solid #d1d5db;
-            border-right: 1px solid #d1d5db;
-            border-bottom: none;
-            background-color: #f9fafb;
-          }
-          .quill-editor-wrapper .ql-container {
-            border-bottom: 1px solid #d1d5db;
-            border-left: 1px solid #d1d5db;
-            border-right: 1px solid #d1d5db;
-            border-top: none;
-            background-color: white;
-          }
-          .quill-editor-wrapper .ql-toolbar.ql-snow {
-            border-radius: 6px 6px 0 0;
-          }
-          .quill-editor-wrapper .ql-container.ql-snow {
-            border-radius: 0 0 6px 6px;
-          }
-          
+
           /* Scrollbar styling */
           .scrollbar-thin {
             scrollbar-width: thin;

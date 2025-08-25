@@ -10,8 +10,12 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@tailwindcss/typography": "^0.5.16",
+    "@uiw/react-markdown-preview": "^5.1.5",
+    "@uiw/react-md-editor": "^4.0.8",
     "dotenv": "^17.0.1",
     "framer-motion": "^10.16.4",
+    "katex": "^0.16.22",
     "lucide-react": "^0.519.0",
     "mongodb": "^6.0.0",
     "mongoose": "^8.0.0",
@@ -20,9 +24,12 @@
     "quill": "^2.0.3",
     "react": "^18",
     "react-dom": "^18",
+    "react-markdown": "^10.1.0",
     "react-multi-carousel": "^2.8.6",
-    "react-quill": "^2.0.0",
-    "react-responsive-carousel": "^3.2.23"
+    "react-responsive-carousel": "^3.2.23",
+    "rehype-katex": "^7.0.1",
+    "rehype-raw": "^7.0.0",
+    "remark-math": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
