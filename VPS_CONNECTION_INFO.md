@@ -7,7 +7,7 @@ Essential information for the Good Motor website VPS server.
 - **Host**: 103.72.96.189
 - **Port**: 24700
 - **Username**: root
-- **Password**: (*W4dd#qao8k%iwlb)%R
+- **Password**: )gOuk&fWwQZJ?F8RnTAN
 
 ## Quick Connection
 
