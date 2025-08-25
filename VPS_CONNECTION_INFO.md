@@ -7,7 +7,8 @@ Essential information for the Good Motor website VPS server.
 - **Host**: 103.72.96.189
 - **Port**: 24700
 - **Username**: root
-- **Password**: )gOuk&fWwQZJ?F8RnTAN
+- **Authentication**: 🔑 SSH Key Authentication (Ed25519)
+- **Legacy Password**: )gOuk&fWwQZJ?F8RnTAN (Disabled for security)
 
 ## Quick Connection
 
@@ -15,7 +16,7 @@ Essential information for the Good Motor website VPS server.
 ssh -p 24700 root@103.72.96.189
 ```
 
-**Note**: Passwordless SSH is set up, password may not be required.
+**Note**: ✅ SSH Key Authentication configured - No password required!
 
 ## Deployment Process
 
@@ -69,11 +70,13 @@ pm2 restart good-motor
 
 ## Server Info
 
-- **OS**: Debian GNU/Linux
+- **Hostname**: cs-linux-20250614162332977
+- **OS**: Debian GNU/Linux 6.1.0-37-cloud-amd64
 - **RAM**: 2GB
 - **Node**: v18.x
 - **Process Manager**: PM2
 - **Web Server**: Nginx
+- **Security**: 🔒 SSH Key Authentication + Non-standard port (24700)
 
 ## Application Management
 
@@ -107,12 +110,15 @@ pm2 logs good-motor --lines 50
 ## Server Specifications
 
 - **Operating System**: Debian GNU/Linux 6.1.0-37-cloud-amd64
+- **Hostname**: cs-linux-20250614162332977
 - **RAM**: 2GB
 - **Disk Space**: 20GB
 - **Web Server**: Nginx (serving as reverse proxy)
 - **Node Version**: 18.x
 - **Process Manager**: PM2 (running in cluster mode)
 - **Database**: MongoDB Atlas (cloud-hosted)
+- **SSH Authentication**: Ed25519 Key (Password auth disabled)
+- **SSH Key Location**: `~/.ssh/id_ed25519`
 
 ## Troubleshooting
 
