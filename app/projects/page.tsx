@@ -45,16 +45,19 @@ interface Project {
     name: string
     url: string
   }>
-  images: string[]
+  images: Array<{
+    url: string
+    alt?: string
+    caption?: string
+    isPrimary?: boolean
+  }>
   specifications: {
     flowRate?: string
     vacuumLevel?: string
     power?: string
     quantity?: string
   }
-  challenges: string
   solutions: string
-  results: string
   featured: boolean
   status: 'completed' | 'ongoing' | 'planned'
 }
@@ -176,8 +179,8 @@ export default function ProjectsPage() {
                   <div className="relative">
                     {project.images && project.images.length > 0 && (
                       <Image
-                        src={project.images[0]}
-                        alt={project.title}
+                        src={project.images[0].url}
+                        alt={project.images[0].alt || project.title}
                         width={600}
                         height={300}
                         className="w-full h-64 object-cover"
@@ -275,29 +278,15 @@ export default function ProjectsPage() {
                       </div>
                     )}
 
-                    {/* Results */}
+                    {/* View Details Button */}
                     <div className="border-t pt-4 mt-auto">
-                      <div className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <h4 className="font-semibold text-gray-800 mb-1">Results Achieved:</h4>
-                          <div 
-                            className="text-sm text-gray-600 line-clamp-3"
-                            dangerouslySetInnerHTML={{ __html: project.results }}
-                          />
-                        </div>
-                      </div>
-                      
-                      {/* View Details Button */}
-                      <div className="mt-4 pt-4 border-t">
-                        <Link 
-                          href={`/projects/${project.slug}`}
-                          className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group"
-                        >
-                          View Project Details
-                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                      </div>
+                      <Link 
+                        href={`/projects/${project.slug}`}
+                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group"
+                      >
+                        View Project Details
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </Link>
                     </div>
                   </div>
                 </div>

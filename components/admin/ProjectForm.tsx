@@ -35,9 +35,7 @@ interface Project {
     power?: string
     quantity?: string
   }
-  challenges: string
   solutions: string
-  results: string
   featured: boolean
   status: 'completed' | 'ongoing' | 'planned'
 }
@@ -78,9 +76,7 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
       power: '',
       quantity: ''
     },
-    challenges: '',
     solutions: '',
-    results: '',
     featured: false,
     status: 'completed'
   })
@@ -112,9 +108,7 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
           return { ...img }
         }),
         specifications: { ...project.specifications },
-        challenges: project.challenges,
         solutions: project.solutions,
-        results: project.results,
         featured: project.featured,
         status: project.status
       })
@@ -303,14 +297,8 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
     if (!formData.completionDate.trim()) {
       errors.completionDate = 'Completion date is required'
     }
-    if (!formData.challenges.trim()) {
-      errors.challenges = 'Project challenges description is required'
-    }
     if (!formData.solutions.trim()) {
       errors.solutions = 'Solutions description is required'
-    }
-    if (!formData.results.trim()) {
-      errors.results = 'Results description is required'
     }
     
     // Validate images
@@ -972,29 +960,6 @@ Project phases and milestones.`}
                   </div>
                 </div>
 
-                {/* Challenges */}
-                <div>
-                  <MarkdownEditor
-                    value={formData.challenges}
-                    onChange={(value) => handleRichTextChange('challenges', value || '')}
-                    {...MarkdownEditorPresets.simpleContent}
-                    label="Project Challenges"
-                    placeholder={`Describe the main challenges faced in this project...
-
-## Technical Challenges
-- Challenge 1: Description
-- Challenge 2: Description
-
-## Environmental Constraints
-- Constraint 1
-- Constraint 2
-
-## Budget/Timeline Limitations
-Description of any budget or timeline constraints encountered.`}
-                    error={showValidation && validationErrors.challenges ? validationErrors.challenges : undefined}
-                  />
-                </div>
-
                 {/* Solutions */}
                 <div>
                   <MarkdownEditor
@@ -1019,36 +984,6 @@ Step-by-step approach taken to address the challenges.
 - Innovation 1
 - Innovation 2`}
                     error={showValidation && validationErrors.solutions ? validationErrors.solutions : undefined}
-                  />
-                </div>
-
-                {/* Results */}
-                <div>
-                  <MarkdownEditor
-                    value={formData.results}
-                    onChange={(value) => handleRichTextChange('results', value || '')}
-                    {...MarkdownEditorPresets.simpleContent}
-                    label="Results Achieved"
-                    placeholder={`Detail the outcomes and achievements...
-
-## Performance Improvements
-- Metric 1: Before vs After results
-- Metric 2: Quantified improvements
-
-## Cost Savings
-- Direct savings: Amount and description
-- Indirect benefits: Long-term advantages
-
-## Client Satisfaction
-Description of client feedback and satisfaction levels.
-
-**Key Achievements:**
-- Achievement 1: Specific results
-- Achievement 2: Measurable outcomes
-
-## Lessons Learned
-Important insights gained from the project implementation.`}
-                    error={showValidation && validationErrors.results ? validationErrors.results : undefined}
                   />
                 </div>
 
@@ -1178,32 +1113,11 @@ Important insights gained from the project implementation.`}
                       </div>
                     )}
 
-                    {/* Challenges */}
-                    {formData.challenges && (
-                      <div className="mb-6">
-                        <h4 className="font-semibold text-gray-800 mb-3">Challenges:</h4>
-                        <ProductDescriptionDisplay content={formData.challenges} />
-                      </div>
-                    )}
-
                     {/* Solutions */}
                     {formData.solutions && (
                       <div className="mb-6">
                         <h4 className="font-semibold text-gray-800 mb-3">Solutions:</h4>
                         <ProductDescriptionDisplay content={formData.solutions} />
-                      </div>
-                    )}
-
-                    {/* Results */}
-                    {formData.results && (
-                      <div className="border-t pt-6">
-                        <div className="flex items-start gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <h4 className="font-semibold text-gray-800 mb-2">Results Achieved:</h4>
-                            <ProductDescriptionDisplay content={formData.results} />
-                          </div>
-                        </div>
                       </div>
                     )}
                   </div>

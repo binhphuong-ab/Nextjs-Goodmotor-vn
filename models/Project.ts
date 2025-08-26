@@ -29,9 +29,7 @@ export interface IProject {
     power?: string
     quantity?: string
   }
-  challenges: string
   solutions: string
-  results: string
   featured: boolean
   status: 'completed' | 'ongoing' | 'planned'
   createdAt: Date
@@ -171,19 +169,9 @@ const ProjectSchema = new Schema<IProject>({
       trim: true
     }
   },
-  challenges: {
-    type: String,
-    required: [true, 'Project challenges description is required'],
-    trim: true
-  },
   solutions: {
     type: String,
     required: [true, 'Solutions description is required'],
-    trim: true
-  },
-  results: {
-    type: String,
-    required: [true, 'Results description is required'],
     trim: true
   },
   featured: {

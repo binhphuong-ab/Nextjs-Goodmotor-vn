@@ -25,7 +25,7 @@
 
 ## Security Notes
 - ✅ **Secured**: SSH key authentication enabled
-- ❌ **Password Authentication**: Disabled for security
+- ❌ **Password Authentication**: MinatoA@87654321A
 - 🔐 **Access Level**: Root access
 - 🔑 **Key Location**: `~/.ssh/id_ed25519`
 - 📖 **Setup Guide**: See `DROPLET_DIGITALOCEAN_SSH_KEY_GUIDE.md`

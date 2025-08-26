@@ -12,9 +12,7 @@ import {
   CheckCircle, 
   Star, 
   ArrowLeft,
-  Target,
   Lightbulb,
-  Award,
   Settings
 } from 'lucide-react'
 import { ProjectDescriptionDisplay } from '@/components/MarkdownDisplay'
@@ -37,16 +35,19 @@ interface Project {
     name: string
     url: string
   }>
-  images: string[]
+  images: Array<{
+    url: string
+    alt?: string
+    caption?: string
+    isPrimary?: boolean
+  }>
   specifications: {
     flowRate?: string
     vacuumLevel?: string
     power?: string
     quantity?: string
   }
-  challenges: string
   solutions: string
-  results: string
   featured: boolean
   status: 'completed' | 'ongoing' | 'planned'
   createdAt: string
@@ -74,6 +75,14 @@ export default function ProjectDetailPage() {
       if (response.ok) {
         const projectData = await response.json()
         setProject(projectData)
+        
+        // Set the primary image as the initial image, if available
+        if (projectData.images && projectData.images.length > 0) {
+          const primaryImageIndex = projectData.images.findIndex((img: any) => img.isPrimary)
+          if (primaryImageIndex !== -1) {
+            setCurrentImageIndex(primaryImageIndex)
+          }
+        }
       } else if (response.status === 404) {
         router.push('/projects')
       } else {
@@ -203,8 +212,8 @@ export default function ProjectDetailPage() {
               <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div className="relative">
                   <Image
-                    src={project.images[currentImageIndex]}
-                    alt={`${project.title} - Image ${currentImageIndex + 1}`}
+                    src={project.images[currentImageIndex].url}
+                    alt={project.images[currentImageIndex].alt || `${project.title} - Image ${currentImageIndex + 1}`}
                     width={800}
                     height={400}
                     className="w-full h-64 lg:h-96 object-cover"
@@ -222,6 +231,12 @@ export default function ProjectDetailPage() {
                       ))}
                     </div>
                   )}
+                  {/* Image Caption */}
+                  {project.images[currentImageIndex].caption && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-3">
+                      <p className="text-sm">{project.images[currentImageIndex].caption}</p>
+                    </div>
+                  )}
                 </div>
                 {project.images.length > 1 && (
                   <div className="p-4 bg-gray-50 flex gap-2 overflow-x-auto">
@@ -229,17 +244,22 @@ export default function ProjectDetailPage() {
                       <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
-                        className={`flex-shrink-0 border-2 rounded-lg overflow-hidden transition-colors ${
+                        className={`relative flex-shrink-0 border-2 rounded-lg overflow-hidden transition-colors ${
                           index === currentImageIndex ? 'border-blue-500' : 'border-gray-200'
                         }`}
                       >
                         <Image
-                          src={image}
-                          alt={`Thumbnail ${index + 1}`}
+                          src={image.url}
+                          alt={image.alt || `Thumbnail ${index + 1}`}
                           width={80}
                           height={60}
                           className="w-20 h-15 object-cover"
                         />
+                        {image.isPrimary && (
+                          <div className="absolute top-1 right-1 bg-yellow-500 text-white text-xs px-1 py-0.5 rounded">
+                            <Star className="w-3 h-3" />
+                          </div>
+                        )}
                       </button>
                     ))}
                   </div>
@@ -253,34 +273,13 @@ export default function ProjectDetailPage() {
               <ProjectDescriptionDisplay content={project.description} />
             </div>
 
-            {/* Challenges, Solutions, Results */}
-            <div className="space-y-6">
-              {/* Challenges */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <Target className="w-6 h-6 text-red-500" />
-                  <h2 className="text-2xl font-bold text-gray-900">Challenges</h2>
-                </div>
-                <ProjectDescriptionDisplay content={project.challenges} />
+            {/* Solutions */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Lightbulb className="w-6 h-6 text-yellow-500" />
+                <h2 className="text-2xl font-bold text-gray-900">Solutions</h2>
               </div>
-
-              {/* Solutions */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <Lightbulb className="w-6 h-6 text-yellow-500" />
-                  <h2 className="text-2xl font-bold text-gray-900">Solutions</h2>
-                </div>
-                <ProjectDescriptionDisplay content={project.solutions} />
-              </div>
-
-              {/* Results */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <Award className="w-6 h-6 text-green-500" />
-                  <h2 className="text-2xl font-bold text-gray-900">Results Achieved</h2>
-                </div>
-                <ProjectDescriptionDisplay content={project.results} />
-              </div>
+              <ProjectDescriptionDisplay content={project.solutions} />
             </div>
           </div>
 

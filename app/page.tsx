@@ -61,7 +61,7 @@ export default function HomePage() {
     {
       name: 'Pharmaceutical Processing',
       description: 'FDA-compliant vacuum solutions for sterile manufacturing',
-      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=600&h=400&fit=crop',
+      image: '/images/database/products/Busch-RD-0240-A.png',
       specs: ['FDA Validated', 'Sterile Design', 'cGMP Compliant'],
       industry: 'Pharmaceutical'
     },
