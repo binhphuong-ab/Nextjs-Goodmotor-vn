@@ -9,6 +9,11 @@ export async function GET() {
   try {
     await connectToDatabase()
     
+    // Ensure models are registered for population
+    // This fixes the MissingSchemaError by forcing model registration
+    Brand.modelName // Access Brand model to ensure it's registered
+    PumpType.modelName // Access PumpType model to ensure it's registered
+    
     // First try to get products with brand and pumpType population
     let products
     try {
