@@ -1,5 +1,24 @@
 import { Schema, model, models, Types } from 'mongoose'
 
+// Interface for populated brand
+export interface IPopulatedBrand {
+  _id: string
+  name: string
+  description?: string
+  productLines?: Array<{
+    _id: string
+    name: string
+  }>
+}
+
+// Interface for populated pump type
+export interface IPopulatedPumpType {
+  _id: string
+  pumpType: string
+  description?: string
+}
+
+// Base product interface (for database operations)
 export interface IProduct {
   _id: string
   name: string
@@ -40,6 +59,13 @@ export interface IProduct {
   updatedAt: Date
 }
 
+// Interface for product with populated fields (for frontend display)
+export interface IProductPopulated extends Omit<IProduct, 'brand' | 'pumpType' | 'subPumpType'> {
+  brand?: IPopulatedBrand
+  pumpType?: IPopulatedPumpType
+  subPumpType?: IPopulatedPumpType
+}
+
 const ProductSchema = new Schema<IProduct>({
   name: {
     type: String,
@@ -77,6 +103,7 @@ const ProductSchema = new Schema<IProduct>({
   },
   subPumpType: {
     type: Schema.Types.ObjectId,
+    ref: 'PumpType', // Add reference for population
     required: false,
     validate: {
       validator: function(v: Types.ObjectId) {
