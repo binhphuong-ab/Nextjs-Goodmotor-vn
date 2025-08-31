@@ -163,10 +163,10 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
     }))
   }
 
-  const handleDescriptionChange = (content: string) => {
+  const handleDescriptionChange = (content: string | undefined) => {
     setFormData(prev => ({
       ...prev,
-      description: content
+      description: content || ''
     }))
   }
 

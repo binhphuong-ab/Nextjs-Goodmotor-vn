@@ -86,10 +86,10 @@ export default function BrandForm({ brand, onSave, onCancel, onShowNotification 
     }
   }
 
-  const handleDescriptionChange = (value: string) => {
+  const handleDescriptionChange = (value: string | undefined) => {
     setFormData(prev => ({
       ...prev,
-      description: value
+      description: value || ''
     }))
     
     // Clear error when user starts typing

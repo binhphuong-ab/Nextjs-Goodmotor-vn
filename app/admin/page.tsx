@@ -28,42 +28,26 @@ import { IBrand, IBrandInput } from '@/models/Brand'
 import { IPumpType, IPumpTypeInput } from '@/models/PumpType'
 import { IProject } from '@/models/Project'
 
-interface Project {
-  _id: string
-  title: string
-  slug: string
-  description: string
-  client: string
-  location: string
+// Using IProject from model - no local interface needed
+
+// Helper functions to convert between IProject and form data
+type ProjectFormData = Omit<IProject, 'completionDate' | 'createdAt' | 'updatedAt'> & {
+  _id?: string
   completionDate: string
-  projectType: string
-  pumpModels: Array<{
-    name: string
-    url: string
-  }>
-  applications: Array<{
-    name: string
-    url: string
-  }>
-  images: Array<{
-    url: string
-    alt?: string
-    caption?: string
-    isPrimary?: boolean
-  }>
-  specifications: {
-    flowRate?: string
-    vacuumLevel?: string
-    power?: string
-    quantity?: string
+}
+
+const convertProjectToFormData = (project: IProject): ProjectFormData => {
+  return {
+    ...project,
+    completionDate: new Date(project.completionDate).toISOString().split('T')[0]
   }
-  challenges: string
-  solutions: string
-  results: string
-  featured: boolean
-  status: 'completed' | 'ongoing' | 'planned'
-  createdAt: string
-  updatedAt: string
+}
+
+const convertFormDataToProject = (formData: Omit<ProjectFormData, '_id'>): Omit<IProject, '_id' | 'createdAt' | 'updatedAt'> => {
+  return {
+    ...formData,
+    completionDate: new Date(formData.completionDate)
+  }
 }
 
 interface LoginCredentials {
@@ -75,8 +59,8 @@ export default function AdminPage() {
   const [products, setProducts] = useState<IProduct[]>([])
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [projects, setProjects] = useState<Project[]>([])
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [projects, setProjects] = useState<IProject[]>([])
+  const [selectedProject, setSelectedProject] = useState<IProject | null>(null)
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false)
   const [customers, setCustomers] = useState<ICustomer[]>([])
   const [selectedCustomer, setSelectedCustomer] = useState<ICustomer | null>(null)
@@ -393,7 +377,7 @@ export default function AdminPage() {
     setIsProjectFormOpen(true)
   }
 
-  const handleEditProject = (project: Project) => {
+  const handleEditProject = (project: IProject) => {
     setSelectedProject(project)
     setIsProjectFormOpen(true)
   }
@@ -424,7 +408,7 @@ export default function AdminPage() {
     }
   }
 
-  const handleSaveProject = async (projectData: Omit<Project, '_id' | 'createdAt' | 'updatedAt'>) => {
+  const handleSaveProject = async (formData: Omit<ProjectFormData, '_id'>) => {
     try {
       if (selectedProject) {
         // Update existing project
@@ -433,7 +417,7 @@ export default function AdminPage() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(projectData),
+          body: JSON.stringify(convertFormDataToProject(formData)),
         })
         
         if (response.ok) {
@@ -454,7 +438,7 @@ export default function AdminPage() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(projectData),
+          body: JSON.stringify(convertFormDataToProject(formData)),
         })
         
         if (response.ok) {
@@ -1272,7 +1256,7 @@ export default function AdminPage() {
 
       {isProjectFormOpen && (
         <ProjectForm
-          project={selectedProject}
+          project={selectedProject ? convertProjectToFormData(selectedProject) : null}
           onSave={handleSaveProject}
           onCancel={() => {
             setIsProjectFormOpen(false)

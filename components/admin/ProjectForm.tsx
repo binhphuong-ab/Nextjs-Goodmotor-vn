@@ -5,44 +5,17 @@ import { Eye, Edit, CheckCircle, AlertCircle } from 'lucide-react'
 import { generateSlug, getTodayDate, validateImageUrl, getImageUrl } from '@/lib/utils'
 import MarkdownEditor, { MarkdownEditorPresets } from '@/components/MarkdownEditor'
 import { ProductDescriptionDisplay } from '@/components/MarkdownDisplay'
+import { IProject } from '@/models/Project'
 
-interface Project {
+// Form-specific type that converts Date to string for form fields
+type ProjectFormData = Omit<IProject, 'completionDate' | 'createdAt' | 'updatedAt'> & {
   _id?: string
-  title: string
-  slug: string
-  description: string
-  client: string
-  location: string
   completionDate: string
-  projectType: string
-  pumpModels: Array<{
-    name: string
-    url: string
-  }>
-  applications: Array<{
-    name: string
-    url: string
-  }>
-  images: Array<{
-    url: string
-    alt?: string
-    caption?: string
-    isPrimary?: boolean
-  }>
-  specifications: {
-    flowRate?: string
-    vacuumLevel?: string
-    power?: string
-    quantity?: string
-  }
-  solutions: string
-  featured: boolean
-  status: 'completed' | 'ongoing' | 'planned'
 }
 
 interface ProjectFormProps {
-  project?: Project | null
-  onSave: (projectData: Omit<Project, '_id' | 'createdAt' | 'updatedAt'>) => void
+  project?: ProjectFormData | null
+  onSave: (projectData: Omit<ProjectFormData, '_id'>) => void
   onCancel: () => void
   onShowNotification?: (type: 'success' | 'error' | 'info', message: string) => void
 }
@@ -59,7 +32,7 @@ export default function ProjectForm({ project, onSave, onCancel, onShowNotificat
   
 
   
-  const [formData, setFormData] = useState<Omit<Project, '_id' | 'createdAt' | 'updatedAt'>>({
+  const [formData, setFormData] = useState<Omit<ProjectFormData, '_id'>>({
     title: '',
     slug: '',
     description: '',

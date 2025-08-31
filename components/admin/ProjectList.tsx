@@ -6,62 +6,26 @@ import { Calendar, MapPin, Building, Star } from 'lucide-react'
 import { getImageUrl } from '@/lib/utils'
 import Notification from '../Notification'
 import ConfirmDialog from '../ConfirmDialog'
-
-interface Project {
-  _id: string
-  title: string
-  slug: string
-  description: string
-  client: string
-  location: string
-  completionDate: string
-  projectType: string
-  pumpModels: Array<{
-    name: string
-    url: string
-  }>
-  applications: Array<{
-    name: string
-    url: string
-  }>
-  images: Array<{
-    url: string
-    alt?: string
-    caption?: string
-    isPrimary?: boolean
-  }>
-  specifications: {
-    flowRate?: string
-    vacuumLevel?: string
-    power?: string
-    quantity?: string
-  }
-  challenges: string
-  solutions: string
-  results: string
-  featured: boolean
-  status: 'completed' | 'ongoing' | 'planned'
-  createdAt: string
-  updatedAt: string
-}
+import { IProject } from '@/models/Project'
 
 interface ProjectListProps {
-  projects: Project[]
-  onEdit: (project: Project) => void
+  projects: IProject[]
+  onEdit: (project: IProject) => void
   onDelete: (projectId: string) => void
 }
 
 export default function ProjectList({ projects, onEdit, onDelete }: ProjectListProps) {
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
-    project: Project | null
+    project: IProject | null
   }>({
     isOpen: false,
     project: null
   })
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const formatDate = (date: string | Date) => {
+    const dateObj = date instanceof Date ? date : new Date(date)
+    return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -95,7 +59,7 @@ export default function ProjectList({ projects, onEdit, onDelete }: ProjectListP
     return typeLabels[projectType as keyof typeof typeLabels] || projectType
   }
 
-  const handleDelete = (project: Project) => {
+  const handleDelete = (project: IProject) => {
     setConfirmDialog({
       isOpen: true,
       project
