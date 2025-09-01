@@ -154,7 +154,7 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
                 Industries
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Country
+                Nationality
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Projects & Models
@@ -232,7 +232,7 @@ export default function CustomerList({ customers, onEdit, onDelete, onCreate }: 
                 
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {customer.country || 'Unknown'}
+                    {customer.nationality || 'Unknown'}
                   </span>
                 </td>
                 

@@ -11,6 +11,10 @@ export async function GET() {
     await connectToDatabase()
     console.log('[API] GET customers: Database connected successfully')
     
+    // Ensure models are registered for population
+    // This fixes the MissingSchemaError by forcing model registration
+    Industry.modelName // Access Industry model to ensure it's registered
+    
     let customers
     
     try {
@@ -25,8 +29,8 @@ export async function GET() {
           website: 1,
           logo: 1,
           province: 1,
-          country: 1,
-          completeDate: 1,
+          nationality: 1,
+
           description: 1,
           projects: 1,
           pumpModelsUsed: 1,
@@ -41,7 +45,7 @@ export async function GET() {
         select: 'name slug',
         strictPopulate: false
       })
-      .sort({ featured: -1, country: -1, createdAt: -1 })
+      .sort({ featured: -1, nationality: -1, createdAt: -1 })
       
       console.log(`[API] GET customers: Found ${customers.length} customers`)
       
@@ -59,8 +63,8 @@ export async function GET() {
           website: 1,
           logo: 1,
           province: 1,
-          country: 1,
-          completeDate: 1,
+          nationality: 1,
+
           description: 1,
           projects: 1,
           pumpModelsUsed: 1,
@@ -69,7 +73,7 @@ export async function GET() {
           createdAt: 1
         }
       )
-      .sort({ featured: -1, country: -1, createdAt: -1 })
+      .sort({ featured: -1, nationality: -1, createdAt: -1 })
       
       console.log(`[API] GET customers: Found ${customers.length} customers (without population)`)
     }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Application from '@/models/Application'
+import Industry from '@/models/Industry'
 import connectToDatabase from '@/lib/mongoose'
 
 // GET /api/admin/applications/[id] - Get single application
@@ -10,6 +11,10 @@ export async function GET(
 ) {
   try {
     await connectToDatabase()
+    
+    // Ensure models are registered for population
+    // This fixes the MissingSchemaError by forcing model registration
+    Industry.modelName // Access Industry model to ensure it's registered
     
     const application = await Application.findById(params.id)
       .populate('recommendedIndustries', 'name slug')
@@ -39,6 +44,10 @@ export async function PUT(
 ) {
   try {
     await connectToDatabase()
+    
+    // Ensure models are registered for population
+    // This fixes the MissingSchemaError by forcing model registration
+    Industry.modelName // Access Industry model to ensure it's registered
     
     const body = await request.json()
     

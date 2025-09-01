@@ -9,6 +9,10 @@ export async function GET() {
     await connectToDatabase()
     console.log('[API] GET customers: Database connected successfully')
     
+    // Ensure models are registered for population
+    // This fixes the MissingSchemaError by forcing model registration
+    Industry.modelName // Access Industry model to ensure it's registered
+    
     const customers = await Customer.find({})
       .populate('industry', 'name slug')
       .sort({ createdAt: -1 })
@@ -83,6 +87,10 @@ export async function POST(request: Request) {
     await customer.save()
     
     console.log('[API] POST customers: Customer created successfully with ID:', customer._id)
+    
+    // Ensure models are registered for population
+    // This fixes the MissingSchemaError by forcing model registration
+    Industry.modelName // Access Industry model to ensure it's registered
     
     // Populate references for response
     await customer.populate([

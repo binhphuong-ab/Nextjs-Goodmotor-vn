@@ -11,6 +11,10 @@ export async function GET(request: Request, { params }: { params: { slug: string
     await connectToDatabase()
     console.log(`[API] GET customer: Fetching customer with slug ${params.slug}`)
     
+    // Ensure models are registered for population
+    // This fixes the MissingSchemaError by forcing model registration
+    Industry.modelName // Access Industry model to ensure it's registered
+    
     let customer
     
     try {

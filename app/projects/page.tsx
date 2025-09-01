@@ -219,11 +219,7 @@ export default function ProjectsPage() {
                       </div>
                     </div>
 
-                    {/* Description */}
-                    <div 
-                      className="text-gray-600 mb-4 line-clamp-2"
-                      dangerouslySetInnerHTML={{ __html: project.description.length > 150 ? project.description.substring(0, 150) + '...' : project.description }}
-                    />
+
 
                     {/* Specifications */}
                     {(project.specifications.flowRate || project.specifications.vacuumLevel || project.specifications.power) && (

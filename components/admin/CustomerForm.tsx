@@ -62,9 +62,8 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
     name: '',
     slug: '',
     businessType: BUSINESS_TYPES[0].value, // Default to first business type
-    country: COUNTRIES[0].value, // Default to Việt Nam
+    nationality: COUNTRIES[0].value, // Default to Việt Nam
     industry: [], // Optional now
-    completeDate: customer ? undefined : new Date(), // Auto-fill with today for new customers
     projects: [],
     pumpModelsUsed: [],
     applications: [],
@@ -115,13 +114,13 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
         name: customer.name,
         slug: customer.slug,
         legalName: customer.legalName,
+        address: customer.address,
         businessType: customer.businessType,
         industry: industryIds,
         website: customer.website,
         logo: customer.logo,
         province: customer.province,
-        country: customer.country,
-        completeDate: customer.completeDate,
+        nationality: customer.nationality,
         description: customer.description,
         projects: customer.projects || [],
         pumpModelsUsed: customer.pumpModelsUsed || [],
@@ -140,12 +139,6 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
         ...prev,
         name: value,
         slug: customer ? prev.slug : generateSlug(value)
-      }))
-    } else if (name === 'completeDate') {
-      // Convert date string to Date object
-      setFormData(prev => ({
-        ...prev,
-        completeDate: value ? new Date(value) : undefined
       }))
     } else {
       setFormData(prev => ({
@@ -470,6 +463,20 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address || ''}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter company address"
+                />
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Business Type */}
                 <div>
@@ -782,11 +789,11 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Country
+                    Nationality
                   </label>
                   <select
-                    name="country"
-                    value={formData.country || 'Việt Nam'}
+                    name="nationality"
+                    value={formData.nationality || 'Việt Nam'}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -799,20 +806,7 @@ export default function CustomerForm({ customer, onSave, onCancel, onShowNotific
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Complete Date
-                  </label>
-                  <input
-                    type="date"
-                    name="completeDate"
-                    value={formData.completeDate ? new Date(formData.completeDate).toISOString().split('T')[0] : ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Settings

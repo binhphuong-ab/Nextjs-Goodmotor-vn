@@ -9,6 +9,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
   try {
     await connectToDatabase()
     
+    // Ensure models are registered for population
+    // This fixes the MissingSchemaError by forcing model registration
+    Industry.modelName // Access Industry model to ensure it's registered
+    
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status') // active, inactive, etc.
     const businessType = searchParams.get('businessType')

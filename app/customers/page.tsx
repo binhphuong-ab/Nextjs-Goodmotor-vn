@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { BuildingOfficeIcon, GlobeAltIcon } from '@heroicons/react/24/outline'
 import { ICustomerPopulated } from '@/types/customer'
@@ -18,7 +18,7 @@ export default function CustomersPage() {
   const [error, setError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
   const [filterByType, setFilterByType] = useState<string>('all')
-  const [filterByCountry, setFilterByCountry] = useState<string>('all')
+  const [filterByNationality, setFilterByNationality] = useState<string>('all')
 
   useEffect(() => {
     fetchCustomers()
@@ -70,11 +70,11 @@ export default function CustomersPage() {
 
   const filteredCustomers = customers.filter(customer => {
     const typeMatch = filterByType === 'all' || customer.businessType === filterByType
-    const countryMatch = filterByCountry === 'all' || customer.country === filterByCountry
-    return typeMatch && countryMatch
+    const nationalityMatch = filterByNationality === 'all' || customer.nationality === filterByNationality
+    return typeMatch && nationalityMatch
   })
 
-  const countries = Array.from(new Set(customers.map(c => c.country)))
+  const nationalities = Array.from(new Set(customers.map(c => c.nationality)))
 
   if (loading) {
     return (
@@ -148,9 +148,9 @@ export default function CustomersPage() {
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary-300">
-                  {countries.length}
+                  {nationalities.length}
                 </div>
-                <div className="text-primary-200">Countries</div>
+                <div className="text-primary-200">Nationalities</div>
               </div>
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function CustomersPage() {
                 </div>
               </div>
 
-              {/* Country Filter */}
+              {/* Nationality Filter */}
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-green-100 rounded-lg">
@@ -229,40 +229,40 @@ export default function CustomersPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Country</h3>
-                    <p className="text-sm text-gray-600">Filter by customer location</p>
+                    <h3 className="text-lg font-semibold text-gray-900">Nationality</h3>
+                    <p className="text-sm text-gray-600">Filter by customer nationality</p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
                   <button
-                    onClick={() => setFilterByCountry('all')}
+                    onClick={() => setFilterByNationality('all')}
                     className={`px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
-                      filterByCountry === 'all'
+                      filterByNationality === 'all'
                         ? 'bg-secondary-600 text-white shadow-lg ring-2 ring-secondary-200'
                         : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400'
                     }`}
                   >
                     <div className="text-left">
-                      <div className="font-medium">All Countries</div>
+                      <div className="font-medium">All Nationalities</div>
                       <div className="text-xs opacity-75">{customers.length} customers</div>
                     </div>
                   </button>
                   
-                  {countries.map(country => (
+                  {nationalities.map(nationality => (
                     <button
-                      key={country}
-                      onClick={() => setFilterByCountry(country)}
+                      key={nationality}
+                      onClick={() => setFilterByNationality(nationality)}
                       className={`px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
-                        filterByCountry === country
+                        filterByNationality === nationality
                           ? 'bg-green-600 text-white shadow-lg ring-2 ring-green-200'
                           : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400'
                       }`}
                     >
                       <div className="text-left">
-                        <div className="font-medium">{country}</div>
+                        <div className="font-medium">{nationality}</div>
                         <div className="text-xs opacity-75">
-                          {customers.filter(c => c.country === country).length} customers
+                          {customers.filter(c => c.nationality === nationality).length} customers
                         </div>
                       </div>
                     </button>
@@ -280,8 +280,6 @@ export default function CustomersPage() {
                     Showing {filteredCustomers.length} of {customers.length} customers
                   </span>
                 </div>
-                
-
               </div>
             </div>
           </div>
@@ -301,7 +299,7 @@ export default function CustomersPage() {
               <button
                 onClick={() => {
                   setFilterByType('all')
-                  setFilterByCountry('all')
+                  setFilterByNationality('all')
                 }}
                 className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
@@ -356,7 +354,7 @@ export default function CustomersPage() {
                       {/* Status Badges */}
                       <div className="flex items-center gap-2 mb-4">
                         <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                          {customer.country}
+                          {customer.nationality}
                         </span>
                         {customer.province && (
                           <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
@@ -378,13 +376,6 @@ export default function CustomersPage() {
                             <GlobeAltIcon className="h-4 w-4 mr-2" />
                             Visit Website
                           </a>
-                        </div>
-                      )}
-
-                      {/* Complete Date */}
-                      {customer.completeDate && (
-                        <div className="text-xs text-gray-500 mb-4">
-                          <span className="font-medium">Completed:</span> {new Date(customer.completeDate).toLocaleDateString()}
                         </div>
                       )}
                     </div>
@@ -445,4 +436,4 @@ export default function CustomersPage() {
       </div>
     </div>
   )
-} 
+}

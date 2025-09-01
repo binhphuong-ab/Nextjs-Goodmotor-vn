@@ -5,6 +5,7 @@ export interface ICustomer {
   name: string
   slug: string
   legalName?: string
+  address?: string
   businessType: 'Machinary service' | 'Nhà chế tạo máy' | 'Nhà máy Việt Nam' | 'Nhà máy nước ngoài' | 'Xưởng sản xuất'
   industry?: string[] // Array of Industry IDs (optional now)
   website?: string
@@ -20,8 +21,7 @@ export interface ICustomer {
   
   // Customer Relationship
   province?: 'TP Ho Chi Minh' | 'TP Hà Nội' | 'TP Đà Nẵng' | 'TP Huế' | 'Quảng Ninh' | 'Cao Bằng' | 'Lạng Sơn' | 'Lai Châu' | 'Điện Biên' | 'Sơn La' | 'Thanh Hóa' | 'Nghệ An' | 'Hà Tĩnh' | 'Tuyên Quang' | 'Lào Cai' | 'Thái Nguyên' | 'Phú Thọ' | 'Bắc Ninh' | 'Hưng Yên' | 'TP Hải Phòng' | 'Ninh Bình' | 'Quảng Trị' | 'Quảng Ngãi' | 'Gia Lai' | 'Khánh Hòa' | 'Lâm Đồng' | 'Đắk Lắk' | 'Đồng Nai' | 'Tây Ninh' | 'TP Cần Thơ' | 'Vĩnh Long' | 'Đồng Tháp' | 'Cà Mau' | 'An Giang'
-  country: 'Việt Nam' | 'Nhật Bản' | 'Hàn Quốc' | 'Trung Quốc' | 'Đài Loan' | 'Mỹ' | 'EU' | 'Thái Lan' | 'Other'
-  completeDate?: Date
+  nationality: 'Việt Nam' | 'Nhật Bản' | 'Hàn Quốc' | 'Trung Quốc' | 'Đài Loan' | 'Mỹ' | 'EU' | 'Thái Lan' | 'Other'
   
   // Description
   description?: string
@@ -56,6 +56,11 @@ const CustomerSchema = new Schema<ICustomer>({
     type: String,
     trim: true,
     maxlength: [300, 'Legal name cannot exceed 300 characters']
+  },
+  address: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Address cannot exceed 500 characters']
   },
   businessType: {
     type: String,
@@ -168,9 +173,9 @@ const CustomerSchema = new Schema<ICustomer>({
     ],
     default: 'TP Ho Chi Minh'
   },
-  country: {
+  nationality: {
     type: String,
-    required: [true, 'Country is required'],
+    required: [true, 'Nationality is required'],
     enum: [
       'Việt Nam',
       'Nhật Bản', 
@@ -184,9 +189,7 @@ const CustomerSchema = new Schema<ICustomer>({
     ],
     default: 'Việt Nam'
   },
-  completeDate: {
-    type: Date
-  },
+
   
   // Description - Markdown content from MarkdownEditor
   description: {
@@ -272,30 +275,30 @@ const CustomerSchema = new Schema<ICustomer>({
 // Essential single-field indexes for filtering and sorting
 CustomerSchema.index({ businessType: 1 })     // Used in frontend filtering
 CustomerSchema.index({ province: 1 })         // Used in admin queries and counts
-CustomerSchema.index({ country: 1 })         // Used in frontend filtering and counts
+CustomerSchema.index({ nationality: 1 })     // Used in frontend filtering and counts
 CustomerSchema.index({ featured: 1 })         // Used for featured customer queries
 CustomerSchema.index({ industry: 1 })         // Industry references (array field)
 CustomerSchema.index({ createdAt: -1 })       // Admin list sorting
 
 // Compound indexes for actual query patterns
-CustomerSchema.index({ featured: -1, country: -1, createdAt: -1 }) // Main public page sort pattern
-CustomerSchema.index({ businessType: 1, country: 1 }) // Frontend business type + country filtering
+CustomerSchema.index({ featured: -1, nationality: -1, createdAt: -1 }) // Main public page sort pattern
+CustomerSchema.index({ businessType: 1, nationality: 1 }) // Frontend business type + nationality filtering
 
 // Sparse indexes for optional fields (only indexes documents that have these fields)
-CustomerSchema.index({ completeDate: -1 }, { sparse: true }) // Optional date sorting
+// Removed completeDate index as field has been removed
 
 // Input interface for creating/updating customers
 export interface ICustomerInput {
   name: string
   slug: string
   legalName?: string
+  address?: string
   businessType: ICustomer['businessType']
   industry?: string[]
   website?: string
   logo?: string
   province?: ICustomer['province']
-  country?: ICustomer['country']
-  completeDate?: Date
+  nationality?: ICustomer['nationality']
   description?: string
   projects?: { name: string; url?: string }[]
   pumpModelsUsed?: { name: string; url?: string }[]
