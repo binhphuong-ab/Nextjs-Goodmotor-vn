@@ -84,10 +84,101 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Đang tải thông tin sản phẩm...</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+        {/* Breadcrumb Navigation Skeleton */}
+        <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
+          <div className="container-custom py-4">
+            <nav className="flex items-center space-x-2 text-sm text-gray-600">
+              <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
+              <ChevronRight className="w-4 h-4 text-gray-300" />
+              <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
+              <ChevronRight className="w-4 h-4 text-gray-300" />
+              <div className="w-32 h-4 bg-gray-200 rounded animate-pulse"></div>
+            </nav>
+          </div>
+        </div>
+
+        <div className="container-custom py-8">
+          {/* Back Button Skeleton */}
+          <div className="flex items-center mb-8">
+            <ArrowLeft className="w-5 h-5 mr-2 text-gray-300" />
+            <div className="w-48 h-5 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+
+          {/* Main Product Layout Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
+            {/* Left Column - Product Images Skeleton */}
+            <div className="space-y-6">
+              {/* Main Image Skeleton */}
+              <div className="relative aspect-square bg-gray-200 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-200 animate-pulse">
+                <div className="absolute inset-0 bg-gray-300"></div>
+              </div>
+              
+              {/* Image Thumbnails Skeleton */}
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {[1, 2, 3, 4].map((index) => (
+                  <div
+                    key={index}
+                    className="relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 border-gray-200 bg-gray-200 animate-pulse"
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column - Product Details Skeleton */}
+            <div className="space-y-8">
+              {/* Product Header Skeleton */}
+              <div className="space-y-4">
+                {/* Product Title */}
+                <div className="space-y-3">
+                  <div className="w-3/4 h-12 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="w-1/2 h-8 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                
+                {/* Product Badges Skeleton */}
+                <div className="flex flex-wrap gap-3">
+                  {[1, 2, 3].map((index) => (
+                    <div
+                      key={index}
+                      className="w-24 h-8 bg-gray-200 rounded-full animate-pulse"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Section Skeleton */}
+              <div className="bg-gradient-to-r from-gray-100 to-gray-100 rounded-2xl p-6 border border-gray-200">
+                <div className="w-48 h-10 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div className="w-64 h-4 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+
+              {/* Action Buttons Skeleton */}
+              <div className="space-y-4">
+                <div className="w-full h-14 bg-gray-200 rounded-xl animate-pulse"></div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="h-12 bg-gray-200 rounded-xl animate-pulse"></div>
+                  <div className="h-12 bg-gray-200 rounded-xl animate-pulse"></div>
+                </div>
+              </div>
+
+              {/* Quick Specifications Skeleton */}
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <Info className="w-5 h-5 mr-2 text-gray-300" />
+                  <div className="w-32 h-6 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                <div className="space-y-4">
+                  {[1, 2, 3].map((index) => (
+                    <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <div className="w-24 h-4 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="w-32 h-4 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -172,6 +263,7 @@ export default function ProductDetailPage() {
                 src={productImages[selectedImage]}
                 alt={getSelectedImageAlt(product, selectedImage)}
                 fill
+                quality={100} // High quality for crisp main product image display
                 className="object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement
