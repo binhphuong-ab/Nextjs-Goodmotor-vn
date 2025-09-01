@@ -28,6 +28,7 @@ export async function GET() {
           industry: 1,
           website: 1,
           logo: 1,
+          images: 1,
           province: 1,
           nationality: 1,
 
@@ -62,6 +63,7 @@ export async function GET() {
           industry: 1,
           website: 1,
           logo: 1,
+          images: 1,
           province: 1,
           nationality: 1,
 

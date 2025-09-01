@@ -315,6 +315,39 @@ export default function CustomersPage() {
                   className="group"
                 >
                   <div className="relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-primary-200 transform hover:-translate-y-1">
+                    {/* Customer Images Banner */}
+                    {customer.images && customer.images.length > 0 && (
+                      <div className="relative h-48 overflow-hidden">
+                        {(() => {
+                          // Find primary image or use first image
+                          const primaryImage = customer.images.find(img => img.isPrimary) || customer.images[0]
+                          return (
+                            <img
+                              src={primaryImage.url}
+                              alt={primaryImage.alt || `${customer.name} image`}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none'
+                              }}
+                            />
+                          )
+                        })()}
+                        
+                        {/* Image Count Indicator */}
+                        {customer.images.length > 1 && (
+                          <div className="absolute top-3 right-3 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                            </svg>
+                            {customer.images.length}
+                          </div>
+                        )}
+                        
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+                      </div>
+                    )}
+
                     {/* Customer Header */}
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">

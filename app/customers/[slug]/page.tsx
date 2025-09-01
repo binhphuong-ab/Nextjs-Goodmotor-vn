@@ -132,9 +132,12 @@ export default function CustomerDetailPage() {
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-6">
               {customer.logo ? (
-                <img
+                <Image
                   src={customer.logo}
                   alt={`${customer.name} logo`}
+                  width={80}
+                  height={80}
+                  quality={100}
                   className="h-20 w-20 rounded-xl object-cover border border-gray-200"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none'
@@ -148,9 +151,7 @@ export default function CustomerDetailPage() {
               
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">{customer.name}</h1>
-                {customer.legalName && customer.legalName !== customer.name && (
-                  <p className="text-lg text-gray-600 mt-1">Legal Name: {customer.legalName}</p>
-                )}
+
                 {customer.address && (
                   <p className="text-lg text-gray-600 mt-1 flex items-center">
                     <MapPinIcon className="h-5 w-5 mr-2 text-gray-500" />
@@ -215,6 +216,7 @@ export default function CustomerDetailPage() {
                     alt={customer.images[currentImageIndex].alt || `${customer.name} - Image ${currentImageIndex + 1}`}
                     width={800}
                     height={400}
+                    quality={100}
                     className="w-full h-64 lg:h-96 object-cover"
                   />
                   {customer.images.length > 1 && (
@@ -252,6 +254,7 @@ export default function CustomerDetailPage() {
                           alt={image.alt || `Thumbnail ${index + 1}`}
                           width={80}
                           height={60}
+                          quality={75}
                           className="w-20 h-15 object-cover"
                         />
                         {image.isPrimary && (
@@ -429,23 +432,7 @@ export default function CustomerDetailPage() {
                   <span className="text-sm text-gray-900">{customer.businessType}</span>
                 </div>
                 
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Created</span>
-                  <span className="text-sm text-gray-900">
-                    {new Date(customer.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Featured</span>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    customer.featured 
-                      ? 'bg-blue-100 text-blue-800' 
-                      : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    {customer.featured ? '⭐ Yes' : 'No'}
-                  </span>
-                </div>
+
               </div>
             </div>
             
