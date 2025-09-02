@@ -141,7 +141,7 @@ export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+      <section className="bg-gradient-to-br from-primary-900 via-primary-800 to-secondary-900 text-white py-20">
         <div className="container-custom">
           <div className="text-center">
             <h1 className="text-4xl lg:text-5xl font-bold mb-6">

@@ -20,9 +20,9 @@ export default function Footer() {
               Trusted by professionals worldwide for quality, reliability, and innovation.
             </p>
             <div className="text-secondary-300">
-              <p>📧 info@goodmotor.com</p>
-              <p>📞 +1 (555) 123-4567</p>
-              <p>📍 123 Industrial Ave, Tech City, TC 12345</p>
+              <p>📧 project@goodmotor.vn</p>
+              <p>📞 0969.653.861</p>
+              <p>📍 4 Liên Khu 1-6, Bình Trị Đông, Bình Tân, Thành Phố Hồ Chí Minh, Việt Nam</p>
             </div>
           </div>
 
@@ -52,7 +52,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-secondary-700 mt-12 pt-8 text-center">
           <p className="text-secondary-300">
-            © {currentYear} Good Motor. All rights reserved. | Built with Next.js & MongoDB
+            © {currentYear} Good Motor. All rights reserved.
           </p>
         </div>
       </div>

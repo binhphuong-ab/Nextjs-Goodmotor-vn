@@ -978,48 +978,51 @@ Specific requirements for vacuum conditions and processing.
                         Recommended Industries *
                       </label>
                       <div className="space-y-2">
-                        {formData.recommendedIndustries.map((industryId, index) => (
-                          <div key={index} className="flex items-center space-x-2">
-                            <select
-                              value={industryId}
-                              onChange={(e) => {
-                                const newArray = [...formData.recommendedIndustries]
-                                newArray[index] = e.target.value
-                                updateArrayField('recommendedIndustries', newArray)
-                              }}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                              <option value="">Select industry</option>
-                              {industries.map(industry => (
-                                <option key={industry._id} value={industry._id}>
-                                  {industry.name}
-                                </option>
-                              ))}
-                            </select>
-                            {formData.recommendedIndustries.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const newArray = formData.recommendedIndustries.filter((_, i) => i !== index)
-                                  updateArrayField('recommendedIndustries', newArray)
-                                }}
-                                className="px-3 py-2 text-red-600 border border-red-300 rounded-md hover:bg-red-50"
+                        <div className="relative">
+                          <select
+                            multiple
+                            value={formData.recommendedIndustries}
+                            onChange={(e) => {
+                              const selectedOptions = Array.from(e.target.selectedOptions, option => option.value)
+                              updateArrayField('recommendedIndustries', selectedOptions)
+                            }}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[120px] transition-colors duration-200 hover:border-gray-400"
+                            size={5}
+                          >
+                            {industries.map(industry => (
+                              <option 
+                                key={industry._id} 
+                                value={industry._id}
+                                className="py-2 px-2 hover:bg-blue-50 cursor-pointer"
                               >
-                                Remove
-                              </button>
+                                {industry.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="flex items-start space-x-2 text-xs text-gray-500">
+                          <svg className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <div>
+                            <div>Hold Ctrl (Cmd on Mac) to select multiple industries</div>
+                            {formData.recommendedIndustries && formData.recommendedIndustries.length > 0 && (
+                              <div className="mt-1 text-blue-600 font-medium">
+                                {formData.recommendedIndustries.length} industry{formData.recommendedIndustries.length > 1 ? 'ies' : 'y'} selected:
+                                <div className="mt-1 flex flex-wrap gap-1">
+                                  {formData.recommendedIndustries.map(industryId => {
+                                    const industry = industries.find(i => i._id === industryId)
+                                    return industry ? (
+                                      <span key={industryId} className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">
+                                        {industry.name}
+                                      </span>
+                                    ) : null
+                                  })}
+                                </div>
+                              </div>
                             )}
                           </div>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newArray = [...formData.recommendedIndustries, '']
-                            updateArrayField('recommendedIndustries', newArray)
-                          }}
-                          className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
-                        >
-                          Add Industry
-                        </button>
+                        </div>
                       </div>
                     </div>
                     
