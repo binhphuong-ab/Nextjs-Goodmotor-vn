@@ -30,6 +30,7 @@
 import { NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Application from '@/models/Application'
+import Industry from '@/models/Industry' // Import Industry model to register schema
 import connectToDatabase from '@/lib/mongoose'
 
 /**
@@ -61,6 +62,10 @@ export async function GET() {
   try {
     // Establish database connection
     await connectToDatabase()
+    
+    // Ensure models are registered for population
+    // This fixes the MissingSchemaError by forcing model registration
+    Industry.modelName // Access Industry model to ensure it's registered
     
     // Query for active applications only (public portfolio)
     // This data will be consumed by /app/applications/page.tsx

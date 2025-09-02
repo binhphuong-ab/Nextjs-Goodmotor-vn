@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import mongoose from 'mongoose'
 import Application from '@/models/Application'
+import Industry from '@/models/Industry' // Import Industry model to register schema
 import connectToDatabase from '@/lib/mongoose'
 
 // GET /api/applications/[slug] - Get application by slug
@@ -10,6 +11,10 @@ export async function GET(
 ) {
   try {
     await connectToDatabase()
+    
+    // Ensure models are registered for population
+    // This fixes the MissingSchemaError by forcing model registration
+    Industry.modelName // Access Industry model to ensure it's registered
     
     const { slug } = params
     
