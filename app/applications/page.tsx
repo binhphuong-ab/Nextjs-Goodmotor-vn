@@ -80,9 +80,9 @@ interface Application {
     url?: string
   }>
   
-  // Benefits and challenges
-  benefits: string[]
-  challenges?: string[]
+  // Authors and case studies
+  authors: string
+  caseStudies?: string
   
   // Media and resources
   images?: Array<{
@@ -362,17 +362,15 @@ export default function ApplicationsPage() {
                       </div>
                     )}
 
-                    {/* Benefits Preview */}
-                    {application.benefits && application.benefits.length > 0 && (
+                    {/* Authors Preview */}
+                    {application.authors && application.authors.trim() && (
                       <div className="mb-4">
-                        <h4 className="font-semibold text-gray-800 mb-2 text-sm">Key Benefits:</h4>
-                        <div className="space-y-1">
-                          {application.benefits.slice(0, 2).map((benefit, index) => (
-                            <div key={index} className="flex items-start gap-2 text-xs text-gray-600">
-                              <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
-                              <span className="line-clamp-1">{benefit}</span>
-                            </div>
-                          ))}
+                        <h4 className="font-semibold text-gray-800 mb-2 text-sm">Authors:</h4>
+                        <div className="text-xs text-gray-600">
+                          <div className="line-clamp-2">
+                            {application.authors.replace(/[#*`]/g, '').substring(0, 100)}
+                            {application.authors.length > 100 && '...'}
+                          </div>
                         </div>
                       </div>
                     )}

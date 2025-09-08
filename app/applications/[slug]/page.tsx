@@ -61,9 +61,9 @@ interface Application {
     url?: string
   }>
   
-  // Benefits and challenges
-  benefits: string[]
-  challenges?: string[]
+  // Authors and case studies
+  authors: string
+  caseStudies?: string
   
   // Media and resources
   images?: Array<{
@@ -296,38 +296,28 @@ export default function ApplicationDetailPage() {
               <ProductDescriptionDisplay content={application.description} />
             </div>
 
-            {/* Benefits */}
-            {application.benefits && application.benefits.length > 0 && (
+            {/* Authors */}
+            {application.authors && application.authors.trim() && (
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <CheckCircle className="w-6 h-6 text-green-500" />
-                  <h2 className="text-2xl font-bold text-gray-900">Key Benefits</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">Authors</h2>
                 </div>
-                <div className="space-y-4">
-                  {application.benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <div className="text-gray-700 whitespace-pre-wrap">{benefit}</div>
-                    </div>
-                  ))}
+                <div className="text-gray-700">
+                  <ProductDescriptionDisplay content={application.authors} />
                 </div>
               </div>
             )}
 
-            {/* Challenges */}
-            {application.challenges && application.challenges.length > 0 && (
+            {/* Case Studies */}
+            {application.caseStudies && application.caseStudies.trim() && (
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <AlertCircle className="w-6 h-6 text-yellow-500" />
-                  <h2 className="text-2xl font-bold text-gray-900">Considerations & Challenges</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">Case Studies</h2>
                 </div>
-                <div className="space-y-4">
-                  {application.challenges.map((challenge, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
-                      <div className="text-gray-700 whitespace-pre-wrap">{challenge}</div>
-                    </div>
-                  ))}
+                <div className="text-gray-700">
+                  <ProductDescriptionDisplay content={application.caseStudies} />
                 </div>
               </div>
             )}

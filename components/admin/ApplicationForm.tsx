@@ -323,8 +323,8 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
     recommendedIndustries: [],
     products: [{ name: '', url: '' }],
     projects: [{ name: '', url: '' }],
-    benefits: [''],
-    challenges: [''],
+    authors: '',
+    caseStudies: '',
     images: [],
     downloadDocuments: [],
     keywords: [''],
@@ -419,8 +419,8 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
         ) || [],
         products: application.products || [{ name: '', url: '' }],
         projects: application.projects || [{ name: '', url: '' }],
-        benefits: application.benefits.length > 0 ? application.benefits : [''],
-        challenges: application.challenges || [''],
+        authors: application.authors || '',
+        caseStudies: application.caseStudies || '',
         images: application.images || [],
         downloadDocuments: application.downloadDocuments || [],
         keywords: application.keywords || [''],
@@ -466,8 +466,8 @@ export default function ApplicationForm({ application, onSave, onCancel, onShowN
     
     const cleanedData = {
       ...formData,
-      benefits: formData.benefits.filter(item => item.trim() !== ''),
-      challenges: formData.challenges?.filter(item => item.trim() !== '') || [],
+      authors: formData.authors?.trim() || '',
+      caseStudies: formData.caseStudies?.trim() || '',
       keywords: formData.keywords?.filter(item => item.trim() !== '') || [],
       products: formData.products?.filter(item => item.name.trim() !== '') || [],
       projects: formData.projects?.filter(item => item.name.trim() !== '') || []
@@ -650,6 +650,80 @@ Specific requirements for vacuum conditions and processing.
 - Reduced processing time
 - Energy efficiency`}
                         required={true}
+                      />
+                    </div>
+
+                    <div>
+                      <MarkdownEditor
+                        value={formData.authors}
+                        onChange={(value) => updateField('authors', value || '')}
+                        {...MarkdownEditorPresets.technicalDocs}
+                        label="Authors"
+                        placeholder={`Enter information about the authors...
+
+## Author Information
+List the main contributors and authors for this application.
+
+**Authors:**
+- **Dr. John Smith** - Lead Researcher, XYZ University
+  - PhD in Vacuum Technology
+  - 15+ years experience in industrial applications
+- **Jane Doe, P.E.** - Senior Engineer, ABC Corp
+  - Professional Engineer specialization in vacuum systems
+  - Project lead for multiple successful implementations
+
+## Contributions
+Briefly describe their key contributions or roles in the application development.`}
+                        required={false}
+                      />
+                    </div>
+
+                    <div>
+                      <MarkdownEditor
+                        value={formData.caseStudies || ''}
+                        onChange={(value) => updateField('caseStudies', value || '')}
+                        {...MarkdownEditorPresets.technicalDocs}
+                        label="Case Studies"
+                        placeholder={`Enter detailed case studies and applications...
+
+## Case Study 1: Industrial Freeze Drying Application
+
+### Background
+Brief overview of the application and client requirements.
+
+### Challenge
+- Problem statement
+- Technical requirements
+- Constraints faced
+
+### Solution
+- Vacuum pump configuration used
+- Technical specifications
+- Implementation approach
+
+### Results
+- Performance metrics achieved
+- **Pressure Range:** 10^-3 to 10^-6 mbar
+- **Efficiency:** 99.5% uptime
+- Client satisfaction and feedback
+
+---
+
+## Case Study 2: Research Laboratory Application
+
+### Background
+Description of the research application and objectives.
+
+### Implementation Details
+- System configuration
+- Technical challenges overcome
+- Timeline and phases
+
+### Outcomes
+- Research results enabled
+- Performance data
+- Future applications`}
+                        required={false}
                       />
                     </div>
 
@@ -1048,19 +1122,6 @@ Specific requirements for vacuum conditions and processing.
                       }}
                     />
 
-                    <SimpleTextArrayInput
-                      label="Benefits"
-                      value={formData.benefits}
-                      onChange={(newArray: string[]) => updateArrayField('benefits', newArray)}
-                      placeholder="e.g., improved product quality, reduced contamination..."
-                    />
-
-                    <SimpleTextArrayInput
-                      label="Challenges"
-                      value={formData.challenges || ['']}
-                      onChange={(newArray: string[]) => updateArrayField('challenges', newArray)}
-                      placeholder="e.g., high initial cost, maintenance requirements..."
-                    />
                   </div>
                 </div>
 
@@ -1305,16 +1366,12 @@ Specific requirements for vacuum conditions and processing.
                     )}
                   </div>
 
-                  {/* Benefits */}
-                  {formData.benefits?.filter(b => b.trim()).length > 0 && (
+                  {/* Authors */}
+                  {formData.authors?.trim() && (
                     <div className="mb-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Key Benefits</h3>
-                      <div className="space-y-3">
-                        {formData.benefits.filter(b => b.trim()).map((benefit, index) => (
-                          <div key={index} className="text-gray-600 whitespace-pre-wrap">
-                            {benefit}
-                          </div>
-                        ))}
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Authors</h3>
+                      <div className="text-gray-600">
+                        <ProductDescriptionDisplay content={formData.authors} />
                       </div>
                     </div>
                   )}

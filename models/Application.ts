@@ -34,9 +34,9 @@ export interface IApplication {
     url?: string
   }[]
   
-  // Benefits and challenges
-  benefits: string[]              // Key advantages of vacuum technology for this application
-  challenges?: string[]           // Common challenges or considerations
+  // Authors and case studies
+  authors: string              // Key authors of vacuum technology for this application (markdown)
+  caseStudies?: string           // Common case studies or considerations (markdown)
   
   // Media and resources
   images?: {
@@ -176,16 +176,16 @@ const ApplicationSchema = new Schema<IApplication>({
     }
   }],
   
-  // Benefits and challenges
-  benefits: [{
+  // Authors and case studies
+  authors: {
     type: String,
     required: true,
     trim: true
-  }],
-  challenges: [{
+  },
+  caseStudies: {
     type: String,
     trim: true
-  }],
+  },
   
   // Media and resources
   images: [{
@@ -285,8 +285,8 @@ export interface IApplicationInput {
   recommendedIndustries: string[] // Array of Industry ObjectId strings
   products?: IApplication['products']
   projects?: IApplication['projects']
-  benefits: string[]
-  challenges?: string[]
+  authors: string
+  caseStudies?: string
   images?: IApplication['images']
   downloadDocuments?: IApplication['downloadDocuments']
   keywords?: string[]
